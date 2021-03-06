@@ -56,7 +56,7 @@ class Receipt():
         potential_date_string = line.split("\t")[1]
 
         # To exclude only time like 1:42 pm
-        if "pm" in potential_date_string or "am" in potential_date_string:
+        if "pm" in potential_date_string.lower() or "am" in potential_date_string.lower():
             return False
 
         try:
@@ -120,6 +120,12 @@ def call_ocrspace(image_64):
     data = {"base64Image": image_64, "isTable": True, "OCREngine": "2"}
     response = requests.post(url, data, headers=headers)
     return response
+
+def convert_image_to_base64(filepath):
+    image = "filepath"
+    image_64 = base64.b64encode(open(image, "rb").read()).decode("utf-8")
+
+    return "data:image/jpg;base64," + image_64
 
 
 # NOTE: For sample response
