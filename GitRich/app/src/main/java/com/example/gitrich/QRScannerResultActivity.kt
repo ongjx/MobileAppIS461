@@ -9,6 +9,7 @@ import android.widget.TextView
 import android.widget.Toast
 import com.github.barteksc.pdfviewer.PDFView
 import com.github.barteksc.pdfviewer.util.FitPolicy
+import org.json.JSONObject
 
 class QRScannerResultActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -17,8 +18,8 @@ class QRScannerResultActivity : AppCompatActivity() {
 
         val intent = intent.extras
         if (intent != null) {
-            Toast.makeText(this, intent.getString("url"), Toast.LENGTH_SHORT).show()
             val url = intent.getString("url")
+            Toast.makeText(this, url, Toast.LENGTH_LONG).show()
             val webview = findViewById<WebView>(R.id.pdfView)
             webview.getSettings().setJavaScriptEnabled(true);
             webview.loadUrl("https://drive.google.com/viewerng/viewer?embedded=true&url=" + url);

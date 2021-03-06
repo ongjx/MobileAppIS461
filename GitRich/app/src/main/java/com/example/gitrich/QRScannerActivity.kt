@@ -10,6 +10,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.budiyev.android.codescanner.*
+import org.json.JSONObject
 
 private const val CAMERA_REQUEST_CODE = 101
 
@@ -39,17 +40,12 @@ class QRScannerActivity : AppCompatActivity() {
         // Callbacks
         codeScanner.decodeCallback = DecodeCallback {
             runOnUiThread {
-                tv_textView.text = it.text
-                val url = Uri.parse(it.text)
-//                val intent = Intent(Intent.ACTION_VIEW, url)
+                val jsonObject = JSONObject(it.text)
+                val url = jsonObject["url"].toString()
+                tv_textView.text = url
                 val intent = Intent(this, QRScannerResultActivity::class.java)
-                intent.putExtra("url", it.text)
+                intent.putExtra("url", url)
                 startActivity(intent)
-//
-//                val intent = Intent(Intent.ACTION_VIEW)
-//                intent.setDataAndType(url, "application/pdf")
-//                intent.flags = Intent.FLAG_ACTIVITY_NO_HISTORY
-//                startActivity(intent)
             }
         }
         codeScanner.errorCallback = ErrorCallback { // or ErrorCallback.SUPPRESS
