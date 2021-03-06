@@ -23,7 +23,6 @@ class Receipt():
 
         for i in range(0, len(lines)):
             line = lines[i]
-            print(line)
             #  if that line got S$, $, means this is the line of item that we need
             if Receipt.has_tab(line):
                 if Receipt.has_money_sign(line):        
