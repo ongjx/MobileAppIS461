@@ -16,6 +16,7 @@ class Receipt():
     # Initialization can be dynamic, depending on the receipt given, can parse differently.
     # For instance receipt = Receipt(raw_response, "kenboru") or Receipt(raw_response, "Pasta Express")
     def __init__(self, raw_response):
+        self.reset()
         self.parse(raw_response)
 
     def parse(self, raw_response):
@@ -38,6 +39,10 @@ class Receipt():
                 elif Receipt.has_date(line):
                     self.date = Receipt.retrieve_date(line)
                 
+    def reset(self):
+        self.total = 0
+        self.date = ""
+        self.items = {}
 
     @staticmethod
     def has_money_sign(line):
