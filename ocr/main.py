@@ -2,12 +2,15 @@ from fastapi import FastAPI, Request
 import base64
 import os
 import requests
+import dateutil.parser as dtp
+from datetime import datetime
 
 app = FastAPI()
 
 class Receipt():
 
     total = 0
+    date = ""
     items = {}
 
     # Initialization can be dynamic, depending on the receipt given, can parse differently.
@@ -16,20 +19,26 @@ class Receipt():
         self.parse(raw_response)
 
     def parse(self, raw_response):
-        lines = raw_response.split("\r\n")
+        lines = raw_response.split("\t\r\n")
 
         for i in range(0, len(lines)):
             line = lines[i]
+            print(line)
             #  if that line got S$, $, means this is the line of item that we need
-            if Receipt.has_tab(line) and Receipt.has_money_sign(line):        
-                item, price, _ = line.split("\t") # third variable is always empty for Pasta Express Receipt
+            if Receipt.has_tab(line):
+                if Receipt.has_money_sign(line):        
+                    item, price = line.split("\t")
 
-                if item.lower() == "total":
-                    self.total = Receipt.to_float(price)
-                else:
-                    # TODO: need detect negative (for discount as well)
-                    # TODO: change gonna ignore
-                    self.items[item] = price
+                    if item.lower() == "total":
+                        self.total = Receipt.to_float(price)
+                    else:
+                        # TODO: need detect negative (for discount as well)
+                        # TODO: change gonna ignore
+                        self.items[item] = price
+                
+                elif Receipt.has_date(line):
+                    self.date = Receipt.retrieve_date(line)
+                
 
     @staticmethod
     def has_money_sign(line):
@@ -43,6 +52,29 @@ class Receipt():
         return False
 
     @staticmethod
+    def has_date(line):
+        # only work for pasta express for now
+        potential_date_string = line.split("\t")[1]
+
+        # To exclude only time like 1:42 pm
+        if "pm" in potential_date_string or "am" in potential_date_string:
+            return False
+
+        try:
+            # Example: "SMU, 40 Stamford        23 February 2021"
+            dtp.parse(potential_date_string)
+        except ValueError:
+            return False
+
+        return True
+        
+    @staticmethod
+    def retrieve_date(line):
+        dt = dtp.parse(line.split("\t")[1])
+        return dt.strftime("%d/%m/%Y")
+
+
+    @staticmethod
     def has_tab(line):
         return "\t" in line
 
@@ -51,7 +83,7 @@ class Receipt():
         return float(price_string.split("$")[1])
 
     def __repr__(self):
-        return "Total Receipt Amount: {} \nWith the following items:\n{}".format(self.total, self.items)
+        return "Total Receipt Amount: {} \nDate of Receipt: {} \nWith the following items:\n{}".format(self.total, self.date, self.items)
 
 
 # TODO: [POST Endpoint] Upload Image to Process [ASYNC] `POST {{base_url}}/api/v1/users/{{user_id}}/receipts`
