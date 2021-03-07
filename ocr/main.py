@@ -127,8 +127,7 @@ def call_ocrspace(image_64):
     return response
 
 def convert_image_to_base64(filepath):
-    image = "filepath"
-    image_64 = base64.b64encode(open(image, "rb").read()).decode("utf-8")
+    image_64 = base64.b64encode(open(filepath, "rb").read()).decode("utf-8")
 
     return "data:image/jpg;base64," + image_64
 
