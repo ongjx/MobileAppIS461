@@ -1,0 +1,56 @@
+from typing import Optional
+from datetime import datetime
+from pydantic import BaseModel, EmailStr, Field
+
+class ReceiptSchema(BaseModel):
+    date: datetime = Field(...) # In Pydantic, the ellipsis, ..., indicates that a Field is required.
+    amount: float = Field(...)
+    items: dict = None
+    image: str = Field(...)
+    category: str = Field(...)
+
+    class Config:
+        schema_extra = {
+            "example": {
+                "date": "24/12/1997",
+                "amount": 1.5,
+                "items": {"Apple": 1.5},
+                "image": "base64 string.....",
+                "category": "Fast Food",
+            }
+        }
+
+class UpdateReceiptModel(BaseModel):
+    date: Optional[datetime]
+    amount: Optional[float]
+    items: Optional[dict]
+    image: Optional[str]
+    category: Optional[str]
+
+    class Config:
+        schema_extra = {
+            "example": {
+                "date": "24/12/1997",
+                "amount": 1.5,
+                "items": {"Apple": 1.5},
+                "image": "base64 string.....",
+                "category": "Fast Food",
+            }
+        }
+
+class UserSchema(BaseModel):
+    username: str = Field(...)
+    password: str = Field(...)
+    receipt_ids: list = None
+
+
+def ResponseModel(data, message):
+    return {
+        "data": [data],
+        "code": 200,
+        "message": message,
+    }
+
+
+def ErrorResponseModel(error, code, message):
+    return {"error": error, "code": code, "message": message}

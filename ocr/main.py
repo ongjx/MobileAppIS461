@@ -1,9 +1,27 @@
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, Body
 import base64
 import os
 import requests
 import dateutil.parser as dtp
 from datetime import datetime
+
+from database import (
+    add_receipt,
+    delete_receipt,
+    retrieve_receipt,
+    retrieve_receipts,
+    update_receipt,
+    test,
+    retrieve_user_receipts,
+)
+
+from models import (
+    ErrorResponseModel,
+    ResponseModel,
+    ReceiptSchema,
+    UserSchema,
+    UpdateReceiptModel,
+)
 
 app = FastAPI()
 
@@ -90,18 +108,18 @@ class Receipt():
         return "Total Receipt Amount: {} \nDate of Receipt: {} \nWith the following items:\n{}".format(self.total, self.date, self.items)
 
 
-# TODO: [POST Endpoint] Upload Image to Process [ASYNC] `POST {{base_url}}/api/v1/users/{{user_id}}/receipts`
+# TODO: [POST Endpoint] Upload Image to Process [ASYNC] `POST {{base_url}}/api/v1/users/{{username}}/receipts`
 # 1. Provide an endpoint to receive image (let's try fastapi package from python)
 # 2. Call OCRSpace API -> Response
 # 3. Parse the Response -> Receipt Class Object
 # 4. Insert into Database (nosql -> MongoDB)
 
-@app.post("/users/{user_id}/receipts")
-async def upload_receipt(user_id: str, request: dict): # if never specify, its gonna be request body from call
+@app.post("/users/{username}/receipts")
+async def upload_receipt(username: str, request: dict): # if never specify, its gonna be request body from call
 
     image_64 = request["image_64"]
 
-    # TODO: Do something with this user_id
+    # TODO: Do something with this username
 
     response = call_ocrspace(image_64)
     response_json = response.json()
@@ -113,12 +131,52 @@ async def upload_receipt(user_id: str, request: dict): # if never specify, its g
     return receipt
 
 
-# TODO: [PUT Endpoint] Allow User to edit each receipt session (cause what we parse might not be accurate) `PUT {{base_url}}/api/v1/users/{{user_id}}/receipts//{{receipt_id}}`
+# [PUT Endpoint] Allow User to edit each receipt session (cause what we parse might not be accurate) `PUT {{base_url}}/api/v1/users/{{username}}/receipts/{{receipt_id}}`
 # No concrete steps yet
+@app.put("/users/{username}/receipts/{receipt_id}")
+async def update_receipt_data(username: str, receipt_id: str, req: UpdateReceiptModel = Body(...)):
+    req = {k: v for k, v in req.dict().items() if v is not None}
 
-# TODO: [GET Endpoint] All receipts for a particular user `GET {{base_url}}/api/v1/users/{{user_id}}/receipts`
+    updated_receipts = await update_receipt(receipt_id, req)
+    if updated_receipts:
+        return ResponseModel(
+            "Receipt with ID: {} update is successful".format(receipt_id),
+            "Success",
+        )
+    return ErrorResponseModel("An error occurred.", 404, "There was an error updating the receipt data")
 
 
+# [DELETE Endpoint]
+@app.delete("/users/{username}/receipts/{receipt_id}")
+async def delete_receipt_data(username: str, receipt_id: str):
+    deleted_receipt = await delete_receipt(receipt_id)
+    if deleted_receipt:
+        return ResponseModel(
+            "Receipt with ID: {} removed".format(receipt_id), "Receipt deleted successfully"
+        )
+    return ErrorResponseModel(
+        "An error occurred", 404, "Receipt with id {} doesn't exist".format(receipt_id)
+    )
+
+
+# [GET Endpoint] All receipts for a particular user `GET {{base_url}}/api/v1/users/{{username}}/receipts`
+@app.get("/users/{username}/receipts")
+async def get_receipts(username: str):
+
+    receipts = await retrieve_user_receipts(username)
+    if receipts:
+        return ResponseModel(receipts, "Receipts data retrieved successfully")
+    return ResponseModel(receipts, "Empty list returned")
+
+# Testin endpoint
+@app.get("/testing")
+async def testing():
+    receipts = await test()
+    print(receipts)
+    return ResponseModel(receipts, "Receipts data retrieved successfully")
+
+
+## Helper Method
 def call_ocrspace(image_64):
     url = "https://api.ocr.space/parse/image"
     headers = {"apikey": "15a830b5cd88957"}
