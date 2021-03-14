@@ -21,3 +21,42 @@
 
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
+
+# ==================================================================================================
+# Python Backend
+# Byte-compiled / optimized / DLL files
+ocr/__pycache__/
+ocr/*.py[cod]
+ocr/*$py.class
+
+# C extensions
+ocr/*.so
+
+# Distribution / packaging
+ocr/.Python
+ocr/build/
+ocr/develop-eggs/
+ocr/dist/
+ocr/downloads/
+ocr/eggs/
+ocr/.eggs/
+ocr/lib/
+ocr/lib64/
+ocr/parts/
+ocr/sdist/
+ocr/var/
+ocr/wheels/
+ocr/share/python-wheels/
+ocr/*.egg-info/
+ocr/.installed.cfg
+ocr/*.egg
+ocr/MANIFEST
+
+
+
+# Environments
+ocr/.env
+ocr/.venv
+ocr/env/
+ocr/venv/
+ocr/ENV/
