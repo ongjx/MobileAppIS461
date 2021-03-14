@@ -29,14 +29,6 @@ def user_helper(user) -> dict:
         "receipt_ids": user["receipt_ids"],
     }
 
-async def test():
-    datas = ["60475207492cb455a49eb2cf", "60474cb3492cb455a49eb2ce"]
-    receipts = []
-    for data in datas:
-        receipt = await receipt_collection.find_one({"_id": ObjectId(data)})
-        if receipt:
-            receipts.append(receipt_helper(receipt))
-    return receipts
 
 async def retrieve_user_receipts(username: str):
     results = []
@@ -51,26 +43,30 @@ async def retrieve_user_receipts(username: str):
 
     # append the receipt object to results
     for receipt_id in receipt_ids:
-        receipt = await receipt_collection.find_one({"_id": ObjectId(receipt_id)})
+        receipt = await receipt_collection.find_one({"_id": receipt_id})
         if receipt:
             results.append(receipt_helper(receipt))
 
     return results
 
 
-
-async def retrieve_receipts():
-    receipts = []
-    async for receipt in receipt_collection.find():
-        receipts.append(receipt_helper(receipt))
-    return receipts
-
-
 # Add a new receipt into to the database
-async def add_receipt(receipt_data: dict) -> dict:
+async def add_receipt(username: str, receipt_data: dict) -> dict:
     receipt = await receipt_collection.insert_one(receipt_data)
     new_receipt = await receipt_collection.find_one({"_id": receipt.inserted_id})
-    return receipt_helper(new_receipt)
+
+    user = await user_collection.find_one({"username": username})
+    if user:
+        current_receipt_ids = user_helper(user)["receipt_ids"]
+        updated_receipt_ids = current_receipt_ids + [receipt.inserted_id]
+        data = {"receipt_ids": updated_receipt_ids}
+        updated_user = await user_collection.update_one(
+            {"username": username}, {"$set": data}
+        )
+        if updated_user:
+            return True
+        return False
+    return False
 
 
 # Retrieve a receipt with a matching ID

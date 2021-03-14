@@ -44,10 +44,10 @@ class UserSchema(BaseModel):
     receipt_ids: list = None
 
 
-def ResponseModel(data, message):
+def ResponseModel(data, code, message):
     return {
-        "data": [data],
-        "code": 200,
+        "data": data,
+        "code": code,
         "message": message,
     }
 

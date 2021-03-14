@@ -8,10 +8,7 @@ from datetime import datetime
 from database import (
     add_receipt,
     delete_receipt,
-    retrieve_receipt,
-    retrieve_receipts,
     update_receipt,
-    test,
     retrieve_user_receipts,
 )
 
@@ -27,14 +24,18 @@ app = FastAPI()
 
 class Receipt():
 
-    total = 0
+    amount = 0
     date = ""
     items = {}
+    image = ""
+    # TODO: To make this dynamic
+    category = "food"
 
     # Initialization can be dynamic, depending on the receipt given, can parse differently.
     # For instance receipt = Receipt(raw_response, "kenboru") or Receipt(raw_response, "Pasta Express")
-    def __init__(self, raw_response):
+    def __init__(self, raw_response, image):
         self.reset()
+        self.image = image
         self.parse(raw_response)
 
     def parse(self, raw_response):
@@ -48,7 +49,7 @@ class Receipt():
                     item, price = line.split("\t")
 
                     if item.lower() == "total":
-                        self.total = Receipt.to_float(price)
+                        self.amount = Receipt.to_float(price)
                     else:
                         # TODO: need detect negative (for discount as well)
                         # TODO: change gonna ignore
@@ -58,9 +59,19 @@ class Receipt():
                     self.date = Receipt.retrieve_date(line)
                 
     def reset(self):
-        self.total = 0
+        self.amount = 0
         self.date = ""
         self.items = {}
+        self.image = ""
+
+    def to_dict(self):
+        return {
+            "amount": self.amount,
+            "date": self.date,
+            "items": self.items,
+            "image": self.image,
+            "category": self.category
+        }
 
     @staticmethod
     def has_money_sign(line):
@@ -95,7 +106,6 @@ class Receipt():
         dt = dtp.parse(line.split("\t")[1])
         return dt.strftime("%d/%m/%Y")
 
-
     @staticmethod
     def has_tab(line):
         return "\t" in line
@@ -105,30 +115,32 @@ class Receipt():
         return float(price_string.split("$")[1])
 
     def __repr__(self):
-        return "Total Receipt Amount: {} \nDate of Receipt: {} \nWith the following items:\n{}".format(self.total, self.date, self.items)
+        return "Total Receipt Amount: {} \nDate of Receipt: {} \nWith the following items:\n{}".format(self.amount, self.date, self.items)
 
 
-# TODO: [POST Endpoint] Upload Image to Process [ASYNC] `POST {{base_url}}/api/v1/users/{{username}}/receipts`
+# [POST Endpoint] Upload Image to Process [ASYNC] `POST {{base_url}}/api/v1/users/{{username}}/receipts`
 # 1. Provide an endpoint to receive image (let's try fastapi package from python)
 # 2. Call OCRSpace API -> Response
 # 3. Parse the Response -> Receipt Class Object
 # 4. Insert into Database (nosql -> MongoDB)
-
 @app.post("/users/{username}/receipts")
 async def upload_receipt(username: str, request: dict): # if never specify, its gonna be request body from call
 
-    image_64 = request["image_64"]
+    image = request["image"]
 
-    # TODO: Do something with this username
-
-    response = call_ocrspace(image_64)
+    # Call OCRSpace
+    response = call_ocrspace(image)
     response_json = response.json()
     raw_response = response_json["ParsedResults"][0]["ParsedText"]
 
-    receipt = Receipt(raw_response)
-    print(receipt)
+    receipt_dict = Receipt(raw_response, image).to_dict()
+    
+    receipt = await add_receipt(username, receipt_dict)
 
-    return receipt
+    if receipt:
+        return ResponseModel(None, "201", "Receipt Successfully Uploaded")
+        
+    return ErrorResponseModel("An error occurred.", 404, "There was an error uploading the receipt data")
 
 
 # [PUT Endpoint] Allow User to edit each receipt session (cause what we parse might not be accurate) `PUT {{base_url}}/api/v1/users/{{username}}/receipts/{{receipt_id}}`
@@ -141,6 +153,7 @@ async def update_receipt_data(username: str, receipt_id: str, req: UpdateReceipt
     if updated_receipts:
         return ResponseModel(
             "Receipt with ID: {} update is successful".format(receipt_id),
+            "200",
             "Success",
         )
     return ErrorResponseModel("An error occurred.", 404, "There was an error updating the receipt data")
@@ -152,7 +165,9 @@ async def delete_receipt_data(username: str, receipt_id: str):
     deleted_receipt = await delete_receipt(receipt_id)
     if deleted_receipt:
         return ResponseModel(
-            "Receipt with ID: {} removed".format(receipt_id), "Receipt deleted successfully"
+            "Receipt with ID: {} removed".format(receipt_id),
+            "200",
+            "Receipt deleted successfully"
         )
     return ErrorResponseModel(
         "An error occurred", 404, "Receipt with id {} doesn't exist".format(receipt_id)
@@ -165,15 +180,8 @@ async def get_receipts(username: str):
 
     receipts = await retrieve_user_receipts(username)
     if receipts:
-        return ResponseModel(receipts, "Receipts data retrieved successfully")
+        return ResponseModel(receipts, "200", "Receipts data retrieved successfully")
     return ResponseModel(receipts, "Empty list returned")
-
-# Testin endpoint
-@app.get("/testing")
-async def testing():
-    receipts = await test()
-    print(receipts)
-    return ResponseModel(receipts, "Receipts data retrieved successfully")
 
 
 ## Helper Method
