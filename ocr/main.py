@@ -181,7 +181,7 @@ async def get_receipts(username: str):
     receipts = await retrieve_user_receipts(username)
     if receipts:
         return ResponseModel(receipts, "200", "Receipts data retrieved successfully")
-    return ResponseModel(receipts, "Empty list returned")
+    return ResponseModel(receipts, "200", "Empty list returned")
 
 
 ## Helper Method

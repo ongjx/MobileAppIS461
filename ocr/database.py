@@ -37,6 +37,8 @@ async def retrieve_user_receipts(username: str):
 
     if user:
         user = user_helper(user)
+    else:
+        return []
 
     for receipt_id in user["receipt_ids"]:
         receipt_ids.append(receipt_id)
