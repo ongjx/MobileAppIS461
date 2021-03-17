@@ -7,6 +7,7 @@
     tools:context=".MainActivity">
 
     <Button
+        android:id="@+id/button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:onClick="launchQR"
@@ -28,5 +29,16 @@
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.598" />
+
+    <fragment
+        android:id="@+id/receipt_summary"
+        android:name="com.example.gitrich.receipts_summary"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.148"
+        tools:layout="@layout/fragment_receipts_summary"
+        tools:layout_editor_absoluteX="-28dp" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
