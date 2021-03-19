@@ -4,6 +4,7 @@ from pydantic import BaseModel, EmailStr, Field
 
 class ReceiptSchema(BaseModel):
     date: datetime = Field(...) # In Pydantic, the ellipsis, ..., indicates that a Field is required.
+    name: str = Field(...)
     amount: float = Field(...)
     items: dict = None
     image: str = Field(...)
@@ -12,6 +13,7 @@ class ReceiptSchema(BaseModel):
     class Config:
         schema_extra = {
             "example": {
+                "name": "Pasta Express 1",
                 "date": "24/12/1997",
                 "amount": 1.5,
                 "items": {"Apple": 1.5},
@@ -21,6 +23,7 @@ class ReceiptSchema(BaseModel):
         }
 
 class UpdateReceiptModel(BaseModel):
+    name: Optional[str]
     date: Optional[datetime]
     amount: Optional[float]
     items: Optional[dict]
@@ -30,6 +33,7 @@ class UpdateReceiptModel(BaseModel):
     class Config:
         schema_extra = {
             "example": {
+                "name": "Pasta Express 1",
                 "date": "24/12/1997",
                 "amount": 1.5,
                 "items": {"Apple": 1.5},

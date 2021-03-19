@@ -14,6 +14,7 @@ user_collection = database.get_collection("users")
 def receipt_helper(receipt) -> dict:
     return {
         "id": str(receipt["_id"]),
+        "name": receipt["name"],
         "date": receipt["date"],
         "amount": receipt["amount"],
         "items": receipt["items"],

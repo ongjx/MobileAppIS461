@@ -24,18 +24,27 @@ app = FastAPI()
 
 class Receipt():
 
+    name = ""
     amount = 0
     date = ""
     items = {}
     image = ""
-    # TODO: To make this dynamic
-    category = "food"
+    category = ""
 
     # Initialization can be dynamic, depending on the receipt given, can parse differently.
     # For instance receipt = Receipt(raw_response, "kenboru") or Receipt(raw_response, "Pasta Express")
-    def __init__(self, raw_response, image):
+    def __init__(self, raw_response, image, name, category):
         self.reset()
-        self.image = image
+        
+        if image is not None:
+            self.image = image
+        
+        if name is not None:
+            self.name = name
+        
+        if category is not None:
+            self.category = category
+
         self.parse(raw_response)
 
     def parse(self, raw_response):
@@ -50,15 +59,18 @@ class Receipt():
 
                     if item.lower() == "total":
                         self.amount = Receipt.to_float(price)
+                    elif item.lower() in ["subtotal", "rounding", "cash"]:
+                        continue
                     else:
-                        # TODO: need detect negative (for discount as well)
-                        # TODO: change gonna ignore
+                        # TODO: Need tweak more for subitems
                         self.items[item] = price
                 
                 elif Receipt.has_date(line):
                     self.date = Receipt.retrieve_date(line)
                 
     def reset(self):
+        self.name = ""
+        self.category = ""
         self.amount = 0
         self.date = ""
         self.items = {}
@@ -66,6 +78,7 @@ class Receipt():
 
     def to_dict(self):
         return {
+            "name": self.name,
             "amount": self.amount,
             "date": self.date,
             "items": self.items,
@@ -123,19 +136,32 @@ class Receipt():
 # 2. Call OCRSpace API -> Response
 # 3. Parse the Response -> Receipt Class Object
 # 4. Insert into Database (nosql -> MongoDB)
-@app.post("/users/{username}/receipts")
-async def upload_receipt(username: str, request: dict): # if never specify, its gonna be request body from call
+@app.post("/users/{username}/ocr-receipts")
+async def upload_ocrreceipt(username: str, request: dict): # if never specify, its gonna be request body from call
 
+    # Get json name from request
     image = request["image"]
+    name = request["name"]
+    category = request["category"]
 
     # Call OCRSpace
     response = call_ocrspace(image)
     response_json = response.json()
     raw_response = response_json["ParsedResults"][0]["ParsedText"]
 
-    receipt_dict = Receipt(raw_response, image).to_dict()
+    receipt_dict = Receipt(raw_response, image, name, category).to_dict()
     
     receipt = await add_receipt(username, receipt_dict)
+
+    if receipt:
+        return ResponseModel(None, "201", "Receipt Successfully Uploaded")
+        
+    return ErrorResponseModel("An error occurred.", 404, "There was an error uploading the receipt data")
+
+@app.post("/users/{username}/qr-receipts")
+async def upload_qrreceipt(username: str, request: dict): # if never specify, its gonna be request body from call
+
+    receipt = await add_receipt(username, request)
 
     if receipt:
         return ResponseModel(None, "201", "Receipt Successfully Uploaded")
