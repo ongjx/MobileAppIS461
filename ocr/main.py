@@ -2,9 +2,17 @@ from fastapi import FastAPI, Request, Body
 import base64
 import os
 import requests
+import uuid
 import dateutil.parser as dtp
 from datetime import datetime
+from google.cloud import dialogflow
+from pathlib import Path
 
+# initializing google cloud credentials
+home = str(Path.home())
+credential_path = f"{home}\\Desktop\\dialogflow.json"
+os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = credential_path
+    
 from database import (
     add_receipt,
     delete_receipt,
@@ -208,6 +216,33 @@ async def get_receipts(username: str):
     if receipts:
         return ResponseModel(receipts, "200", "Receipts data retrieved successfully")
     return ResponseModel(receipts, "200", "Empty list returned")
+
+@app.post("/users/{username}/dialogflow")
+async def post_dialogflow(username: str, request: dict):
+    text = request["text"]
+    
+    session_client = dialogflow.SessionsClient()
+    session = session_client.session_path('gitrich-9txq', str(uuid.uuid4()))
+    
+    text_input = dialogflow.TextInput(text=text, language_code='en')
+    query_input = dialogflow.QueryInput(text=text_input)
+
+    response = session_client.detect_intent(
+        request={"session": session, "query_input": query_input}
+    )
+
+    params = response.query_result.parameters
+    
+    currency = params["unit-currency"]["currency"]
+    price = params["unit-currency"]["amount"]
+    food = params["foods"]
+    drink = params["drinks"]
+    
+    
+    return {
+        "food": food,
+        "drink": drink
+        }, 200
 
 
 ## Helper Method
