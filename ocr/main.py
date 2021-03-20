@@ -159,22 +159,23 @@ async def upload_ocrreceipt(username: str, request: dict): # if never specify, i
 
     receipt_dict = Receipt(raw_response, image, name, category).to_dict()
     
-    receipt = await add_receipt(username, receipt_dict)
+    success, receipt = await add_receipt(username, receipt_dict)
 
-    if receipt:
-        return ResponseModel(None, "201", "Receipt Successfully Uploaded")
+    if success:
+        return ResponseModel(receipt, 201, "Receipt Successfully Uploaded")
         
-    return ErrorResponseModel("An error occurred.", 404, "There was an error uploading the receipt data")
+    return ErrorResponseModel("An error occurred.", 400, "There was an error uploading the receipt data")
+
 
 @app.post("/users/{username}/qr-receipts")
 async def upload_qrreceipt(username: str, request: dict): # if never specify, its gonna be request body from call
 
-    receipt = await add_receipt(username, request)
+    success, receipt = await add_receipt(username, request)
 
-    if receipt:
-        return ResponseModel(None, "201", "Receipt Successfully Uploaded")
+    if success:
+        return ResponseModel(receipt, 201, "Receipt Successfully Uploaded")
         
-    return ErrorResponseModel("An error occurred.", 404, "There was an error uploading the receipt data")
+    return ErrorResponseModel("An error occurred.", 400, "There was an error uploading the receipt data")
 
 
 # [PUT Endpoint] Allow User to edit each receipt session (cause what we parse might not be accurate) `PUT {{base_url}}/api/v1/users/{{username}}/receipts/{{receipt_id}}`
@@ -187,10 +188,10 @@ async def update_receipt_data(username: str, receipt_id: str, req: UpdateReceipt
     if updated_receipts:
         return ResponseModel(
             "Receipt with ID: {} update is successful".format(receipt_id),
-            "200",
+            200,
             "Success",
         )
-    return ErrorResponseModel("An error occurred.", 404, "There was an error updating the receipt data")
+    return ErrorResponseModel("An error occurred.", 400, "There was an error updating the receipt data")
 
 
 # [DELETE Endpoint]
@@ -200,11 +201,11 @@ async def delete_receipt_data(username: str, receipt_id: str):
     if deleted_receipt:
         return ResponseModel(
             "Receipt with ID: {} removed".format(receipt_id),
-            "200",
+            200,
             "Receipt deleted successfully"
         )
     return ErrorResponseModel(
-        "An error occurred", 404, "Receipt with id {} doesn't exist".format(receipt_id)
+        "An error occurred", 400, "Receipt with id {} doesn't exist".format(receipt_id)
     )
 
 
@@ -214,12 +215,18 @@ async def get_receipts(username: str):
 
     receipts = await retrieve_user_receipts(username)
     if receipts:
-        return ResponseModel(receipts, "200", "Receipts data retrieved successfully")
-    return ResponseModel(receipts, "200", "Empty list returned")
+        return ResponseModel(receipts, 200, "Receipts data retrieved successfully")
+    return ResponseModel(receipts, 200, "Empty list returned")
+
 
 @app.post("/users/{username}/dialogflow")
 async def post_dialogflow(username: str, request: dict):
     text = request["text"]
+    
+    if request["name"] is None:
+        name = str(uuid.uuid4())
+    else:
+        name = request["name"]
     
     session_client = dialogflow.SessionsClient()
     session = session_client.session_path('gitrich-9txq', str(uuid.uuid4()))
@@ -231,19 +238,30 @@ async def post_dialogflow(username: str, request: dict):
         request={"session": session, "query_input": query_input}
     )
 
+    category = response.query_result.intent.display_name.capitalize()
     params = response.query_result.parameters
-    
-    currency = params["unit-currency"]["currency"]
-    price = params["unit-currency"]["amount"]
-    food = params["foods"]
-    drink = params["drinks"]
-    
-    
-    return {
-        "food": food,
-        "drink": drink
-        }, 200
 
+    try:
+        price = params["unit-currency"]["amount"]
+        price = f"{price:.2f}"
+    except TypeError:
+        return ErrorResponseModel("Price not found within text", 400, "Please provide the price of the item")
+
+    receipt = {
+        "name": name,
+        "amount": price,
+        "items": {},
+        "category": category,
+        "image": None,
+        "date": datetime.today().strftime('%d/%m/%Y') 
+    }
+    
+    success, receipt = await add_receipt(username, receipt)
+    
+    if not(success):
+        return ErrorResponseModel("Unexpected Error Occured", 400, "Please check request body again")
+    
+    return ResponseModel(receipt, 201, "Successfully uploaded adhoc receipt")
 
 ## Helper Method
 def call_ocrspace(image_64):

@@ -67,9 +67,9 @@ async def add_receipt(username: str, receipt_data: dict) -> dict:
             {"username": username}, {"$set": data}
         )
         if updated_user:
-            return True
-        return False
-    return False
+            return True, receipt_helper(new_receipt)
+        return False, None
+    return False, None
 
 
 # Retrieve a receipt with a matching ID
