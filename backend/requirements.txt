@@ -1,0 +1,8 @@
+fastapi
+uvicorn
+motor
+google-cloud-dialogflow
+pydantic
+requests
+pymongo
+dnspython

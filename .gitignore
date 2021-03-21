@@ -25,38 +25,39 @@ hs_err_pid*
 # ==================================================================================================
 # Python Backend
 # Byte-compiled / optimized / DLL files
-ocr/__pycache__/
-ocr/*.py[cod]
-ocr/*$py.class
+backend/__pycache__/
+backend/*.py[cod]
+backend/*$py.class
 
 # C extensions
-ocr/*.so
+backend/*.so
 
 # Distribution / packaging
-ocr/.Python
-ocr/build/
-ocr/develop-eggs/
-ocr/dist/
-ocr/downloads/
-ocr/eggs/
-ocr/.eggs/
-ocr/lib/
-ocr/lib64/
-ocr/parts/
-ocr/sdist/
-ocr/var/
-ocr/wheels/
-ocr/share/python-wheels/
-ocr/*.egg-info/
-ocr/.installed.cfg
-ocr/*.egg
-ocr/MANIFEST
+backend/.Python
+backend/build/
+backend/develop-eggs/
+backend/dist/
+backend/downloads/
+backend/eggs/
+backend/.eggs/
+backend/lib/
+backend/lib64/
+backend/parts/
+backend/sdist/
+backend/var/
+backend/wheels/
+backend/share/python-wheels/
+backend/*.egg-info/
+backend/.installed.cfg
+backend/*.egg
+backend/MANIFEST
 
 
 
 # Environments
-ocr/.env
-ocr/.venv
-ocr/env/
-ocr/venv/
-ocr/ENV/
+backend/.env
+backend/.venv
+backend/env/
+backend/venv/
+backend/ENV/
+backend/dialogflow.json
