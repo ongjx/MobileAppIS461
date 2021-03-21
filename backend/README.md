@@ -3,6 +3,6 @@
 
 `pip install -r requirements.txt`
 
-`cd ocr`
+`cd backend`
 
 `uvicorn main:app --reload`
