@@ -1,5 +1,6 @@
 package com.example.gitrich
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
@@ -17,6 +18,14 @@ class AllReceipts : AppCompatActivity() {
 
         val listView = findViewById<ListView>(R.id.receipt_all_list)
         listView.adapter = receipts_summary.CustomAdapter(this, receipts)
+
+        listView.setOnItemClickListener { parent, view, position, id ->
+            val receipt = receipts[position];
+            Log.e("Receipt", receipt.toString())
+            val intent = Intent(this, ReceiptDetails::class.java)
+            intent.putExtra("receipt", receipt)
+            startActivity(intent)
+        }
     }
 
 

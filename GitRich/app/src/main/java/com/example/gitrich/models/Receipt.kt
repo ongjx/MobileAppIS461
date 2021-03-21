@@ -32,7 +32,7 @@ class Receipt (): Parcelable {
     }
 
     override fun toString(): String {
-        return "Receipt [id:$id, date:$date, amount:$amount, category:$category]"
+        return "Receipt [id:$id, date:$date, amount:$amount, category:$category, image: $image, items: $items]"
     }
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {
