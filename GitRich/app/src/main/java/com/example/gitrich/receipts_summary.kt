@@ -1,24 +1,21 @@
 package com.example.gitrich
 
 import android.content.Context
-import android.graphics.Bitmap
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
-import android.util.LruCache
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.BaseAdapter
 import android.widget.ListView
 import android.widget.TextView
-import android.widget.Toast
 import androidx.fragment.app.Fragment
 import com.android.volley.Request
 import com.android.volley.RequestQueue
-import com.android.volley.Response
-import com.android.volley.toolbox.ImageLoader
 import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.Volley
+import com.example.gitrich.models.Receipt
 import com.google.gson.Gson
 
 // TODO: Rename parameter arguments, choose names that match
@@ -31,67 +28,76 @@ private const val ARG_PARAM2 = "param2"
  * Use the [receipts_summary.newInstance] factory method to
  * create an instance of this fragment.
  */
+var receipts = ArrayList<Receipt>();
 
 class receipts_summary : Fragment() {
-
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        retainInstance = true
+//        if (savedInstanceState != null) {
+//            receipts = savedInstanceState.getParcelableArrayList<Receipt>("receipts") as ArrayList<Receipt>
+//        }
+    }
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_receipts_summary, container, false)
-    }
-    class Receipt(
-        val id: String,
-        val date: String,
-        val amount: Double,
-        val category: String
-    ) {
-        override fun toString(): String {
-            return "Receipt [id:$id, date:$date, amount:$amount, category:$category]"
-        }
-    }
-     override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
+        val view = inflater.inflate(R.layout.fragment_receipts_summary, container, false)
 
+        val seeAll = view.findViewById<TextView>(R.id.see_all_receipts_btn)
+        seeAll.setOnClickListener {
+            val intent = Intent(activity!!, AllReceipts::class.java)
+            intent.putExtra("receipts", receipts)
+            startActivity(intent)
+        }
+
+        return view
+    }
+
+    override fun onActivityCreated(savedInstanceState: Bundle?) {
+        super.onActivityCreated(savedInstanceState)
+        if (savedInstanceState != null) {
+            //Restore the fragment's state here
+            receipts = savedInstanceState.getParcelableArrayList<Receipt>("receipts") as ArrayList<Receipt>
+        } else {
+            getReceipts()
+            getReceipts()
+
+        }
+
+
+    }
+    private fun getReceipts () {
         val gson = Gson()
         val listView = activity!!.findViewById<ListView>(R.id.receipt_summary_list)
 
-         val url = "https://leojk9.deta.dev/users/kelvinngsl/receipts"
-         val receipts = ArrayList<Receipt>();
-         listView.adapter = CustomAdapter(activity!!, receipts)
+        val url = "https://leojk9.deta.dev/users/kelvinngsl/receipts"
+        listView.adapter = CustomAdapter(activity!!, receipts)
 
-         val jsonObjectRequest = JsonObjectRequest(Request.Method.GET, url, null,
-             Response.Listener { response ->
-                 Toast.makeText(activity!!, response.toString(), Toast.LENGTH_LONG)
-                 val res = response.getJSONArray("data")
-                 for (i in 0 until res.length()) {
-                     val receipt = gson.fromJson(res[i].toString(), Receipt::class.java)
-                     receipts.add(receipt)
-                 }
-                 Log.e("receipt", receipts.size.toString())
-                 listView.adapter = CustomAdapter(activity!!, receipts)
+        val jsonObjectRequest = JsonObjectRequest(Request.Method.GET, url, null,
+            { response ->
+                val res = response.getJSONArray("data")
+                for (i in 0 until res.length()) {
+                    val receipt = gson.fromJson(res[i].toString(), Receipt::class.java)
+                    Log.e("receipt", receipt.toString())
+                    receipts.add(receipt)
+                }
+                Log.e("receipt", receipts.size.toString())
+                listView.adapter = CustomAdapter(activity!!, receipts)
+            },
+            { error ->
+                // TODO: Handle error
+                Log.e("Error", error.toString())
+            }
+        )
 
-             },
-             Response.ErrorListener { error ->
-                 // TODO: Handle error
-                 Log.e("Error", error.toString())
-             }
-         )
+        MySingleton.getInstance(activity!!).addToRequestQueue(jsonObjectRequest)
+    }
+    class CustomAdapter(context: Context, receipts: ArrayList<Receipt>): BaseAdapter() {
 
-         MySingleton.getInstance(activity!!).addToRequestQueue(jsonObjectRequest)
-
-     }
-
-    private class CustomAdapter(context: Context, receipts: ArrayList<Receipt>): BaseAdapter() {
-
-        private val mContext: Context
-        private val mReceipts: ArrayList<Receipt>
-
-        init {
-            mContext = context
-            mReceipts = receipts
-        }
+        private val mContext: Context = context
+        private val mReceipts: ArrayList<Receipt> = receipts
 
         override fun getCount(): Int {
             return mReceipts.size
@@ -124,7 +130,6 @@ class receipts_summary : Fragment() {
             return row
 
         }
-
     }
     class MySingleton constructor(context: Context) {
         companion object {
@@ -148,6 +153,12 @@ class receipts_summary : Fragment() {
             requestQueue.add(req)
         }
     }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putParcelableArrayList("receipts", receipts)
+    }
+
 
 
 }
