@@ -10,7 +10,8 @@ from pathlib import Path
 
 # initializing google cloud credentials
 home = str(Path.home())
-credential_path = f"{home}\\Desktop\\dialogflow.json"
+# credential_path = f"{home}\\Desktop\\dialogflow.json"
+credential_path = "./dialogflow.json"
 os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = credential_path
     
 from database import (

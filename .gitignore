@@ -60,3 +60,4 @@ ocr/.venv
 ocr/env/
 ocr/venv/
 ocr/ENV/
+ocr/dialogflow.json
