@@ -5,18 +5,14 @@ import android.app.Activity
 import android.content.ContentValues
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.graphics.BitmapFactory
 import android.net.Uri
-import android.opengl.ETC1.encodeImage
 import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
-import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.gitrich.databinding.ActivityMainBinding
-import java.io.InputStream
 
 
 private const val PERMISSION_CODE = 1000
@@ -97,6 +93,7 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
-
     }
+
+
 }
