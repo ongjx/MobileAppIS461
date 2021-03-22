@@ -19,6 +19,8 @@ from database import (
     delete_receipt,
     update_receipt,
     retrieve_user_receipts,
+    add_user,
+    check_user_existence,
 )
 
 from models import (
@@ -276,6 +278,30 @@ def convert_image_to_base64(filepath):
     image_64 = base64.b64encode(open(filepath, "rb").read()).decode("utf-8")
 
     return "data:image/jpg;base64," + image_64
+
+
+# ===================================================================================================
+# User sign up
+@app.post("/users/{username}/signup")
+async def create_user(username:str, request: dict):
+    # initialise empty receipt ids
+    request["receipt_ids"] = []
+    created, user = await add_user(username, request)
+    
+    if not(created):
+        return ErrorResponseModel('Username already exists', 400, 'Please choose another username')
+    
+    return ResponseModel(user, 201, "User successfully created.")
+
+# User login
+@app.post("/users/{username}/login")
+async def login_user(username: str):
+    exist, user = await check_user_existence(username)
+    
+    if not(exist):
+        return ErrorResponseModel('User not found', 400, 'Please enter the correct username')
+    
+    return ResponseModel(user, 200, "User logged in.")
 
 
 # NOTE: For sample response

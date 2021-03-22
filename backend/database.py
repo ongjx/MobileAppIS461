@@ -26,8 +26,7 @@ def user_helper(user) -> dict:
     return {
         "id": str(user["_id"]),
         "username": user["username"],
-        "password": user["password"],
-        "receipt_ids": user["receipt_ids"],
+        "receipt_ids": str(user["receipt_ids"]),
     }
 
 
@@ -100,3 +99,29 @@ async def delete_receipt(id: str):
     if receipt:
         await receipt_collection.delete_one({"_id": ObjectId(id)})
         return True
+    
+    
+# ================================================================================
+# Users
+
+# Create new user
+async def add_user(username, user_data: dict) -> dict:
+    
+    user = await user_collection.find_one({"username": username})
+    if user:
+        return False, None
+
+    user = await user_collection.insert_one(user_data)
+    new_user = await user_collection.find_one({"_id": user.inserted_id})
+    
+    return True, user_helper(new_user)
+
+# Check user existence
+async def check_user_existence(username: str) -> dict:
+    
+    user = await user_collection.find_one({"username": username})
+    print(user)
+    if user:
+        return True, user_helper(user)
+    
+    return False, None
