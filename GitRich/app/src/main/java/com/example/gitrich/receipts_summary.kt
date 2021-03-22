@@ -75,6 +75,8 @@ class receipts_summary : Fragment() {
         val listView = activity!!.findViewById<ListView>(R.id.receipt_summary_list)
 
         val url = "https://leojk9.deta.dev/users/kelvinngsl/receipts"
+        // For development local
+//        val url = "http://10.0.2.2:8000/users/kelvinngsl/receipts"
         listView.adapter = CustomAdapter(activity!!, receipts)
 
         val jsonObjectRequest = JsonObjectRequest(Request.Method.GET, url, null,
