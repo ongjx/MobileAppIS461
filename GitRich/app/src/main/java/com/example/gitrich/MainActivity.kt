@@ -14,13 +14,14 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.gitrich.databinding.ActivityMainBinding
 import java.io.FileNotFoundException
+import java.io.PrintStream
 import java.util.*
 
 
 private const val PERMISSION_CODE = 1000
 private const val IMAGE_CAPTURE_CODE = 1001
 private const val IMAGE_PICK_CODE=1002
-private const val CREATE_USER_CODE = 1003
+private const val LOGIN_USER_CODE = 1003
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
@@ -65,7 +66,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun loginPage() {
         val it = Intent(this, LoginActivity::class.java)
-        startActivityForResult(it, CREATE_USER_CODE)
+        startActivityForResult(it, LOGIN_USER_CODE)
     }
 
     private fun openCamera() {
@@ -104,6 +105,12 @@ class MainActivity : AppCompatActivity() {
                     intent.putExtra("image_uri", image_uri)
                     startActivity(intent)
                 }
+            }
+            else if (requestCode == LOGIN_USER_CODE) {
+                val output = PrintStream(openFileOutput("userProfile.txt", MODE_PRIVATE))
+                val username = data?.getStringExtra("username")
+                output.println("${username}")
+                output.close()
             }
         }
     }

@@ -48,19 +48,19 @@ class SignupActivity : AppCompatActivity() {
             { response ->
                 val res = response.getInt("code")
 
-                if (res == 200){
+                if (res == 201){
                     val data = response.getJSONObject("data")
                     val username = data.optString("username")
                     goBack.putExtra("username", username)
                     setResult(RESULT_OK, goBack)
                     finish()
                 }
-                binding.textView.text = "Error Login in"
+                binding.textView.text = "Error signing up"
             },
             { error ->
                 // TODO: Handle error
                 Log.e("Error", error.toString())
-                binding.textView.text = "Error Login in"
+                binding.textView.text = "Error signing up"
             }
         )
 

@@ -1,5 +1,6 @@
 package com.example.gitrich
 
+import android.app.Activity
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -68,6 +69,21 @@ class LoginActivity : AppCompatActivity() {
 
         MySingleton.getInstance(this).addToRequestQueue(jsonObjectRequest)
 
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (resultCode == Activity.RESULT_OK) {
+
+            if(requestCode == SIGNUP_CODE) {
+                val username = data?.getStringExtra("username")
+                val goBack = Intent()
+                intent.putExtra("username", username)
+                setResult(RESULT_OK, goBack)
+                finish()
+            }
+
+        }
     }
 
 
