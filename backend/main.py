@@ -286,7 +286,8 @@ def convert_image_to_base64(filepath):
 async def create_user(username:str, request: dict):
     # initialise empty receipt ids
     request["receipt_ids"] = []
-    created, user = await add_user(username, request)
+    request["username"] = username
+    created, user = await add_user(request)
     
     if not(created):
         return ErrorResponseModel('Username already exists', 400, 'Please choose another username')

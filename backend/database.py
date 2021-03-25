@@ -26,7 +26,7 @@ def user_helper(user) -> dict:
     return {
         "id": str(user["_id"]),
         "username": user["username"],
-        "receipt_ids": str(user["receipt_ids"]),
+        "receipt_ids": user["receipt_ids"],
     }
 
 
@@ -105,9 +105,9 @@ async def delete_receipt(id: str):
 # Users
 
 # Create new user
-async def add_user(username, user_data: dict) -> dict:
+async def add_user(user_data: dict) -> dict:
     
-    user = await user_collection.find_one({"username": username})
+    user = await user_collection.find_one({"username": user_data['username']})
     if user:
         return False, None
 
