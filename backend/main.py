@@ -241,7 +241,6 @@ async def post_dialogflow(username: str, request: dict):
         request={"session": session, "query_input": query_input}
     )
 
-    category = response.query_result.intent.display_name.capitalize()
     params = response.query_result.parameters
 
     try:
@@ -249,7 +248,12 @@ async def post_dialogflow(username: str, request: dict):
         price = f"{price:.2f}"
     except TypeError:
         return ErrorResponseModel("Price not found within text", 400, "Please provide the price of the item")
-
+    
+    if params["foods"] != "":
+        category = "Food"
+    else:
+        category = "Entertainment"
+    
     receipt = {
         "name": name,
         "amount": price,
