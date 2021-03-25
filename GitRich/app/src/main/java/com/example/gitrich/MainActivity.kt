@@ -13,11 +13,14 @@ import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.gitrich.databinding.ActivityMainBinding
+import java.io.FileNotFoundException
+import java.util.*
 
 
 private const val PERMISSION_CODE = 1000
 private const val IMAGE_CAPTURE_CODE = 1001
 private const val IMAGE_PICK_CODE=1002
+private const val CREATE_USER_CODE = 1003
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
@@ -27,6 +30,12 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        try{
+            val scan = Scanner(openFileInput("userProfile.txt"))
+        } catch(e: FileNotFoundException) {
+            loginPage()
+        }
 
         binding.OCRBtn.setOnClickListener {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
@@ -54,6 +63,10 @@ class MainActivity : AppCompatActivity() {
 
     }
 
+    private fun loginPage() {
+        val it = Intent(this, LoginActivity::class.java)
+        startActivityForResult(it, CREATE_USER_CODE)
+    }
 
     private fun openCamera() {
         val contents = ContentValues()
