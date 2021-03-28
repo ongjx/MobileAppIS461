@@ -300,8 +300,14 @@ async def create_user(username:str, request: dict):
 
 # User login
 @app.post("/users/{username}/login")
-async def login_user(username: str):
-    exist, user = await check_user_existence(username)
+async def login_user(username: str, request: dict):
+    password = request.get("password", False)
+    
+    # never send password
+    if not(password):
+        return ErrorResponseModel('Request body incomplete', 400, 'Please send the correct request')
+        
+    exist, user = await check_user_existence(username, password)
     
     if not(exist):
         return ErrorResponseModel('User not found', 400, 'Please enter the correct username')
