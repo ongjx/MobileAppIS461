@@ -241,7 +241,6 @@ async def post_dialogflow(username: str, request: dict):
         request={"session": session, "query_input": query_input}
     )
 
-    category = response.query_result.intent.display_name.capitalize()
     params = response.query_result.parameters
 
     try:
@@ -249,7 +248,12 @@ async def post_dialogflow(username: str, request: dict):
         price = f"{price:.2f}"
     except TypeError:
         return ErrorResponseModel("Price not found within text", 400, "Please provide the price of the item")
-
+    
+    if params["foods"] != "":
+        category = "Food"
+    else:
+        category = "Entertainment"
+    
     receipt = {
         "name": name,
         "amount": price,
@@ -296,8 +300,14 @@ async def create_user(username:str, request: dict):
 
 # User login
 @app.post("/users/{username}/login")
-async def login_user(username: str):
-    exist, user = await check_user_existence(username)
+async def login_user(username: str, request: dict):
+    password = request.get("password", False)
+    
+    # never send password
+    if not(password):
+        return ErrorResponseModel('Request body incomplete', 400, 'Please send the correct request')
+        
+    exist, user = await check_user_existence(username, password)
     
     if not(exist):
         return ErrorResponseModel('User not found', 400, 'Please enter the correct username')

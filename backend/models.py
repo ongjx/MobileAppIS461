@@ -44,6 +44,7 @@ class UpdateReceiptModel(BaseModel):
 
 class UserSchema(BaseModel):
     username: str = Field(...)
+    password: str = Field(...)
     receipt_ids: list = None
 
 

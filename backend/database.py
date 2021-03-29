@@ -26,7 +26,15 @@ def user_helper(user) -> dict:
     return {
         "id": str(user["_id"]),
         "username": user["username"],
+        "password": user["password"],
         "receipt_ids": user["receipt_ids"],
+    }
+    
+def user_helper_without_receipts(user) -> dict:
+    return {
+        "id": str(user["_id"]),
+        "username": user["username"],
+        "password": user["password"],
     }
 
 
@@ -116,12 +124,12 @@ async def add_user(user_data: dict) -> dict:
     
     return True, user_helper(new_user)
 
-# Check user existence
-async def check_user_existence(username: str) -> dict:
+# Check user existence aka login
+async def check_user_existence(username: str, password: str) -> dict:
     
     user = await user_collection.find_one({"username": username})
-    print(user)
-    if user:
-        return True, user_helper(user)
+
+    if user and user["password"] == password:
+        return True, user_helper_without_receipts(user)
     
     return False, None
