@@ -33,18 +33,21 @@ class SignupActivity : AppCompatActivity() {
         //Call API and return to main page.
 
         val username = binding.editTextUsername.text.toString()
+        val password = binding.editTextPassword.text.toString()
 
         val goBack = Intent()
-        if (username == "") {
+        if (username == "" || password == "") {
             Toast.makeText(this, "Please do not leave any inputs blank", Toast.LENGTH_SHORT).show()
             return
         }
 
         val url = "http://10.0.2.2:8000/users/${binding.editTextUsername.text}/signup"
+        val payload = JSONObject()
+        payload.put("password", password)
 
 // Formulate the request and handle the response.
         val jsonObjectRequest = JsonObjectRequest(
-            Request.Method.POST, url, JSONObject(),
+            Request.Method.POST, url, payload,
             { response ->
                 val res = response.getInt("code")
 
