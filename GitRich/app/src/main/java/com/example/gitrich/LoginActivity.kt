@@ -62,7 +62,11 @@ class LoginActivity : AppCompatActivity() {
                     setResult(RESULT_OK, goBack)
                     finish()
                 }
-                binding.textView.text = "Error Login in"
+
+                if (res == 400){
+                    binding.textView.text = "Wrong Username/Password"
+                }
+
             },
             { error ->
                 // TODO: Handle error

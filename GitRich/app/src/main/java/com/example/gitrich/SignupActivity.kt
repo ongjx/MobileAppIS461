@@ -58,7 +58,10 @@ class SignupActivity : AppCompatActivity() {
                     setResult(RESULT_OK, goBack)
                     finish()
                 }
-                binding.textView.text = "Error signing up"
+
+                if (res == 400){
+                    binding.textView.text = "Error signing up"
+                }
             },
             { error ->
                 // TODO: Handle error
