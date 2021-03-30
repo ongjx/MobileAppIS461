@@ -64,6 +64,7 @@ class Voice : AppCompatActivity() {
 
                 if (res == 201){
                     println("success")
+                    finish()
                 } else {
                     println("failure")
                 }
