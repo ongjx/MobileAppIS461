@@ -16,7 +16,13 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.GitRich"
         android:usesCleartextTraffic="true">
-        <activity android:name=".MainActivity"></activity>
+        <activity android:name=".MainActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
         <activity android:name=".ReceiptDetails" />
         <activity
             android:name=".AllReceipts"
@@ -33,11 +39,7 @@
         <activity
             android:name=".Voice"
             android:screenOrientation="portrait">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
 
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
         </activity>
     </application>
 

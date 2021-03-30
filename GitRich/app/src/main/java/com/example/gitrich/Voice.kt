@@ -7,12 +7,14 @@ import android.util.Log
 import android.widget.Button
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
-import okhttp3.*
+import com.android.volley.Request
+import com.android.volley.toolbox.JsonObjectRequest
 import java.io.IOException
 import java.util.*
 import com.example.gitrich.models.Receipt
 import com.google.gson.GsonBuilder
 import org.json.JSONObject
+
 
 
 
@@ -42,42 +44,37 @@ class Voice : AppCompatActivity() {
         if(requestCode == 100 || data != null){
             val res : ArrayList<String> = data!!.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS) as ArrayList<String>
             txt.text = res[0]
-            Log.v("printing", "calling")
             api_call(res[0])
         }
     }
 
     fun api_call(text: String) {
-        val client = OkHttpClient();
         val jsonObject = JSONObject()
-        jsonObject.put("text", text)
-        jsonObject.put("name", "Adhoc Receipt Mobile")
-        val JSON = MediaType.parse("application/json; charset=utf-8")
-        val body = RequestBody.create(JSON, jsonObject.toString());
 
-        val url = "http://192.168.10.145:8000/users/kelvinngsl/dialogflow"
-        val request = Request.Builder()
-                .url(url)
-                .post(body)
-                .build()
+        // TODO: Change the name dynamically
+        val url = "http://10.0.2.2:8000/users/kelvinngsl/dialogflow"
+        val payload = JSONObject()
+        payload.put("text", text)
+        payload.put("name", "Adhoc Receipt Mobile")
 
-        client.newCall(request).enqueue(object: Callback {
-            override fun onFailure(call: Call, e: IOException) {
-                println("failed to execute request")
+        val jsonObjectRequest = JsonObjectRequest(
+            Request.Method.POST, url, payload,
+            { response ->
+                val res = response.getInt("code")
 
-            }
-
-            override fun onResponse(call: Call, response: Response) {
-                val body = response?.body()?.string()
-                if (body != null) {
-                    val status = JSONObject(body).getInt("code")
-                    if (status == 201) {
-                        println("success")
-                    } else {
-                        println("failure")
-                    }
+                if (res == 201){
+                    println("success")
+                } else {
+                    println("failure")
                 }
+            },
+            { error ->
+                // TODO: Handle error
+                Log.e("Error", error.toString())
             }
-        })
+        )
+
+        MySingleton.getInstance(this).addToRequestQueue(jsonObjectRequest)
+
     }
 }

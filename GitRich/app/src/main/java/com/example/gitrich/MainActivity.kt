@@ -76,6 +76,8 @@ class MainActivity : AppCompatActivity() {
 
         binding.voice.setOnClickListener {
             Toast.makeText(this, "Voice", Toast.LENGTH_SHORT).show()
+            val intent = Intent(this, Voice::class.java)
+            startActivity(intent)
         }
 
         binding.qr.setOnClickListener {
