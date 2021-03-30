@@ -12,6 +12,7 @@ import android.provider.MediaStore
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.Fragment
 import com.example.gitrich.databinding.ActivityMainBinding
 
 
@@ -28,21 +29,35 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        binding.OCRBtn.setOnClickListener {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
-                if (checkSelfPermission(Manifest.permission.CAMERA) == PackageManager.PERMISSION_DENIED ||
-                        checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED){
-                    val permission = arrayOf(Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                    requestPermissions(permission, PERMISSION_CODE)
-                }
-                else{
-                    openCamera()
-                }
+        val transactionsFragment = receipts_summary()
+        val analyticsFragment = AnalyticsFragment()
+
+        makeCurrentFragment(transactionsFragment)
+
+        binding.bottomNav.setOnNavigationItemSelectedListener {
+            when (it.itemId) {
+                R.id.ic_transaction -> makeCurrentFragment(transactionsFragment)
+                R.id.ic_analytics -> makeCurrentFragment(analyticsFragment)
+
             }
-            else{
-                openCamera()
-            }
+            true
         }
+
+//        binding.OCRBtn.setOnClickListener {
+//            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
+//                if (checkSelfPermission(Manifest.permission.CAMERA) == PackageManager.PERMISSION_DENIED ||
+//                        checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED){
+//                    val permission = arrayOf(Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+//                    requestPermissions(permission, PERMISSION_CODE)
+//                }
+//                else{
+//                    openCamera()
+//                }
+//            }
+//            else{
+//                openCamera()
+//            }
+//        }
     }
 
     fun launchQR(view: View) {
@@ -54,6 +69,11 @@ class MainActivity : AppCompatActivity() {
 
     }
 
+    private fun makeCurrentFragment(fragment: Fragment) =
+        supportFragmentManager.beginTransaction().apply{
+            replace(R.id.fl_wrapper, fragment)
+            commit()
+        }
 
     private fun openCamera() {
         val contents = ContentValues()
