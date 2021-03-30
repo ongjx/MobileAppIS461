@@ -9,15 +9,26 @@ import com.android.volley.toolbox.ImageLoader
 import com.android.volley.toolbox.Volley
 
 class MySingleton constructor(context: Context) {
+
+
     companion object {
         @Volatile
         private var INSTANCE: MySingleton? = null
+        private var USERNAME: String = ""
         fun getInstance(context: Context) =
             INSTANCE ?: synchronized(this) {
                 INSTANCE ?: MySingleton(context).also {
                     INSTANCE = it
                 }
             }
+
+        fun setUsername(username: String) {
+            USERNAME = username
+        }
+
+        fun getUsername() : String {
+            return USERNAME
+        }
     }
     val imageLoader: ImageLoader by lazy {
         ImageLoader(requestQueue,
@@ -39,4 +50,6 @@ class MySingleton constructor(context: Context) {
     fun <T> addToRequestQueue(req: Request<T>) {
         requestQueue.add(req)
     }
+
+
 }

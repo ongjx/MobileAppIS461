@@ -43,6 +43,10 @@ class MainActivity : AppCompatActivity() {
 
         try{
             val scan = Scanner(openFileInput("userProfile.txt"))
+
+            // Load username to global context
+            val username = scan.nextLine().toString()
+            MySingleton.setUsername(username)
         } catch(e: FileNotFoundException) {
             loginPage()
         }

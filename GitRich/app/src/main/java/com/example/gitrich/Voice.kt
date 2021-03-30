@@ -51,8 +51,8 @@ class Voice : AppCompatActivity() {
     fun api_call(text: String) {
         val jsonObject = JSONObject()
 
-        // TODO: Change the name dynamically
-        val url = "http://10.0.2.2:8000/users/kelvinngsl/dialogflow"
+        val username = MySingleton.getUsername()
+        val url = "http://10.0.2.2:8000/users/" + username + "/dialogflow"
         val payload = JSONObject()
         payload.put("text", text)
         payload.put("name", "Adhoc Receipt Mobile")
@@ -64,6 +64,9 @@ class Voice : AppCompatActivity() {
 
                 if (res == 201){
                     println("success")
+                    val goBack = Intent()
+                    goBack.putExtra("message", "Receipt Created")
+                    setResult(RESULT_OK, goBack)
                     finish()
                 } else {
                     println("failure")
