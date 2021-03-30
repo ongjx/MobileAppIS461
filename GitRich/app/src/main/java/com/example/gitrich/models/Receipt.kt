@@ -7,6 +7,7 @@ class Receipt (): Parcelable {
     var id: String = ""
     var date: String = ""
     var amount: String = ""
+    var name: String = ""
 
     var items: HashMap<String, String> = HashMap()
     var image: String = ""
@@ -14,6 +15,7 @@ class Receipt (): Parcelable {
 
     constructor(parcel: Parcel) : this() {
         id = parcel.readString().toString()
+        name = parcel.readString().toString()
         date = parcel.readString().toString()
         amount = parcel.readString().toString()
         category = parcel.readString().toString()
@@ -32,11 +34,12 @@ class Receipt (): Parcelable {
     }
 
     override fun toString(): String {
-        return "Receipt [id:$id, date:$date, amount:$amount, category:$category, image: $image, items: $items]"
+        return "Receipt [id:$id, name:$name, date:$date, amount:$amount, category:$category, image: $image, items: $items]"
     }
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {
         parcel.writeString(id)
+        parcel.writeString(name)
         parcel.writeString(date)
         parcel.writeString(amount)
         parcel.writeString(category)
