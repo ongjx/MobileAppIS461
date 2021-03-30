@@ -55,7 +55,7 @@ class Voice : AppCompatActivity() {
         val url = "http://10.0.2.2:8000/users/" + username + "/dialogflow"
         val payload = JSONObject()
         payload.put("text", text)
-        payload.put("name", "Adhoc Receipt Mobile")
+        payload.put("name", "Adhoc Voice Receipt")
 
         val jsonObjectRequest = JsonObjectRequest(
             Request.Method.POST, url, payload,
