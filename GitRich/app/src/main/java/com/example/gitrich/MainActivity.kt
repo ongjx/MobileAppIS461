@@ -9,13 +9,18 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
+import android.speech.RecognizerIntent
+import android.util.Log
 import android.view.View
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
+import com.android.volley.Request
+import com.android.volley.toolbox.JsonObjectRequest
 import com.example.gitrich.databinding.ActivityMainBinding
+import org.json.JSONObject
 import java.io.FileNotFoundException
 import java.io.PrintStream
 import java.util.*
@@ -25,6 +30,8 @@ private const val PERMISSION_CODE = 1000
 private const val IMAGE_CAPTURE_CODE = 1001
 private const val IMAGE_PICK_CODE=1002
 private const val LOGIN_USER_CODE = 1003
+
+private const val VOICE_CODE = 1005
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
@@ -80,8 +87,13 @@ class MainActivity : AppCompatActivity() {
 
         binding.voice.setOnClickListener {
             Toast.makeText(this, "Voice", Toast.LENGTH_SHORT).show()
-            val intent = Intent(this, Voice::class.java)
-            startActivity(intent)
+            val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH)
+            intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
+            intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault())
+            intent.putExtra(RecognizerIntent.EXTRA_PROMPT,"Say Something")
+            startActivityForResult(intent, VOICE_CODE)
+//            val intent = Intent(this, Voice::class.java)
+//            startActivity(intent)
         }
 
         binding.qr.setOnClickListener {
@@ -219,7 +231,44 @@ class MainActivity : AppCompatActivity() {
                 output.println("${username}")
                 output.close()
             }
+            else if (requestCode == VOICE_CODE) {
+                if (data == null) {
+                    // make toast say error for voice cant process try again
+                } else {
+                    val res : ArrayList<String> = data!!.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS) as ArrayList<String>
+                    api_call(res[0])
+                }
+
+            }
         }
+    }
+
+    fun api_call(text: String) {
+        val jsonObject = JSONObject()
+
+        val username = MySingleton.getUsername()
+        val url = "http://10.0.2.2:8000/users/" + username + "/dialogflow"
+        val payload = JSONObject()
+        payload.put("text", text)
+        payload.put("name", "Adhoc Receipt Mobile")
+
+        val jsonObjectRequest = JsonObjectRequest(
+                Request.Method.POST, url, payload,
+                { response ->
+                    val res = response.getInt("code")
+
+                    if (res == 201){
+                        println("success")
+                    } else {
+                        println("failure")
+                    }
+                },
+                { error ->
+                    // TODO: Handle error
+                    Log.e("Error", error.toString())
+                }
+        )
+        MySingleton.getInstance(this).addToRequestQueue(jsonObjectRequest)
     }
 
 
