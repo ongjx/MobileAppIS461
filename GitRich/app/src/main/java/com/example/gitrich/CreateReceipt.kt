@@ -1,5 +1,6 @@
 package com.example.gitrich
 
+import android.content.Intent
 import android.graphics.Color
 import android.graphics.Typeface
 import android.graphics.drawable.ColorDrawable
@@ -14,14 +15,13 @@ import androidx.annotation.RequiresApi
 import okhttp3.*
 import org.json.JSONObject
 import java.io.IOException
-import java.text.SimpleDateFormat
-import java.time.format.DateTimeFormatter
-import java.util.*
+import com.android.volley.Request
+import com.android.volley.toolbox.JsonObjectRequest
 
 class CreateReceipt : AppCompatActivity() {
     private lateinit var categories: Array<String>;
     private var amount = "";
-    private var date = Date();
+    private var date = "";
     private var store = "";
     private var desc = "";
     private var category = "";
@@ -89,15 +89,12 @@ class CreateReceipt : AppCompatActivity() {
 
     @RequiresApi(Build.VERSION_CODES.O)
     fun save(view: View) {
-        amount = findViewById<TextView>(R.id.create_amount).toString()
-        date = findViewById(R.id.create_date)
-        val format = SimpleDateFormat("dd/MM/yyyy")
-        var dateStr = format.format(date)
-        store = findViewById(R.id.create_shop)
-        desc = findViewById(R.id.create_desc)
-        category = findViewById(R.id.category)
+
+        amount = findViewById<EditText>(R.id.create_amount).text.toString()
+        date = findViewById<EditText>(R.id.create_date).text.toString()
+        store = findViewById<EditText>(R.id.create_store).text.toString()
+        desc = findViewById<EditText>(R.id.create_desc).text.toString()
         val image = ""
-        Log.e("err", "$amount    $dateStr $store $desc $category")
         val client = OkHttpClient();
         val jsonObject = JSONObject()
 
@@ -107,34 +104,30 @@ class CreateReceipt : AppCompatActivity() {
         itemsObject.put(desc, amount)
         jsonObject.put("items", itemsObject)
         jsonObject.put("image", image)
-        jsonObject.put("date", dateStr)
+        jsonObject.put("date", date)
+        jsonObject.put("category", category)
 
-        val JSON = MediaType.parse("application/json; charset=utf-8")
-        val body = RequestBody.create(JSON, jsonObject.toString());
-
+        // TODO: handle name of requester
         val url = "http://10.0.2.2:8000/users/yongwk1/qr-receipts"
-        val request = Request.Builder()
-                .url(url)
-                .post(body)
-                .build()
+        val jsonObjectRequest = JsonObjectRequest(
+                Request.Method.POST, url, jsonObject,
+                { response ->
+                    val res = response.getInt("code")
 
-        client.newCall(request).enqueue(object: Callback {
-            override fun onFailure(call: Call, e: IOException) {
-                println("failed to execute request")
-            }
-
-            override fun onResponse(call: Call, response: Response) {
-                val body = response?.body()?.string()
-                if (body != null) {
-                    val status = JSONObject(body).getInt("code")
-                    if (status == 201) {
-                        println("success")
-                    } else {
-                        println("failure")
+                    if (res == 201){
+                        val goBack = Intent()
+                        goBack.putExtra("message", "Receipt Created")
+                        setResult(RESULT_OK, goBack)
+                        finish()
                     }
+                },
+                { error ->
+                    // TODO: Handle error
+                    Log.e("Error", error.toString())
                 }
-            }
-        })
+        )
+
+        MySingleton.getInstance(this).addToRequestQueue(jsonObjectRequest)
 
     }
 }
