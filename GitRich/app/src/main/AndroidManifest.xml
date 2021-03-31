@@ -16,6 +16,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.GitRich"
         android:usesCleartextTraffic="true">
+        <activity android:name=".SignupActivity" />
+        <activity android:name=".LoginActivity" />
+        <activity android:name=".ReceiptDetails" />
         <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -23,7 +26,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".ReceiptDetails" />
         <activity
             android:name=".AllReceipts"
             android:screenOrientation="portrait" />
