@@ -7,11 +7,12 @@ import dateutil.parser as dtp
 from datetime import datetime
 from google.cloud import dialogflow
 from pathlib import Path
+from collections import defaultdict, OrderedDict
 
 # initializing google cloud credentials
 home = str(Path.home())
 # credential_path = f"{home}\\Desktop\\dialogflow.json"
-credential_path = "./dialogflow.json"
+credential_path = "google-credentials.json"
 os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = credential_path
     
 from database import (
@@ -250,7 +251,7 @@ async def post_dialogflow(username: str, request: dict):
         return ErrorResponseModel("Price not found within text", 400, "Please provide the price of the item")
     
     if params["foods"] != "":
-        category = "Food"
+        category = "Food & Drinks"
     else:
         category = "Entertainment"
     
@@ -313,6 +314,51 @@ async def login_user(username: str, request: dict):
         return ErrorResponseModel('User not found', 400, 'Please enter the correct username')
     
     return ResponseModel(user, 200, "User logged in.")
+
+
+
+# ===================================================================================================
+# Analytics
+# [GET Endpoint] Expense
+@app.get("/users/{username}/analytics/expense")
+async def get_expense_analytics(username: str):
+    result = defaultdict(int)
+    # Everything is monthly for now
+    receipts = await retrieve_user_receipts(username)
+    if receipts:
+        for receipt in receipts:
+            receipt_date = receipt["date"]
+            date_time_obj = datetime.strptime(receipt_date, '%d/%m/%Y')
+            month_and_year = date_time_obj.strftime('%b %Y')
+            result[month_and_year] += float(receipt["amount"])
+
+        result= OrderedDict(sorted(result.items(), key=lambda t: datetime.strptime(t[0], '%b %Y'), reverse=True))
+        return ResponseModel(result, 200, "Receipts data retrieved successfully")
+    return ErrorResponseModel([], 400, "No Receipts")
+
+# [GET Endpoint] Category
+@app.get("/users/{username}/analytics/category")
+async def get_category_expense_analytics(username: str):
+    result = defaultdict(dict)
+    # Everything is monthly for now
+    receipts = await retrieve_user_receipts(username)
+    if receipts:
+        for receipt in receipts:
+            receipt_date = receipt["date"]
+            category = receipt["category"]
+            amount = receipt["amount"]
+            date_time_obj = datetime.strptime(receipt_date, '%d/%m/%Y')
+            month_and_year = date_time_obj.strftime('%b %Y')
+
+            if category not in result[month_and_year]:
+                result[month_and_year][category] = 0.0
+
+            result[month_and_year][category] += float(amount)
+
+        result= OrderedDict(sorted(result.items(), key=lambda t: datetime.strptime(t[0], '%b %Y'), reverse=True))
+        return ResponseModel(result, 200, "Receipts data retrieved successfully")
+    return ErrorResponseModel([], 400, "No Receipts")
+
 
 
 # NOTE: For sample response

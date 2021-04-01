@@ -56,6 +56,9 @@ class SignupActivity : AppCompatActivity() {
                     val username = data.optString("username")
                     goBack.putExtra("username", username)
                     setResult(RESULT_OK, goBack)
+
+                    // Set username in global context
+                    MySingleton.setUsername(username)
                     finish()
                 }
 

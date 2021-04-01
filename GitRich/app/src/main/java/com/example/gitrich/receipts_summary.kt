@@ -3,6 +3,7 @@ package com.example.gitrich
 import android.content.Context
 import android.content.Intent
 import android.graphics.BitmapFactory
+import android.os.Build
 import android.os.Bundle
 import android.util.Base64
 import android.util.Log
@@ -13,6 +14,7 @@ import android.widget.BaseAdapter
 import android.widget.ImageView
 import android.widget.ListView
 import android.widget.TextView
+import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
 import com.android.volley.Request
 import com.android.volley.RequestQueue
@@ -20,6 +22,11 @@ import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.Volley
 import com.example.gitrich.models.Receipt
 import com.google.gson.Gson
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+import java.util.*
+import kotlin.collections.ArrayList
+import kotlin.collections.HashMap
 
 
 // TODO: Rename parameter arguments, choose names that match
@@ -35,6 +42,10 @@ private const val ARG_PARAM2 = "param2"
 var receipts = ArrayList<Receipt>();
 
 class receipts_summary : Fragment() {
+//    private var receiptsMap: Map<String, ArrayList<Receipt>> = mutableMapOf()
+    private var receiptsMap : HashMap<String, ArrayList<Receipt>> = HashMap<String, ArrayList<Receipt>> ()
+    private lateinit var sortedReceiptsMap : SortedMap<String, ArrayList<Receipt>>
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         retainInstance = true
@@ -59,6 +70,7 @@ class receipts_summary : Fragment() {
         return view
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         if (savedInstanceState != null) {
@@ -67,16 +79,15 @@ class receipts_summary : Fragment() {
         } else {
             getReceipts()
         }
-
-
     }
+    @RequiresApi(Build.VERSION_CODES.O)
     private fun getReceipts () {
         val gson = Gson()
         val listView = activity!!.findViewById<ListView>(R.id.receipt_summary_list)
 
-        val url = "https://leojk9.deta.dev/users/kelvinngsl/receipts"
+//        val url = "https://leojk9.deta.dev/users/kelvinngsl/receipts"
         // For development local
-//        val url = "http://10.0.2.2:8000/users/kelvinngsl/receipts"
+        val url = "http://10.0.2.2:8000/users/kelvinngsl/receipts"
         listView.adapter = CustomAdapter(activity!!, receipts)
 
         val jsonObjectRequest = JsonObjectRequest(Request.Method.GET, url, null,
@@ -84,8 +95,29 @@ class receipts_summary : Fragment() {
                 val res = response.getJSONArray("data")
                 for (i in 0 until res.length()) {
                     val receipt = gson.fromJson(res[i].toString(), Receipt::class.java)
-                    receipts.add(receipt)
+
+                    if (!receiptsMap.containsKey(receipt.date)) {
+                        val newList = ArrayList<Receipt>()
+                        newList.add(receipt)
+                        receiptsMap[receipt.date] = newList
+
+                    } else {
+                        val newList = receiptsMap.get(receipt.date)
+                        newList!!.add(receipt)
+                        receiptsMap[receipt.date] = newList
+                    }
                 }
+                val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy", Locale.ENGLISH)
+
+                sortedReceiptsMap = receiptsMap.toSortedMap(compareByDescending { LocalDate.parse(it, formatter) })
+
+                // add the sorted receipt to receipts list
+                for ((key, value) in sortedReceiptsMap) {
+                    for (receipt in value) {
+                        receipts.add(receipt)
+                    }
+                }
+
                 listView.adapter = CustomAdapter(activity!!, receipts)
             },
             { error ->
@@ -118,7 +150,7 @@ class receipts_summary : Fragment() {
         override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
             val layoutInflater = LayoutInflater.from(mContext)
             val row = layoutInflater.inflate(R.layout.main_row, parent, false)
-            
+
             val thumbnail = row.findViewById<ImageView>(R.id.thumbnail_display)
             val title = row.findViewById<TextView>(R.id.row_title)
             val amount = row.findViewById<TextView>(R.id.row_amount)
@@ -136,12 +168,13 @@ class receipts_summary : Fragment() {
                     thumbnail.setImageBitmap(decodedByte)
                 } catch (error: Exception){
                 }
-                title.text = receipt.id
+                title.text = receipt.name
                 amount.text = "$${receipt.amount}"
                 category.text = receipt.category
                 date.text = receipt.date
                 return row
             }
+
             return row
 
         }
