@@ -70,7 +70,8 @@ class Receipt():
                     item, price = line.split("\t")
 
                     if item.lower() == "total":
-                        self.amount = Receipt.to_float(price)
+                        raw_amount = Receipt.to_float(price)
+                        self.amount = f"{raw_amount:.2f}"
                     elif item.lower() in ["subtotal", "rounding", "cash"]:
                         continue
                     else:
@@ -129,7 +130,7 @@ class Receipt():
     @staticmethod
     def retrieve_date(line):
         dt = dtp.parse(line.split("\t")[1])
-        return dt.strftime("%d/%m/%Y")
+        return dt.strftime("%d/%m/%Y %H:%M:%S")
 
     @staticmethod
     def has_tab(line):
@@ -174,6 +175,8 @@ async def upload_ocrreceipt(username: str, request: dict): # if never specify, i
 @app.post("/users/{username}/qr-receipts")
 async def upload_qrreceipt(username: str, request: dict): # if never specify, its gonna be request body from call
 
+    # add Hours minutes and seconds to date
+    request["date"] += " 00:00:00"
     success, receipt = await add_receipt(username, request)
 
     if success:
@@ -216,8 +219,9 @@ async def delete_receipt_data(username: str, receipt_id: str):
 # [GET Endpoint] All receipts for a particular user `GET {{base_url}}/api/v1/users/{{username}}/receipts`
 @app.get("/users/{username}/receipts")
 async def get_receipts(username: str):
-
     receipts = await retrieve_user_receipts(username)
+    receipts.sort(key=lambda x:datetime.strptime(x["date"], '%d/%m/%Y %H:%M:%S'), reverse=True)
+    
     if receipts:
         return ResponseModel(receipts, 200, "Receipts data retrieved successfully")
     return ResponseModel(receipts, 200, "Empty list returned")
@@ -261,7 +265,7 @@ async def post_dialogflow(username: str, request: dict):
         "items": {},
         "category": category,
         "image": None,
-        "date": datetime.today().strftime('%d/%m/%Y') 
+        "date": datetime.now().strftime('%d/%m/%Y %H:%M:%S')
     }
     
     success, receipt = await add_receipt(username, receipt)
