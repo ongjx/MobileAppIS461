@@ -12,7 +12,7 @@ from collections import defaultdict, OrderedDict
 # initializing google cloud credentials
 home = str(Path.home())
 # credential_path = f"{home}\\Desktop\\dialogflow.json"
-credential_path = "./google-credentials.json"
+credential_path = "google-credentials.json"
 os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = credential_path
     
 from database import (
