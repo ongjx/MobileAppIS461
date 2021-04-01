@@ -99,7 +99,6 @@ class receipts_summary : Fragment() {
 
             { error ->
                 // TODO: Handle error
-                Log.e("Error", error.toString())
             }
         )
 
@@ -137,13 +136,19 @@ class receipts_summary : Fragment() {
                 val receipt = receipts[position]
                 try {
                     var receiptBytes = receipt.image
-                    if (receipt.image.contains("data:image")) {
-                        receiptBytes = receipt.image.substringAfter(',')
+                    if (receipt.image == null) {
+                        thumbnail.setImageResource(R.drawable.empty)
+                    } else {
+                        if (receipt.image.contains("data:image")) {
+                            receiptBytes = receipt.image.substringAfter(',')
+                            val decodedString = Base64.decode(receiptBytes, Base64.DEFAULT);
+                            val decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.size)
+                            thumbnail.setImageBitmap(decodedByte)
+                        }
                     }
-                    val decodedString = Base64.decode(receiptBytes, Base64.DEFAULT);
-                    val decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.size)
-                    thumbnail.setImageBitmap(decodedByte)
+
                 } catch (error: Exception){
+                    println(error)
                 }
                 title.text = receipt.name
                 amount.text = "$${receipt.amount}"
@@ -165,8 +170,7 @@ class receipts_summary : Fragment() {
 
     fun startListListener(listView: ListView) {
         listView.setOnItemClickListener { _, _, position, id ->
-            val receipt = receipts[position];
-            Log.e("Receipt", receipt.toString())
+            val receipt = receipts[position]
             val intent = Intent(activity!!, ReceiptDetails::class.java)
             intent.putExtra("receipt", receipt)
             startActivity(intent)
