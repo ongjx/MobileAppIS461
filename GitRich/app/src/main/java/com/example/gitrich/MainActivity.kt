@@ -249,7 +249,7 @@ class MainActivity : AppCompatActivity() {
         val jsonObject = JSONObject()
 
         val username = MySingleton.getUsername()
-        val url = "http://192.168.10.115:8000/users/" + username + "/dialogflow"
+        val url = "https://gitrich-backend.herokuapp.com/users/" + username + "/dialogflow"
         val payload = JSONObject()
         payload.put("text", text)
         payload.put("name", "Adhoc Receipt Mobile")
