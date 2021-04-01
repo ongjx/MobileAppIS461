@@ -30,6 +30,7 @@ class CreateReceipt : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_create_receipt)
+        supportActionBar!!.setTitle("GitRich - Add New Receipt");
         categories = resources.getStringArray(R.array.Categories)
         spinner = findViewById(R.id.create_category)
         if (spinner != null) {
@@ -94,21 +95,29 @@ class CreateReceipt : AppCompatActivity() {
         date = findViewById<EditText>(R.id.create_date).text.toString()
         store = findViewById<EditText>(R.id.create_store).text.toString()
         desc = findViewById<EditText>(R.id.create_desc).text.toString()
+        val items = desc.splitToSequence("\n")
+        val itemsObject = JSONObject()
+        for (item: String in items) {
+            val l = item.split(',')
+            val name = l[0].trim()
+            val amount = if ("$" in l[1]) l[1].trim() else ("$${l[1].trim()}")
+
+            itemsObject.put(l[0].trim() as String, l[1])
+        }
         val image = ""
         val client = OkHttpClient();
         val jsonObject = JSONObject()
 
         jsonObject.put("name", store)
         jsonObject.put("amount", amount)
-        val itemsObject = JSONObject()
-        itemsObject.put(desc, amount)
         jsonObject.put("items", itemsObject)
         jsonObject.put("image", image)
         jsonObject.put("date", date)
         jsonObject.put("category", category)
 
         // TODO: handle name of requester
-        val url = "http://10.0.2.2:8000/users/yongwk1/qr-receipts"
+        val user = MySingleton.getUsername()
+        val url = "http://10.0.2.2:8000/users/${user}/qr-receipts"
         val jsonObjectRequest = JsonObjectRequest(
                 Request.Method.POST, url, jsonObject,
                 { response ->
