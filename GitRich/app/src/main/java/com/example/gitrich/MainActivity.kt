@@ -237,6 +237,8 @@ class MainActivity : AppCompatActivity() {
                 } else {
                     val res : ArrayList<String> = data!!.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS) as ArrayList<String>
                     api_call(res[0])
+                    finish()
+                    startActivity(getIntent())
                 }
 
             }
@@ -259,8 +261,10 @@ class MainActivity : AppCompatActivity() {
 
                     if (res == 201){
                         println("success")
+                        Toast.makeText(this, "Success! Receipt Created!", Toast.LENGTH_SHORT).show()
                     } else {
                         println("failure")
+                        Toast.makeText(this, "Failure! Receipt Not Created!", Toast.LENGTH_SHORT).show()
                     }
                 },
                 { error ->
