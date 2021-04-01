@@ -39,10 +39,11 @@ private const val ARG_PARAM2 = "param2"
  * Use the [receipts_summary.newInstance] factory method to
  * create an instance of this fragment.
  */
-var receipts = ArrayList<Receipt>();
+
+var receipts = ArrayList<Receipt>()
 
 class receipts_summary : Fragment() {
-//    private var receiptsMap: Map<String, ArrayList<Receipt>> = mutableMapOf()
+    private val username = com.example.gitrich.MySingleton.getUsername()
     private var receiptsMap : HashMap<String, ArrayList<Receipt>> = HashMap<String, ArrayList<Receipt>> ()
     private lateinit var sortedReceiptsMap : SortedMap<String, ArrayList<Receipt>>
 
@@ -77,6 +78,11 @@ class receipts_summary : Fragment() {
             //Restore the fragment's state here
             receipts = savedInstanceState.getParcelableArrayList<Receipt>("receipts") as ArrayList<Receipt>
         } else {
+            receipts.clear()
+            if (this::sortedReceiptsMap.isInitialized) {
+                sortedReceiptsMap.clear()
+            }
+            receiptsMap.clear()
             getReceipts()
         }
     }
@@ -85,10 +91,7 @@ class receipts_summary : Fragment() {
         val gson = Gson()
         val listView = activity!!.findViewById<ListView>(R.id.receipt_summary_list)
 
-//        val url = "https://leojk9.deta.dev/users/kelvinngsl/receipts"
-        // For development local
-        val url = "https://gitrich-backend.herokuapp.com/users/kelvinngsl/receipts"
-        listView.adapter = CustomAdapter(activity!!, receipts)
+        val url = "https://gitrich-backend.herokuapp.com/users/${username}/receipts"
 
         val jsonObjectRequest = JsonObjectRequest(Request.Method.GET, url, null,
             { response ->
@@ -120,6 +123,7 @@ class receipts_summary : Fragment() {
 
                 listView.adapter = CustomAdapter(activity!!, receipts)
             },
+
             { error ->
                 // TODO: Handle error
                 Log.e("Error", error.toString())
@@ -131,7 +135,6 @@ class receipts_summary : Fragment() {
         MySingleton.getInstance(activity!!).addToRequestQueue(jsonObjectRequest)
     }
     class CustomAdapter(context: Context, receipts: ArrayList<Receipt>): BaseAdapter() {
-
         private val mContext: Context = context
         private val mReceipts: ArrayList<Receipt> = receipts
 
@@ -156,8 +159,11 @@ class receipts_summary : Fragment() {
             val amount = row.findViewById<TextView>(R.id.row_amount)
             val category = row.findViewById<TextView>(R.id.category)
             val date = row.findViewById<TextView>(R.id.date)
-            if (mReceipts.isNotEmpty()) {
-                val receipt = mReceipts[position]
+
+            if (receipts.isNotEmpty()) {
+                val receipt = receipts[position]
+                println("getview")
+                println(receipts.size)
                 try {
                     var receiptBytes = receipt.image
                     if (receipt.image.contains("data:image")) {
