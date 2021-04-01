@@ -3,6 +3,7 @@ import base64
 import os
 import requests
 import uuid
+import pytz
 import dateutil.parser as dtp
 from datetime import datetime
 from google.cloud import dialogflow
@@ -265,7 +266,7 @@ async def post_dialogflow(username: str, request: dict):
         "items": {},
         "category": category,
         "image": None,
-        "date": datetime.now().strftime('%d/%m/%Y %H:%M:%S')
+        "date": datetime.now(pytz.timezone('Asia/Singapore')).strftime('%d/%m/%Y %H:%M:%S')
     }
     
     success, receipt = await add_receipt(username, receipt)
