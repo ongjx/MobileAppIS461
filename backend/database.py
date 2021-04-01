@@ -102,12 +102,22 @@ async def update_receipt(id: str, data: dict):
 
 
 # Delete a receipt from the database
-async def delete_receipt(id: str):
+async def delete_receipt(username: str, id: str):
     receipt = await receipt_collection.find_one({"_id": ObjectId(id)})
+    
     if receipt:
         await receipt_collection.delete_one({"_id": ObjectId(id)})
-        return True
     
+    user = await user_collection.find_one({"username": username})
+    if user:
+        current_receipt_ids = user_helper(user)["receipt_ids"]
+        current_receipt_ids.remove(ObjectId(id))
+        data = {"receipt_ids": current_receipt_ids}
+        updated_user = await user_collection.update_one(
+            {"username": username}, {"$set": data}
+        )
+        return True
+    return False
     
 # ================================================================================
 # Users

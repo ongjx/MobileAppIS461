@@ -204,7 +204,7 @@ async def update_receipt_data(username: str, receipt_id: str, req: UpdateReceipt
 # [DELETE Endpoint]
 @app.delete("/users/{username}/receipts/{receipt_id}")
 async def delete_receipt_data(username: str, receipt_id: str):
-    deleted_receipt = await delete_receipt(receipt_id)
+    deleted_receipt = await delete_receipt(username, receipt_id)
     if deleted_receipt:
         return ResponseModel(
             "Receipt with ID: {} removed".format(receipt_id),
