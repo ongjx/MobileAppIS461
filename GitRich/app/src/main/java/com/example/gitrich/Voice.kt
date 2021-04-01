@@ -9,10 +9,7 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.android.volley.Request
 import com.android.volley.toolbox.JsonObjectRequest
-import java.io.IOException
 import java.util.*
-import com.example.gitrich.models.Receipt
-import com.google.gson.GsonBuilder
 import org.json.JSONObject
 
 

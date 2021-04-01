@@ -43,9 +43,7 @@ private const val ARG_PARAM2 = "param2"
 var receipts = ArrayList<Receipt>()
 
 class receipts_summary : Fragment() {
-    private val username = com.example.gitrich.MySingleton.getUsername()
-    private var receiptsMap : HashMap<String, ArrayList<Receipt>> = HashMap<String, ArrayList<Receipt>> ()
-    private lateinit var sortedReceiptsMap : SortedMap<String, ArrayList<Receipt>>
+    private val username = MySingleton.getUsername()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -79,10 +77,6 @@ class receipts_summary : Fragment() {
             receipts = savedInstanceState.getParcelableArrayList<Receipt>("receipts") as ArrayList<Receipt>
         } else {
             receipts.clear()
-            if (this::sortedReceiptsMap.isInitialized) {
-                sortedReceiptsMap.clear()
-            }
-            receiptsMap.clear()
             getReceipts()
         }
     }
@@ -98,29 +92,8 @@ class receipts_summary : Fragment() {
                 val res = response.getJSONArray("data")
                 for (i in 0 until res.length()) {
                     val receipt = gson.fromJson(res[i].toString(), Receipt::class.java)
-
-                    if (!receiptsMap.containsKey(receipt.date)) {
-                        val newList = ArrayList<Receipt>()
-                        newList.add(receipt)
-                        receiptsMap[receipt.date] = newList
-
-                    } else {
-                        val newList = receiptsMap.get(receipt.date)
-                        newList!!.add(receipt)
-                        receiptsMap[receipt.date] = newList
-                    }
+                    receipts.add(receipt)
                 }
-                val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy", Locale.ENGLISH)
-
-                sortedReceiptsMap = receiptsMap.toSortedMap(compareByDescending { LocalDate.parse(it, formatter) })
-
-                // add the sorted receipt to receipts list
-                for ((key, value) in sortedReceiptsMap) {
-                    for (receipt in value) {
-                        receipts.add(receipt)
-                    }
-                }
-
                 listView.adapter = CustomAdapter(activity!!, receipts)
             },
 
@@ -162,8 +135,6 @@ class receipts_summary : Fragment() {
 
             if (receipts.isNotEmpty()) {
                 val receipt = receipts[position]
-                println("getview")
-                println(receipts.size)
                 try {
                     var receiptBytes = receipt.image
                     if (receipt.image.contains("data:image")) {
@@ -185,28 +156,6 @@ class receipts_summary : Fragment() {
 
         }
     }
-    class MySingleton constructor(context: Context) {
-        companion object {
-            @Volatile
-            private var INSTANCE: MySingleton? = null
-            fun getInstance(context: Context) =
-                INSTANCE ?: synchronized(this) {
-                    INSTANCE ?: MySingleton(context).also {
-                        INSTANCE = it
-                    }
-                }
-        }
-
-        val requestQueue: RequestQueue by lazy {
-            // applicationContext is key, it keeps you from leaking the
-            // Activity or BroadcastReceiver if someone passes one in.
-            Volley.newRequestQueue(context.applicationContext)
-        }
-
-        fun <T> addToRequestQueue(req: Request<T>) {
-            requestQueue.add(req)
-        }
-    }
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
@@ -223,6 +172,4 @@ class receipts_summary : Fragment() {
             startActivity(intent)
         }
     }
-
-
 }
