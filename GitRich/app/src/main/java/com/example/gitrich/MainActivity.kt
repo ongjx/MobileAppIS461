@@ -30,6 +30,7 @@ private const val PERMISSION_CODE = 1000
 private const val IMAGE_CAPTURE_CODE = 1001
 private const val IMAGE_PICK_CODE=1002
 private const val LOGIN_USER_CODE = 1003
+private const val RECEIPT_SUBMIT_CODE = 1004
 
 private const val VOICE_CODE = 1005
 
@@ -65,6 +66,8 @@ class MainActivity : AppCompatActivity() {
 
         binding.manual.setOnClickListener {
             Toast.makeText(this, "Manual", Toast.LENGTH_SHORT).show()
+            intent = Intent(this, CreateReceipt::class.java)
+            startActivityForResult(intent, RECEIPT_SUBMIT_CODE)
         }
 
         binding.ocr.setOnClickListener {
