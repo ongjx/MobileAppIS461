@@ -23,6 +23,7 @@ from database import (
     retrieve_user_receipts,
     add_user,
     check_user_existence,
+    bootstrap_receipts,
 )
 
 from models import (
@@ -226,6 +227,15 @@ async def get_receipts(username: str):
     if receipts:
         return ResponseModel(receipts, 200, "Receipts data retrieved successfully")
     return ResponseModel(receipts, 200, "Empty list returned")
+
+# [DELETE Endpoint] bootstrap
+@app.delete("/users/{username}/receipts")
+async def bootstrap_receipts_endpoint(username: str):
+    status = await bootstrap_receipts(username)
+    
+    if status:
+        return ResponseModel(None, 200, "Receipts data bootstraped")
+    return ErrorResponseModel(None, 400, "Error")
 
 
 @app.post("/users/{username}/dialogflow")

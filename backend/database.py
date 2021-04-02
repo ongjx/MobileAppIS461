@@ -118,7 +118,25 @@ async def delete_receipt(username: str, id: str):
         )
         return True
     return False
-    
+
+# Bootstrap user receipts from the database
+async def bootstrap_receipts(username: str):
+    user = await user_collection.find_one({"username": username})
+
+    if user:
+        user = user_helper(user)
+    else:
+        return False
+
+    for receipt_id in user["receipt_ids"]:
+        # delete that receipt
+        receipt_collection.delete_one({"_id": ObjectId(receipt_id)})
+                                      
+    # empty the user array
+    data = {"receipt_ids": []}
+    updated_user = await user_collection.update_one({"username": username}, {"$set": data})
+
+    return True    
 # ================================================================================
 # Users
 
