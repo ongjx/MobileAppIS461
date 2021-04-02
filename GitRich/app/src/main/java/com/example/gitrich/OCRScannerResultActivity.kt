@@ -101,7 +101,7 @@ class OCRScannerResultActivity : AppCompatActivity() {
     }
 
     fun populateForm(id: String) {
-        val url = "http://10.0.2.2:8000/users/${username}/receipts/${id}"
+        val url = "http://192.168.10.115:8000/users/${username}/receipts/${id}"
 
         val payload = JSONObject()
 
@@ -160,7 +160,7 @@ class OCRScannerResultActivity : AppCompatActivity() {
 
     fun save(view: View) {
         //TODO: update receipt submission to backend
-        val url = "http://10.0.2.2:8000/users/${username}/receipts/${id}"
+        val url = "http://192.168.10.115:8000/users/${username}/receipts/${id}"
         val payload = JSONObject()
         amount = findViewById<EditText>(R.id.create_amount).text.toString().toDouble()
         store = findViewById<EditText>(R.id.create_store).text.toString()

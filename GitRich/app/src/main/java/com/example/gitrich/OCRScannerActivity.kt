@@ -20,6 +20,7 @@ import java.io.IOException
 class OCRScannerActivity : AppCompatActivity() {
     private lateinit var binding: ActivityOCRScannerBinding
     private var encodedImage_BASE64 = ""
+    private var filepath = ""
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityOCRScannerBinding.inflate(layoutInflater)
@@ -33,6 +34,7 @@ class OCRScannerActivity : AppCompatActivity() {
             val bitmap = Bitmap.createScaledBitmap(selectedImage, 768, 1024, true)
             binding.imageView.setImageBitmap(bitmap)
             encodedImage_BASE64 = "data:image/jpg;base64," + encodeImage(bitmap)
+            filepath = intent.getString("filepath").toString()
         }
     }
 
@@ -59,21 +61,19 @@ class OCRScannerActivity : AppCompatActivity() {
         // TODO: After that show the receipt in a view
         // TODO: Go back main screen and refresh
         println("processing")
-        post_ocr_receipt(encodedImage_BASE64)
+        post_ocr_receipt()
 
-
-//        setResult(RESULT_OK, goBack)
-//        finish()
     }
 
-    fun post_ocr_receipt(base64_image: String) {
+    fun post_ocr_receipt() {
         val username = MySingleton.getUsername()
         val client = OkHttpClient()
 
-        // val url = "https://gitrich-backend.herokuapp.com/users/" + username + "/ocr-receipts"
-        val url = "http://10.0.2.2:8000/users/" + username + "/ocr-receipts"
+        // val url = "http://192.168.10.115:8000/users/" + username + "/ocr-receipts"
+        val url = "http://192.168.10.115:8000/users/" + username + "/ocr-receipts"
         val payload = JSONObject()
-        payload.put("image", base64_image)
+        payload.put("image", encodedImage_BASE64)
+        payload.put("filepath", filepath)
 
         val JSON = MediaType.parse("application/json; charset=utf-8")
         val body = RequestBody.create(JSON, payload.toString())
@@ -95,10 +95,6 @@ class OCRScannerActivity : AppCompatActivity() {
                     val status = JSONObject(body).getInt("code")
                     if (status == 201) {
                         println("success")
-                        // go to ScannerResult
-//                        val intent = Intent(this@OCRScannerActivity, OCRScannerResultActivity::class.java)
-//                        intent.putExtra("data", JSONObject(body).getJSONObject("data").toString())
-//                        startActivityForResult(intent, 777)
 
                         val goBack = Intent()
                         // Get ID
@@ -112,31 +108,5 @@ class OCRScannerActivity : AppCompatActivity() {
                 }
             }
         })
-
-//        val jsonObjectRequest = JsonObjectRequest(
-//                Request.Method.POST, url, payload,
-//                { response ->
-//                    val res = response.getInt("code")
-//
-//                    if (res == 201){
-//                        println("success")
-//                        val result = response.getJSONObject("data").toString()
-//                        println(result)
-//                        Toast.makeText(this, "Success! Receipt Created!", Toast.LENGTH_SHORT).show()
-////                        val it = Intent(this, OCRScannerResultActivity::class.java)
-////                        it.putExtra("data", result)
-////                        startActivityForResult(it, 888)
-//
-//                    } else {
-//                        println("failure")
-//                        Toast.makeText(this, "Failure! Receipt Not Created!", Toast.LENGTH_SHORT).show()
-//                    }
-//                },
-//                { error ->
-//                    // TODO: Handle error
-//                    Log.e("Error", error.toString())
-//                }
-//        )
-//        MySingleton.getInstance(this).addToRequestQueue(jsonObjectRequest)
     }
 }

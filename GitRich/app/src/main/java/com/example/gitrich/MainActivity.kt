@@ -6,10 +6,13 @@ import android.content.ContentValues
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.os.Environment
 import android.provider.MediaStore
+import android.provider.MediaStore.Images.Thumbnails.getThumbnail
 import android.speech.RecognizerIntent
 import android.util.Log
 import android.view.View
@@ -22,8 +25,7 @@ import com.android.volley.Request
 import com.android.volley.toolbox.JsonObjectRequest
 import com.example.gitrich.databinding.ActivityMainBinding
 import org.json.JSONObject
-import java.io.FileNotFoundException
-import java.io.PrintStream
+import java.io.*
 import java.util.*
 
 
@@ -37,6 +39,7 @@ private const val VOICE_CODE = 1005
 private const val OCR_CODE = 1006
 private const val OCR_RESULT_CODE = 1007
 class MainActivity : AppCompatActivity() {
+    private lateinit var username: String
     private lateinit var binding: ActivityMainBinding
     private var image_uri: Uri? = null
 
@@ -55,7 +58,7 @@ class MainActivity : AppCompatActivity() {
             val scan = Scanner(openFileInput("userProfile.txt"))
 
             // Load username to global context
-            val username = scan.nextLine().toString()
+            username = scan.nextLine().toString()
             MySingleton.setUsername(username)
         } catch(e: FileNotFoundException) {
             loginPage()
@@ -221,7 +224,39 @@ class MainActivity : AppCompatActivity() {
         if (resultCode == Activity.RESULT_OK) {
             if(requestCode == IMAGE_CAPTURE_CODE) {
                 val intent = Intent(this, OCRScannerActivity::class.java )
+                // change to bitmap and store
+                val imageStream: InputStream? = contentResolver.openInputStream(image_uri!!)
+                val selectedImage = BitmapFactory.decodeStream(imageStream)
+                val bitmap = Bitmap.createScaledBitmap(selectedImage, 768, 1024, true)
+
+                val root = getExternalFilesDir(username)
+//                val currentFiles = root?.listFiles()
+                val newFileName = UUID.randomUUID().toString() + ".jpg"
+
+//                if (currentFiles != null && currentFiles.size > 0) {
+//                    newFileName = (currentFiles.first().toString()
+//                                            .split(username + "/")[1]
+//                                            .split(".jpg")[0]
+//                                            .toInt()+1).toString() + ".jpg"
+//                } else {
+//                    newFileName = "1.jpg"
+//                }
+
+                // Saving files
+                println("new file name: " + newFileName)
+                val imageFile = File(root, newFileName)
+                bitmap.compress(Bitmap.CompressFormat.JPEG, 90, FileOutputStream(imageFile))
+
+                // Show all files
+                val files = root?.listFiles()
+                if (files != null) {
+                    for (file in files) {
+                        println(file.toString())
+                    }
+                }
+
                 intent.putExtra("image_uri", image_uri)
+                intent.putExtra("filepath", newFileName)
                 startActivityForResult(intent, OCR_CODE)
             }
             else if (requestCode == IMAGE_PICK_CODE) {
@@ -262,8 +297,8 @@ class MainActivity : AppCompatActivity() {
 
     fun post_dialoflow_api(text: String) {
         val username = MySingleton.getUsername()
-        // val url = "https://gitrich-backend.herokuapp.com/users/" + username + "/dialogflow"
-        val url = "http://10.0.2.2:8000/users/" + username + "/dialogflow"
+        // val url = "http://192.168.10.115:8000/users/" + username + "/dialogflow"
+        val url = "http://192.168.10.115:8000/users/" + username + "/dialogflow"
         val payload = JSONObject()
         payload.put("text", text)
         payload.put("name", "Adhoc Receipt Mobile")

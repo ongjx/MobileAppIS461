@@ -48,18 +48,18 @@ class Receipt():
 
     # Initialization can be dynamic, depending on the receipt given, can parse differently.
     # For instance receipt = Receipt(raw_response, "kenboru") or Receipt(raw_response, "Pasta Express")
-    def __init__(self, raw_response, image, name, category):
+    def __init__(self, raw_response, filepath, name, category):
         self.reset()
         
-        if image is not None:
-            self.image = image
+        if filepath is not None:
+            self.image = filepath
         
         if name is not None:
             self.name = name
         
         if category is not None:
             self.category = category
-
+            
         self.parse(raw_response)
 
     def parse(self, raw_response):
@@ -157,10 +157,10 @@ def size(b64string):
 
 @app.post("/users/{username}/ocr-receipts")
 async def upload_ocrreceipt(username: str, request: dict): # if never specify, its gonna be request body from call
-    print("executing")
     # Get json name from request
     image = request["image"]
-    
+    filepath = request["filepath"]
+
     try:
         name = request["name"]
     except KeyError:
@@ -176,7 +176,7 @@ async def upload_ocrreceipt(username: str, request: dict): # if never specify, i
     response_json = response.json()
     raw_response = response_json["ParsedResults"][0]["ParsedText"]
 
-    receipt_dict = Receipt(raw_response, image, name, category).to_dict()
+    receipt_dict = Receipt(raw_response, filepath, name, category).to_dict()
     
     success, receipt = await add_receipt(username, receipt_dict)
 

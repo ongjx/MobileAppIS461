@@ -17,16 +17,11 @@ import android.widget.TextView
 import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
 import com.android.volley.Request
-import com.android.volley.RequestQueue
 import com.android.volley.toolbox.JsonObjectRequest
-import com.android.volley.toolbox.Volley
 import com.example.gitrich.models.Receipt
 import com.google.gson.Gson
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
-import java.util.*
+import java.io.File
 import kotlin.collections.ArrayList
-import kotlin.collections.HashMap
 
 
 // TODO: Rename parameter arguments, choose names that match
@@ -85,8 +80,8 @@ class receipts_summary : Fragment() {
         val gson = Gson()
         val listView = activity!!.findViewById<ListView>(R.id.receipt_summary_list)
 
-        // val url = "https://gitrich-backend.herokuapp.com/users/${username}/receipts"
-        val url = "http://10.0.2.2:8000/users/${username}/receipts"
+        // val url = "http://192.168.10.115:8000/users/${username}/receipts"
+        val url = "http://192.168.10.115:8000/users/${username}/receipts"
 
         val jsonObjectRequest = JsonObjectRequest(Request.Method.GET, url, null,
             { response ->
@@ -145,6 +140,15 @@ class receipts_summary : Fragment() {
                             val decodedString = Base64.decode(receiptBytes, Base64.DEFAULT);
                             val decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.size)
                             thumbnail.setImageBitmap(decodedByte)
+                        } else {
+                            // .jpg
+                            val root = mContext.getExternalFilesDir(MySingleton.getUsername())
+                            val imgFile = File(root, receipt.image)
+
+                            if (imgFile.exists()) {
+                                val decodedByte = BitmapFactory.decodeFile(imgFile.getAbsolutePath())
+                                thumbnail.setImageBitmap(decodedByte)
+                            }
                         }
                     }
 
