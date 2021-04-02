@@ -37,16 +37,17 @@ class ReceiptDetails : AppCompatActivity() {
         if (receipt != null) {
             try {
                 var receiptBytes = receipt.image
-                if (receipt.image.contains("data:image")) {
-                    receiptBytes = receipt.image.substringAfter(',')
+                if (receipt.image == "null") {
+                    receiptImage.setImageResource(R.drawable.empty)
+                } else {
+                    println(receipt.image)
+                    if (receipt.image.contains("data:image")) {
+                        receiptBytes = receipt.image.substringAfter(',')
+                        val decodedString = Base64.decode(receiptBytes, Base64.DEFAULT);
+                        val decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.size)
+                        receiptImage.setImageBitmap(decodedByte)
+                    }
                 }
-                val decodedString = Base64.decode(receiptBytes, Base64.DEFAULT);
-                val decodedByte = BitmapFactory.decodeByteArray(
-                    decodedString,
-                    0,
-                    decodedString.size
-                )
-                receiptImage.setImageBitmap(decodedByte)
                 height = receiptImage.layoutParams.height
                 width = receiptImage.layoutParams.width
             } catch (error: Exception){

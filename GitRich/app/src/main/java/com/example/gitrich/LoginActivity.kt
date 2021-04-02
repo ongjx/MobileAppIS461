@@ -46,7 +46,7 @@ class LoginActivity : AppCompatActivity() {
             return
         }
 
-        val url = "http://10.0.2.2:8000/users/${binding.editTextUsername.text}/login"
+        val url = "https://gitrich-backend.herokuapp.com/users/${binding.editTextUsername.text}/login"
         val payload = JSONObject()
         payload.put("password", password)
 
