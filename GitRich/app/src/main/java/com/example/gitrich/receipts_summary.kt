@@ -47,7 +47,7 @@ class receipts_summary : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        retainInstance = true
+//        retainInstance = true
 //        if (savedInstanceState != null) {
 //            receipts = savedInstanceState.getParcelableArrayList<Receipt>("receipts") as ArrayList<Receipt>
 //        }
@@ -163,10 +163,10 @@ class receipts_summary : Fragment() {
         }
     }
 
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
-        outState.putParcelableArrayList("receipts", receipts)
-    }
+//    override fun onSaveInstanceState(outState: Bundle) {
+//        super.onSaveInstanceState(outState)
+//        outState.putParcelableArrayList("receipts", receipts)
+//    }
 
 
     fun startListListener(listView: ListView) {

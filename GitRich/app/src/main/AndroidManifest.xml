@@ -16,11 +16,14 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.GitRich"
         android:usesCleartextTraffic="true">
-        <activity android:name=".CreateReceipt"></activity>
+        <activity android:name=".OCRScannerResultActivity"></activity>
+        <activity android:name=".CreateReceipt" />
         <activity android:name=".SignupActivity" />
         <activity android:name=".LoginActivity" />
         <activity android:name=".ReceiptDetails" />
-        <activity android:name=".MainActivity" android:screenOrientation="portrait">
+        <activity
+            android:name=".MainActivity"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -41,9 +44,7 @@
             android:screenOrientation="portrait" />
         <activity
             android:name=".Voice"
-            android:screenOrientation="portrait">
-
-        </activity>
+            android:screenOrientation="portrait"></activity>
     </application>
 
 </manifest>

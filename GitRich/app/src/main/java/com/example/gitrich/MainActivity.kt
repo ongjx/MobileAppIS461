@@ -5,6 +5,7 @@ import android.app.Activity
 import android.content.ContentValues
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -33,7 +34,8 @@ private const val LOGIN_USER_CODE = 1003
 private const val RECEIPT_SUBMIT_CODE = 1004
 
 private const val VOICE_CODE = 1005
-
+private const val OCR_CODE = 1006
+private const val OCR_RESULT_CODE = 1007
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private var image_uri: Uri? = null
@@ -72,6 +74,8 @@ class MainActivity : AppCompatActivity() {
 
         binding.ocr.setOnClickListener {
             Toast.makeText(this, "OCR", Toast.LENGTH_SHORT).show()
+//            intent = Intent(this, OCRScannerActivity::class.java)
+//            startActivityForResult(intent, OCR_CODE)
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
                 if (checkSelfPermission(Manifest.permission.CAMERA) == PackageManager.PERMISSION_DENIED ||
@@ -215,17 +219,17 @@ class MainActivity : AppCompatActivity() {
 
         //called when image was captured from camera intent
         if (resultCode == Activity.RESULT_OK) {
-            val intent = Intent(this, OCRScannerActivity::class.java )
-
             if(requestCode == IMAGE_CAPTURE_CODE) {
+                val intent = Intent(this, OCRScannerActivity::class.java )
                 intent.putExtra("image_uri", image_uri)
-                startActivity(intent)
+                startActivityForResult(intent, OCR_CODE)
             }
             else if (requestCode == IMAGE_PICK_CODE) {
+                val intent = Intent(this, OCRScannerActivity::class.java )
                 image_uri = data?.data
                 if (image_uri != null) {
                     intent.putExtra("image_uri", image_uri)
-                    startActivity(intent)
+                    startActivityForResult(intent, OCR_CODE)
                 }
             }
             else if (requestCode == LOGIN_USER_CODE) {
@@ -239,18 +243,24 @@ class MainActivity : AppCompatActivity() {
                     // make toast say error for voice cant process try again
                 } else {
                     val res : ArrayList<String> = data!!.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS) as ArrayList<String>
-                    api_call(res[0])
+                    post_dialoflow_api(res[0])
                     finish()
                     startActivity(getIntent())
                 }
 
             }
+            else if (requestCode == OCR_CODE) {
+                // ocr finished
+                val id = data!!.getStringExtra("id")
+                val intent = Intent(this, OCRScannerResultActivity::class.java )
+                intent.putExtra("id", id)
+                println("starting result ocr")
+                startActivityForResult(intent, OCR_RESULT_CODE)
+            }
         }
     }
 
-    fun api_call(text: String) {
-        val jsonObject = JSONObject()
-
+    fun post_dialoflow_api(text: String) {
         val username = MySingleton.getUsername()
         // val url = "https://gitrich-backend.herokuapp.com/users/" + username + "/dialogflow"
         val url = "http://10.0.2.2:8000/users/" + username + "/dialogflow"

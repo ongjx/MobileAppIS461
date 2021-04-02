@@ -41,7 +41,7 @@ class SignupActivity : AppCompatActivity() {
             return
         }
 
-        val url = "http://192.168.10.115/users/${binding.editTextUsername.text}/signup"
+        val url = "http://10.0.2.2/users/${binding.editTextUsername.text}/signup"
         val payload = JSONObject()
         payload.put("password", password)
 

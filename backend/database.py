@@ -136,7 +136,15 @@ async def bootstrap_receipts(username: str):
     data = {"receipt_ids": []}
     updated_user = await user_collection.update_one({"username": username}, {"$set": data})
 
-    return True    
+    return True
+
+async def retrieve_user_receipt(receipt_id: str):
+    receipt = await receipt_collection.find_one({"_id": ObjectId(receipt_id)})
+    if receipt:
+        return receipt_helper(receipt)
+    
+    return None
+    
 # ================================================================================
 # Users
 

@@ -24,6 +24,7 @@ from database import (
     add_user,
     check_user_existence,
     bootstrap_receipts,
+    retrieve_user_receipt,
 )
 
 from models import (
@@ -39,8 +40,8 @@ app = FastAPI()
 class Receipt():
 
     name = ""
-    amount = 0
-    date = ""
+    amount = ""
+    date = "01/01/0001 00:00:00"
     items = {}
     image = ""
     category = ""
@@ -86,8 +87,8 @@ class Receipt():
     def reset(self):
         self.name = ""
         self.category = ""
-        self.amount = 0
-        self.date = ""
+        self.amount = ""
+        self.date = "01/01/0001 00:00:00"
         self.items = {}
         self.image = ""
 
@@ -151,13 +152,24 @@ class Receipt():
 # 2. Call OCRSpace API -> Response
 # 3. Parse the Response -> Receipt Class Object
 # 4. Insert into Database (nosql -> MongoDB)
+def size(b64string):
+    return (len(b64string) * 3) / 4 - b64string.count('=', -2)
+
 @app.post("/users/{username}/ocr-receipts")
 async def upload_ocrreceipt(username: str, request: dict): # if never specify, its gonna be request body from call
-
+    print("executing")
     # Get json name from request
     image = request["image"]
-    name = request["name"]
-    category = request["category"]
+    
+    try:
+        name = request["name"]
+    except KeyError:
+        name = ""
+        
+    try:
+        category = request["category"]
+    except KeyError:
+        category = ""
 
     # Call OCRSpace
     response = call_ocrspace(image)
@@ -169,6 +181,7 @@ async def upload_ocrreceipt(username: str, request: dict): # if never specify, i
     success, receipt = await add_receipt(username, receipt_dict)
 
     if success:
+        print("returning")
         return ResponseModel(receipt, 201, "Receipt Successfully Uploaded")
         
     return ErrorResponseModel("An error occurred.", 400, "There was an error uploading the receipt data")
@@ -188,11 +201,10 @@ async def upload_qrreceipt(username: str, request: dict): # if never specify, it
 
 
 # [PUT Endpoint] Allow User to edit each receipt session (cause what we parse might not be accurate) `PUT {{base_url}}/api/v1/users/{{username}}/receipts/{{receipt_id}}`
-# No concrete steps yet
 @app.put("/users/{username}/receipts/{receipt_id}")
 async def update_receipt_data(username: str, receipt_id: str, req: UpdateReceiptModel = Body(...)):
     req = {k: v for k, v in req.dict().items() if v is not None}
-
+    print(req)
     updated_receipts = await update_receipt(receipt_id, req)
     if updated_receipts:
         return ResponseModel(
@@ -201,6 +213,20 @@ async def update_receipt_data(username: str, receipt_id: str, req: UpdateReceipt
             "Success",
         )
     return ErrorResponseModel("An error occurred.", 400, "There was an error updating the receipt data")
+
+# [GET Endpoint] user individual receipt
+@app.get("/users/{username}/receipts/{receipt_id}")
+async def get_receipt(username: str, receipt_id: str):
+    receipt = await retrieve_user_receipt(receipt_id)
+    
+    if receipt:
+        return ResponseModel(
+            receipt,
+            200,
+            "Success",
+        )
+
+    return ErrorResponseModel(None, 400, "There was an error updating the receipt data")
 
 
 # [DELETE Endpoint]
