@@ -80,8 +80,8 @@ class receipts_summary : Fragment() {
         val gson = Gson()
         val listView = activity!!.findViewById<ListView>(R.id.receipt_summary_list)
 
-        // val url = "http://192.168.10.115:8000/users/${username}/receipts"
-        val url = "http://192.168.10.115:8000/users/${username}/receipts"
+        // val url = "http://10.0.2.2:8000/users/${username}/receipts"
+        val url = "http://10.0.2.2:8000/users/${username}/receipts"
 
         val jsonObjectRequest = JsonObjectRequest(Request.Method.GET, url, null,
             { response ->

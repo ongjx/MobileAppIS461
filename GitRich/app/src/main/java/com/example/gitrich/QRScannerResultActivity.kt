@@ -121,7 +121,7 @@ class QRScannerResultActivity : AppCompatActivity() {
         //TODO: Handle receipt submission to backend
         val client = OkHttpClient();
         val user = MySingleton.getUsername()
-        val url = "http://192.168.10.115:8000/users/${user}/qr-receipts"
+        val url = "http://10.0.2.2:8000/users/${user}/qr-receipts"
         val jsonObjectRequest = JsonObjectRequest(
                 Request.Method.POST, url, json,
                 { response ->

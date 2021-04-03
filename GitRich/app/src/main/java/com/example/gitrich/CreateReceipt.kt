@@ -117,7 +117,7 @@ class CreateReceipt : AppCompatActivity() {
 
         // TODO: handle name of requester
         val user = MySingleton.getUsername()
-        val url = "http://192.168.10.115:8000/users/${user}/qr-receipts"
+        val url = "http://10.0.2.2:8000/users/${user}/qr-receipts"
         val jsonObjectRequest = JsonObjectRequest(
                 Request.Method.POST, url, jsonObject,
                 { response ->

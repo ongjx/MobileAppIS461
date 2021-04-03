@@ -69,8 +69,8 @@ class OCRScannerActivity : AppCompatActivity() {
         val username = MySingleton.getUsername()
         val client = OkHttpClient()
 
-        // val url = "http://192.168.10.115:8000/users/" + username + "/ocr-receipts"
-        val url = "http://192.168.10.115:8000/users/" + username + "/ocr-receipts"
+        // val url = "http://10.0.2.2:8000/users/" + username + "/ocr-receipts"
+        val url = "http://10.0.2.2:8000/users/" + username + "/ocr-receipts"
         val payload = JSONObject()
         payload.put("image", encodedImage_BASE64)
         payload.put("filepath", filepath)

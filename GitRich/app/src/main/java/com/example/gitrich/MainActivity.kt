@@ -297,8 +297,8 @@ class MainActivity : AppCompatActivity() {
 
     fun post_dialoflow_api(text: String) {
         val username = MySingleton.getUsername()
-        // val url = "http://192.168.10.115:8000/users/" + username + "/dialogflow"
-        val url = "http://192.168.10.115:8000/users/" + username + "/dialogflow"
+        // val url = "http://10.0.2.2:8000/users/" + username + "/dialogflow"
+        val url = "http://10.0.2.2:8000/users/" + username + "/dialogflow"
         val payload = JSONObject()
         payload.put("text", text)
         payload.put("name", "Adhoc Receipt Mobile")
