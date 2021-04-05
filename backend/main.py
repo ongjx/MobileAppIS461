@@ -9,6 +9,7 @@ from datetime import datetime
 from google.cloud import dialogflow
 from pathlib import Path
 from collections import defaultdict, OrderedDict
+from fastapi.middleware.cors import CORSMiddleware
 
 # initializing google cloud credentials
 home = str(Path.home())
@@ -36,6 +37,16 @@ from models import (
 )
 
 app = FastAPI()
+
+origins = ["*"]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 class Receipt():
 
