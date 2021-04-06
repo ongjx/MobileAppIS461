@@ -189,13 +189,14 @@ async def upload_ocrreceipt(username: str, request: dict): # if never specify, i
 
     receipt_dict = Receipt(raw_response, filepath, name, category).to_dict()
     
-    success, receipt = await add_receipt(username, receipt_dict)
+    # success, receipt = await add_receipt(username, receipt_dict)
 
-    if success:
-        print("returning")
-        return ResponseModel(receipt, 201, "Receipt Successfully Uploaded")
+    return ResponseModel(receipt_dict, 200, "Receipt Successfully Uploaded")
+
+    # if success:
+    #     return ResponseModel(receipt, 201, "Receipt Successfully Uploaded")
         
-    return ErrorResponseModel("An error occurred.", 400, "There was an error uploading the receipt data")
+    # return ErrorResponseModel("An error occurred.", 400, "There was an error uploading the receipt data")
 
 
 @app.post("/users/{username}/qr-receipts")
