@@ -261,8 +261,13 @@ async def get_receipts(username: str):
     receipts = await retrieve_user_receipts(username)
     receipts.sort(key=lambda x:datetime.strptime(x["date"], '%d/%m/%Y %H:%M:%S'), reverse=True)
     
+    receipts_without_time = []
+    for receipt in receipts:
+        receipt["date"] = receipt["date"].split(" ")[0]
+        receipts_without_time.append(receipt)
+
     if receipts:
-        return ResponseModel(receipts, 200, "Receipts data retrieved successfully")
+        return ResponseModel(receipts_without_time, 200, "Receipts data retrieved successfully")
     return ResponseModel(receipts, 200, "Empty list returned")
 
 # [DELETE Endpoint] bootstrap
@@ -380,9 +385,12 @@ async def get_expense_analytics(username: str):
     if receipts:
         for receipt in receipts:
             receipt_date = receipt["date"]
-            date_time_obj = datetime.strptime(receipt_date, '%d/%m/%Y')
+            date_time_obj = datetime.strptime(receipt_date, '%d/%m/%Y %H:%M:%S')
             month_and_year = date_time_obj.strftime('%b %Y')
-            result[month_and_year] += float(receipt["amount"])
+            try:
+                result[month_and_year] += float(receipt["amount"])
+            except ValueError:
+                result[month_and_year] += 0
 
         result= OrderedDict(sorted(result.items(), key=lambda t: datetime.strptime(t[0], '%b %Y'), reverse=True))
         return ResponseModel(result, 200, "Receipts data retrieved successfully")
@@ -399,13 +407,17 @@ async def get_category_expense_analytics(username: str):
             receipt_date = receipt["date"]
             category = receipt["category"]
             amount = receipt["amount"]
-            date_time_obj = datetime.strptime(receipt_date, '%d/%m/%Y')
+            date_time_obj = datetime.strptime(receipt_date, '%d/%m/%Y %H:%M:%S')
             month_and_year = date_time_obj.strftime('%b %Y')
 
             if category not in result[month_and_year]:
                 result[month_and_year][category] = 0.0
 
-            result[month_and_year][category] += float(amount)
+            try:
+                result[month_and_year][category] += float(amount)
+            except ValueError:
+                result[month_and_year][category] += 0
+            
 
         result= OrderedDict(sorted(result.items(), key=lambda t: datetime.strptime(t[0], '%b %Y'), reverse=True))
         return ResponseModel(result, 200, "Receipts data retrieved successfully")
