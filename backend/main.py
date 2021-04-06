@@ -216,7 +216,6 @@ async def upload_qrreceipt(username: str, request: dict): # if never specify, it
 @app.put("/users/{username}/receipts/{receipt_id}")
 async def update_receipt_data(username: str, receipt_id: str, req: UpdateReceiptModel = Body(...)):
     req = {k: v for k, v in req.dict().items() if v is not None}
-    print(req)
     updated_receipts = await update_receipt(receipt_id, req)
     if updated_receipts:
         return ResponseModel(
