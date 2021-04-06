@@ -283,11 +283,7 @@ async def bootstrap_receipts_endpoint(username: str):
 @app.post("/users/{username}/dialogflow")
 async def post_dialogflow(username: str, request: dict):
     text = request["text"]
-    
-    if request["name"] is None:
-        name = str(uuid.uuid4())
-    else:
-        name = request["name"]
+    name = request["name"]
     
     session_client = dialogflow.SessionsClient()
     session = session_client.session_path('gitrich-9txq', str(uuid.uuid4()))
