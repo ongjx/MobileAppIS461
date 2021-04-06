@@ -233,15 +233,6 @@ class MainActivity : AppCompatActivity() {
 //                val currentFiles = root?.listFiles()
                 val newFileName = UUID.randomUUID().toString() + ".jpg"
 
-//                if (currentFiles != null && currentFiles.size > 0) {
-//                    newFileName = (currentFiles.first().toString()
-//                                            .split(username + "/")[1]
-//                                            .split(".jpg")[0]
-//                                            .toInt()+1).toString() + ".jpg"
-//                } else {
-//                    newFileName = "1.jpg"
-//                }
-
                 // Saving files
                 println("new file name: " + newFileName)
                 val imageFile = File(root, newFileName)
@@ -269,7 +260,8 @@ class MainActivity : AppCompatActivity() {
             }
             else if (requestCode == LOGIN_USER_CODE) {
                 val output = PrintStream(openFileOutput("userProfile.txt", MODE_PRIVATE))
-                val username = data?.getStringExtra("username")
+                username = data?.getStringExtra("username").toString()
+                MySingleton.setUsername(username)
                 output.println("${username}")
                 output.close()
             }
@@ -279,26 +271,38 @@ class MainActivity : AppCompatActivity() {
                 } else {
                     val res : ArrayList<String> = data!!.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS) as ArrayList<String>
                     post_dialoflow_api(res[0])
-                    finish()
-                    startActivity(getIntent())
                 }
 
             }
             else if (requestCode == OCR_CODE) {
                 // ocr finished
-                val id = data!!.getStringExtra("id")
                 val intent = Intent(this, OCRScannerResultActivity::class.java )
-                intent.putExtra("id", id)
-                println("starting result ocr")
+                // name
+                intent.putExtra("name", data!!.getStringExtra("name"))
+                // amount
+                intent.putExtra("amount", data!!.getStringExtra("amount"))
+                // date
+                intent.putExtra("date", data!!.getStringExtra("date"))
+                // items
+                intent.putExtra("items", data!!.getStringExtra("items"))
+                // image
+                intent.putExtra("image", data!!.getStringExtra("image"))
+                // category
+                intent.putExtra("category", data!!.getStringExtra("category"))
+
                 startActivityForResult(intent, OCR_RESULT_CODE)
+            }
+            else if (requestCode == OCR_RESULT_CODE) {
+                Toast.makeText(this, "Success! OCR Receipt Created!", Toast.LENGTH_SHORT).show()
+                refresh()
             }
         }
     }
 
     fun post_dialoflow_api(text: String) {
         val username = MySingleton.getUsername()
-        // val url = "http://10.0.2.2:8000/users/" + username + "/dialogflow"
-        val url = "http://10.0.2.2:8000/users/" + username + "/dialogflow"
+        // val url = "http://ec2-18-136-119-32.ap-southeast-1.compute.amazonaws.com:8000/users/" + username + "/dialogflow"
+        val url = "http://ec2-18-136-119-32.ap-southeast-1.compute.amazonaws.com:8000/users/" + username + "/dialogflow"
         val payload = JSONObject()
         payload.put("text", text)
         payload.put("name", "Adhoc Receipt Mobile")
@@ -310,7 +314,8 @@ class MainActivity : AppCompatActivity() {
 
                     if (res == 201){
                         println("success")
-                        Toast.makeText(this, "Success! Receipt Created!", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this, "Success! Adhoc Voice Receipt Created!", Toast.LENGTH_SHORT).show()
+                        refresh()
                     } else {
                         println("failure")
                         Toast.makeText(this, "Failure! Receipt Not Created!", Toast.LENGTH_SHORT).show()
@@ -322,6 +327,13 @@ class MainActivity : AppCompatActivity() {
                 }
         )
         MySingleton.getInstance(this).addToRequestQueue(jsonObjectRequest)
+    }
+
+    fun refresh() {
+        finish()
+        overridePendingTransition( 0, 0)
+        startActivity(getIntent())
+        overridePendingTransition( 0, 0)
     }
 
 

@@ -1,5 +1,6 @@
 package com.example.gitrich
 
+import android.app.Activity
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
@@ -16,6 +17,8 @@ import java.io.ByteArrayOutputStream
 import java.io.InputStream
 import okhttp3.*
 import java.io.IOException
+
+private const val OCR_RESULT_CODE = 1007
 
 class OCRScannerActivity : AppCompatActivity() {
     private lateinit var binding: ActivityOCRScannerBinding
@@ -57,10 +60,6 @@ class OCRScannerActivity : AppCompatActivity() {
     }
 
     fun processReceipt(view: View) {
-        // TODO: Send base64 image string to backend ocr service
-        // TODO: After that show the receipt in a view
-        // TODO: Go back main screen and refresh
-        println("processing")
         post_ocr_receipt()
 
     }
@@ -69,8 +68,8 @@ class OCRScannerActivity : AppCompatActivity() {
         val username = MySingleton.getUsername()
         val client = OkHttpClient()
 
-        // val url = "http://10.0.2.2:8000/users/" + username + "/ocr-receipts"
-        val url = "http://10.0.2.2:8000/users/" + username + "/ocr-receipts"
+        // val url = "http://ec2-18-136-119-32.ap-southeast-1.compute.amazonaws.com:8000/users/" + username + "/ocr-receipts"
+        val url = "http://ec2-18-136-119-32.ap-southeast-1.compute.amazonaws.com:8000/users/" + username + "/ocr-receipts"
         val payload = JSONObject()
         payload.put("image", encodedImage_BASE64)
         payload.put("filepath", filepath)
@@ -93,12 +92,23 @@ class OCRScannerActivity : AppCompatActivity() {
                 val body = response?.body()?.string()
                 if (body != null) {
                     val status = JSONObject(body).getInt("code")
-                    if (status == 201) {
-                        println("success")
-
+                    if (status == 200) {
+                        val data = JSONObject(body).getJSONObject("data")
                         val goBack = Intent()
-                        // Get ID
-                        goBack.putExtra("id", JSONObject(body).getJSONObject("data").getString("id"))
+
+                        // name
+                        goBack.putExtra("name", data.getString("name"))
+                        // amount
+                        goBack.putExtra("amount", data.getString("amount"))
+                        // date
+                        goBack.putExtra("date", data.getString("date"))
+                        // items
+                        goBack.putExtra("items", data.getJSONObject("items").toString())
+                        // image
+                        goBack.putExtra("image", data.getString("image"))
+                        // category
+                        goBack.putExtra("category", data.getString("category"))
+
                         setResult(RESULT_OK, goBack)
                         finish()
 

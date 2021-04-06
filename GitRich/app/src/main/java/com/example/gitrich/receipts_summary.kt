@@ -38,7 +38,7 @@ private const val ARG_PARAM2 = "param2"
 var receipts = ArrayList<Receipt>()
 
 class receipts_summary : Fragment() {
-    private val username = MySingleton.getUsername()
+    private lateinit var username:String
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -79,9 +79,9 @@ class receipts_summary : Fragment() {
     private fun getReceipts () {
         val gson = Gson()
         val listView = activity!!.findViewById<ListView>(R.id.receipt_summary_list)
-
-        // val url = "http://10.0.2.2:8000/users/${username}/receipts"
-        val url = "http://10.0.2.2:8000/users/${username}/receipts"
+        username = MySingleton.getUsername()
+        // val url = "http://ec2-18-136-119-32.ap-southeast-1.compute.amazonaws.com:8000/users/${username}/receipts"
+        val url = "http://ec2-18-136-119-32.ap-southeast-1.compute.amazonaws.com:8000/users/${username}/receipts"
 
         val jsonObjectRequest = JsonObjectRequest(Request.Method.GET, url, null,
             { response ->
@@ -148,6 +148,8 @@ class receipts_summary : Fragment() {
                             if (imgFile.exists()) {
                                 val decodedByte = BitmapFactory.decodeFile(imgFile.getAbsolutePath())
                                 thumbnail.setImageBitmap(decodedByte)
+                            } else {
+                                thumbnail.setImageResource(R.drawable.empty)
                             }
                         }
                     }

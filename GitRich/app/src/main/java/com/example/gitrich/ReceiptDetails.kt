@@ -54,6 +54,8 @@ class ReceiptDetails : AppCompatActivity() {
                         if (imgFile.exists()) {
                             val decodedByte = BitmapFactory.decodeFile(imgFile.getAbsolutePath())
                             receiptImage.setImageBitmap(decodedByte)
+                        } else {
+                            receiptImage.setImageResource(R.drawable.empty)
                         }
                     }
                 }
