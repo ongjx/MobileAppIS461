@@ -1,82 +1,93 @@
 package com.example.gitrich
 
+import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.speech.RecognizerIntent
 import android.util.Log
+import android.view.View
 import android.widget.Button
+import android.widget.EditText
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.android.volley.Request
 import com.android.volley.toolbox.JsonObjectRequest
+import okhttp3.*
 import java.util.*
 import org.json.JSONObject
-
-
+import java.io.IOException
 
 
 class Voice : AppCompatActivity() {
-    lateinit var btn : Button
-    lateinit var txt : TextView
+    private lateinit var btnCancel : Button
+    private lateinit var btnConfirm : Button
+    private lateinit var speechTv : TextView
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_voice)
-        btn = findViewById(R.id.btnn)
-        txt = findViewById(R.id.text)
-        btn.setOnClickListener {
+        btnCancel = findViewById(R.id.btnCancel)
+        btnConfirm = findViewById(R.id.btnConfirm)
+        speechTv = findViewById(R.id.speech)
 
-            speechToText()
-        }
-    }
-    fun speechToText(){
-        val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH)
-        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
-        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault())
-        intent.putExtra(RecognizerIntent.EXTRA_PROMPT,"Say Something")
-        startActivityForResult(intent,100)
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if(requestCode == 100 || data != null){
-            val res : ArrayList<String> = data!!.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS) as ArrayList<String>
-            txt.text = res[0]
-            api_call(res[0])
+        val extras = intent.extras
+        if (extras != null) {
+            speechTv.text = extras.getString("speech")
         }
     }
 
-    fun api_call(text: String) {
-        val jsonObject = JSONObject()
-
+    fun postVoiceReceipt() {
+        val speech = speechTv.text.toString()
         val username = MySingleton.getUsername()
-        // val url = "http://ec2-18-136-119-32.ap-southeast-1.compute.amazonaws.com:8000/users/" + username + "/dialogflow"
+        val client = OkHttpClient()
+
+        // Get editTextName
+        var name = findViewById<EditText>(R.id.editTextName).text.toString()
+        if (name == "") {
+            name = "Adhoc Voice Receipt"
+        }
+
         val url = "http://ec2-18-136-119-32.ap-southeast-1.compute.amazonaws.com:8000/users/" + username + "/dialogflow"
         val payload = JSONObject()
-        payload.put("text", text)
-        payload.put("name", "Adhoc Voice Receipt")
+        payload.put("text", speech)
+        payload.put("name", name)
+        val JSON = MediaType.parse("application/json; charset=utf-8")
+        val body = RequestBody.create(JSON, payload.toString())
 
-        val jsonObjectRequest = JsonObjectRequest(
-            Request.Method.POST, url, payload,
-            { response ->
-                val res = response.getInt("code")
+        val request = okhttp3.Request.Builder()
+                .url(url)
+                .post(body)
+                .build()
 
-                if (res == 201){
-                    println("success")
-                    val goBack = Intent()
-                    goBack.putExtra("message", "Receipt Created")
-                    setResult(RESULT_OK, goBack)
-                    finish()
-                } else {
-                    println("failure")
-                }
-            },
-            { error ->
-                // TODO: Handle error
-                Log.e("Error", error.toString())
+        client.newCall(request).enqueue(object: Callback {
+            override fun onFailure(call: Call, e: IOException) {
+                println("failed to execute request")
             }
-        )
 
-        MySingleton.getInstance(this).addToRequestQueue(jsonObjectRequest)
+            override fun onResponse(call: Call, response: Response) {
+                val body = response?.body()?.string()
+                if (body != null) {
+                    val status = JSONObject(body).getInt("code")
+                    if (status == 201) {
+                        println("success voice dialogflow call")
+                        setResult(RESULT_OK)
+                        finish()
+                    } else {
+                        println("failure voice dialogflow call")
+                        setResult(RESULT_CANCELED)
+                        finish()
+                    }
+                }
+            }
+        })
+    }
 
+    fun confirm(view: View) {
+        // api call
+        postVoiceReceipt()
+    }
+    fun cancel(view: View) {
+        // return
+        setResult(RESULT_CANCELED)
+        finish()
     }
 }

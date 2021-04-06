@@ -36,8 +36,9 @@ private const val LOGIN_USER_CODE = 1003
 private const val RECEIPT_SUBMIT_CODE = 1004
 
 private const val VOICE_CODE = 1005
-private const val OCR_CODE = 1006
-private const val OCR_RESULT_CODE = 1007
+private const val VOICE_CONFIRM_CODE = 1006
+private const val OCR_CODE = 1007
+private const val OCR_RESULT_CODE = 1008
 class MainActivity : AppCompatActivity() {
     private lateinit var username: String
     private lateinit var binding: ActivityMainBinding
@@ -267,11 +268,20 @@ class MainActivity : AppCompatActivity() {
             }
             else if (requestCode == VOICE_CODE) {
                 if (data == null) {
-                    // make toast say error for voice cant process try again
+                    // Cant process voice
+                    Toast.makeText(this, "Can't process your voice, please try again or remember to open your virtual mic", Toast.LENGTH_SHORT)
                 } else {
                     val res : ArrayList<String> = data!!.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS) as ArrayList<String>
-                    post_dialoflow_api(res[0])
+                    // Go to voice class to confirm
+                    val intent = Intent(this, Voice::class.java )
+                    intent.putExtra("speech", res[0])
+                    startActivityForResult(intent, VOICE_CONFIRM_CODE)
                 }
+
+            }
+            else if (requestCode == VOICE_CONFIRM_CODE) {
+                Toast.makeText(this, "Success! Adhoc Voice Receipt Created!", Toast.LENGTH_SHORT).show()
+                refresh()
 
             }
             else if (requestCode == OCR_CODE) {
@@ -297,36 +307,6 @@ class MainActivity : AppCompatActivity() {
                 refresh()
             }
         }
-    }
-
-    fun post_dialoflow_api(text: String) {
-        val username = MySingleton.getUsername()
-        // val url = "http://ec2-18-136-119-32.ap-southeast-1.compute.amazonaws.com:8000/users/" + username + "/dialogflow"
-        val url = "http://ec2-18-136-119-32.ap-southeast-1.compute.amazonaws.com:8000/users/" + username + "/dialogflow"
-        val payload = JSONObject()
-        payload.put("text", text)
-        payload.put("name", "Adhoc Receipt Mobile")
-
-        val jsonObjectRequest = JsonObjectRequest(
-                Request.Method.POST, url, payload,
-                { response ->
-                    val res = response.getInt("code")
-
-                    if (res == 201){
-                        println("success")
-                        Toast.makeText(this, "Success! Adhoc Voice Receipt Created!", Toast.LENGTH_SHORT).show()
-                        refresh()
-                    } else {
-                        println("failure")
-                        Toast.makeText(this, "Failure! Receipt Not Created!", Toast.LENGTH_SHORT).show()
-                    }
-                },
-                { error ->
-                    // TODO: Handle error
-                    Log.e("Error", error.toString())
-                }
-        )
-        MySingleton.getInstance(this).addToRequestQueue(jsonObjectRequest)
     }
 
     fun refresh() {
