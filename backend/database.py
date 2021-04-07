@@ -12,12 +12,17 @@ user_collection = database.get_collection("users")
 
 # helpers
 def receipt_helper(receipt) -> dict:
+    try:
+        image = receipt["image"]
+    except KeyError:
+        image = None
+
     return {
         "id": str(receipt["_id"]),
         "name": receipt["name"],
         "date": receipt["date"],
         "amount": receipt["amount"],
-        "items": receipt["items"],
+        "items": image,
         "image": receipt["image"],
         "category": receipt["category"],
     }
