@@ -63,7 +63,7 @@ class ReceiptDetails : AppCompatActivity() {
                 width = receiptImage.layoutParams.width
             } catch (error: Exception){
             }
-            title.text = receipt.id
+            title.text = receipt.name
             amount.text = "$${receipt.amount}"
             category.text = receipt.category
             date.text = receipt.date

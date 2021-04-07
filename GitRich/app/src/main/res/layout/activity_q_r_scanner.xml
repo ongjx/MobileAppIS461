@@ -7,23 +7,24 @@ android:layout_height="match_parent"
 tools:context=".QRScannerActivity">
 
     <com.budiyev.android.codescanner.CodeScannerView
-        android:layout_width="match_parent"
-        android:layout_height="500dp"
         android:id="@+id/scanner_view"
+        android:layout_width="match_parent"
+        android:layout_height="680dp"
         app:autoFocusButtonColor="@android:color/white"
         app:autoFocusButtonVisible="true"
         app:flashButtonColor="@android:color/white"
         app:flashButtonVisible="true"
-        app:maskColor="#6D000000"/>
+        app:maskColor="#6D000000" />
 
     <TextView
         android:id="@+id/tv_textView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Scan QR Code"
         android:layout_below="@id/scanner_view"
         android:layout_centerHorizontal="true"
         android:layout_margin="20dp"
-        android:textColor="@android:color/black"/>
+        android:layout_marginTop="119dp"
+        android:text="Scan QR Code"
+        android:textColor="@android:color/black" />
 
 </RelativeLayout>
