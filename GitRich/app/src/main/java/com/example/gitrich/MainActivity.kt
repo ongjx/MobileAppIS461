@@ -50,6 +50,7 @@ class MainActivity : AppCompatActivity() {
     private val toBottom: Animation by lazy { AnimationUtils.loadAnimation(this, R.anim.to_bottom_anim) }
     private var clicked = false
 
+    private lateinit var transactionsFragment: receipts_summary;
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
@@ -113,7 +114,7 @@ class MainActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
-        val transactionsFragment = receipts_summary()
+        transactionsFragment = receipts_summary()
         val analyticsFragment = AnalyticsFragment()
 
         makeCurrentFragment(transactionsFragment)
@@ -306,6 +307,9 @@ class MainActivity : AppCompatActivity() {
                 Toast.makeText(this, "Success! OCR Receipt Created!", Toast.LENGTH_SHORT).show()
                 refresh()
             }
+            else if (requestCode == RECEIPT_SUBMIT_CODE) {
+                refreshFragment()
+            }
         }
     }
 
@@ -314,6 +318,13 @@ class MainActivity : AppCompatActivity() {
         overridePendingTransition( 0, 0)
         startActivity(getIntent())
         overridePendingTransition( 0, 0)
+    }
+
+    fun refreshFragment() {
+        val fragTransaction = supportFragmentManager.beginTransaction()
+        fragTransaction.detach(transactionsFragment)
+        fragTransaction.attach(transactionsFragment)
+        fragTransaction.commit()
     }
 
 

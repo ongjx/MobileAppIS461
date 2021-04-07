@@ -17,6 +17,7 @@ import org.json.JSONObject
 import java.io.IOException
 import com.android.volley.Request
 import com.android.volley.toolbox.JsonObjectRequest
+import java.util.regex.Pattern
 
 class CreateReceipt : AppCompatActivity() {
     private lateinit var categories: Array<String>;
@@ -88,7 +89,6 @@ class CreateReceipt : AppCompatActivity() {
         }
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
     fun save(view: View) {
 
         amount = findViewById<EditText>(R.id.create_amount).text.toString()
@@ -104,39 +104,51 @@ class CreateReceipt : AppCompatActivity() {
 
             itemsObject.put(l[0].trim() as String, l[1])
         }
-        val image = ""
-        val client = OkHttpClient();
-        val jsonObject = JSONObject()
+        val image = null
 
-        jsonObject.put("name", store)
-        jsonObject.put("amount", amount)
-        jsonObject.put("items", itemsObject)
-        jsonObject.put("image", image)
-        jsonObject.put("date", date)
-        jsonObject.put("category", category)
+        val dateRegex = "^([0-2][0-9]||3[0-1])/(0[0-9]||1[0-2])/([0-9][0-9])?[0-9][0-9]$"
+        if (!Pattern.matches(dateRegex, date)){
+            Toast.makeText(this, "Invalid date format", Toast.LENGTH_SHORT).show()
+        }
+        else if (amount == "" || date == "" || store == "" || desc == "") {
+            Toast.makeText(this, "Please ensure that there are no empty fields!", Toast.LENGTH_SHORT).show()
+        }
+        else {
+            val client = OkHttpClient();
+            val jsonObject = JSONObject()
 
-        // TODO: handle name of requester
-        val user = MySingleton.getUsername()
-        val url = "http://ec2-18-136-119-32.ap-southeast-1.compute.amazonaws.com:8000/users/${user}/qr-receipts"
-        val jsonObjectRequest = JsonObjectRequest(
-                Request.Method.POST, url, jsonObject,
-                { response ->
-                    val res = response.getInt("code")
+            jsonObject.put("name", store)
+            jsonObject.put("amount", amount)
+            jsonObject.put("items", itemsObject)
+            jsonObject.put("image", "")
+            jsonObject.put("date", date)
+            jsonObject.put("category", category)
 
-                    if (res == 201){
-                        val goBack = Intent()
-                        goBack.putExtra("message", "Receipt Created")
-                        setResult(RESULT_OK, goBack)
-                        finish()
+            // TODO: handle name of requester
+            val user = MySingleton.getUsername()
+            val url = "http://ec2-18-136-119-32.ap-southeast-1.compute.amazonaws.com:8000/users/${user}/qr-receipts"
+            val jsonObjectRequest = JsonObjectRequest(
+                    Request.Method.POST, url, jsonObject,
+                    { response ->
+                        val res = response.getInt("code")
+                        Log.e("response", response.toString())
+                        if (res == 201){
+                            val goBack = Intent()
+//                            goBack.putExtra("message", "Receipt Created")
+                            setResult(RESULT_OK)
+                            finish()
+                        }
+                    },
+                    { error ->
+                        // TODO: Handle error
+                        Log.e("Error", error.toString())
                     }
-                },
-                { error ->
-                    // TODO: Handle error
-                    Log.e("Error", error.toString())
-                }
-        )
+            )
 
-        MySingleton.getInstance(this).addToRequestQueue(jsonObjectRequest)
+            MySingleton.getInstance(this).addToRequestQueue(jsonObjectRequest)
+
+        }
+
 
     }
 }

@@ -122,6 +122,18 @@ class QRScannerResultActivity : AppCompatActivity() {
         val client = OkHttpClient();
         val user = MySingleton.getUsername()
         val url = "http://ec2-18-136-119-32.ap-southeast-1.compute.amazonaws.com:8000/users/${user}/qr-receipts"
+
+        // Check if value on form has been edited
+        amount = findViewById<EditText>(R.id.create_amount).text.toString().toDouble()
+        date = findViewById<EditText>(R.id.create_date).text.toString()
+        store = findViewById<EditText>(R.id.create_store).text.toString()
+        desc = findViewById<EditText>(R.id.create_desc).text.toString()
+
+        json.put("name", store)
+        json.put("amount", amount)
+        json.put("items", desc)
+        json.put("date", date)
+
         val jsonObjectRequest = JsonObjectRequest(
                 Request.Method.POST, url, json,
                 { response ->
