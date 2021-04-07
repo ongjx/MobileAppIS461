@@ -39,6 +39,8 @@ private const val VOICE_CODE = 1005
 private const val VOICE_CONFIRM_CODE = 1006
 private const val OCR_CODE = 1007
 private const val OCR_RESULT_CODE = 1008
+private const val QR_RESULT_CODE = 1009
+
 class MainActivity : AppCompatActivity() {
     private lateinit var username: String
     private lateinit var binding: ActivityMainBinding
@@ -111,7 +113,7 @@ class MainActivity : AppCompatActivity() {
         binding.qr.setOnClickListener {
             Toast.makeText(this, "QR", Toast.LENGTH_SHORT).show()
             val intent = Intent(this, QRScannerActivity::class.java)
-            startActivity(intent)
+            startActivityForResult(intent, QR_RESULT_CODE)
         }
 
         transactionsFragment = receipts_summary()
@@ -308,6 +310,9 @@ class MainActivity : AppCompatActivity() {
                 refresh()
             }
             else if (requestCode == RECEIPT_SUBMIT_CODE) {
+                refreshFragment()
+            }
+            else if (requestCode == QR_RESULT_CODE) {
                 refreshFragment()
             }
         }

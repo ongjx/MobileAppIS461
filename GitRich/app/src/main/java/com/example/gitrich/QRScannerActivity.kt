@@ -94,6 +94,7 @@ class QRScannerActivity : AppCompatActivity() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (resultCode == RESULT_OK && requestCode == CAMERA_REQUEST_CODE){
+            setResult(RESULT_OK)
             finish()
         }
     }

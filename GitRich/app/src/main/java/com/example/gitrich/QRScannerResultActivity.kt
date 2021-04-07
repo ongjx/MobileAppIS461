@@ -18,7 +18,7 @@ import org.json.JSONObject
 class QRScannerResultActivity : AppCompatActivity() {
     private lateinit var categories: Array<String>;
     private var json = JSONObject();
-    private var amount = 0.0
+    private var amount = ""
     private var date = ""
     private var store = ""
     private var desc = ""
@@ -41,7 +41,7 @@ class QRScannerResultActivity : AppCompatActivity() {
         if (intent != null) {
             val data = intent.getString("data")!!
             json = JSONObject(data)
-            amount = json.get("amount") as Double
+            amount = json.get("amount") as String
             date = json.get("date") as String
             store = json.get("name") as String
             category = json.get("category") as String
@@ -124,14 +124,23 @@ class QRScannerResultActivity : AppCompatActivity() {
         val url = "http://ec2-18-136-119-32.ap-southeast-1.compute.amazonaws.com:8000/users/${user}/qr-receipts"
 
         // Check if value on form has been edited
-        amount = findViewById<EditText>(R.id.create_amount).text.toString().toDouble()
+        amount = findViewById<EditText>(R.id.create_amount).text.toString()
         date = findViewById<EditText>(R.id.create_date).text.toString()
         store = findViewById<EditText>(R.id.create_store).text.toString()
         desc = findViewById<EditText>(R.id.create_desc).text.toString()
-
+        val items = desc.splitToSequence("\n")
+        val itemsObject = JSONObject()
+        for (item: String in items) {
+            if (item != "") {
+                val l = item.split(',')
+                val name = l[0].trim()
+                val amount = if ("$" in l[1]) l[1].trim() else ("$${l[1].trim()}")
+                itemsObject.put(l[0].trim() as String, l[1])
+            }
+        }
         json.put("name", store)
         json.put("amount", amount)
-        json.put("items", desc)
+        json.put("items", itemsObject)
         json.put("date", date)
 
         val jsonObjectRequest = JsonObjectRequest(
