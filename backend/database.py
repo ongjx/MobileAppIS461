@@ -22,8 +22,8 @@ def receipt_helper(receipt) -> dict:
         "name": receipt["name"],
         "date": receipt["date"],
         "amount": receipt["amount"],
-        "items": image,
-        "image": receipt["image"],
+        "items": receipt["items"],
+        "image": image,
         "category": receipt["category"],
     }
 
