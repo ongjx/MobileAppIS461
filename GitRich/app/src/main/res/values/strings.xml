@@ -11,4 +11,7 @@
         <item>Transportation</item>
         <item>Others</item>
     </string-array>
+
+    <string name="datehint"><font size="14">Date * (DD/MM/YYYY)</font></string>
+
 </resources>
