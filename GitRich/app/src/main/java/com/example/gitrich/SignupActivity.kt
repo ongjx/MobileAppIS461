@@ -41,7 +41,7 @@ class SignupActivity : AppCompatActivity() {
             return
         }
 
-        val url = "http://ec2-18-136-119-32.ap-southeast-1.compute.amazonaws.com/users/${binding.editTextUsername.text}/signup"
+        val url = "http://ec2-18-136-119-32.ap-southeast-1.compute.amazonaws.com:8000/users/${binding.editTextUsername.text}/signup"
         val payload = JSONObject()
         payload.put("password", password)
 
@@ -51,7 +51,7 @@ class SignupActivity : AppCompatActivity() {
             { response ->
                 val res = response.getInt("code")
 
-                if (res == 201){
+                if (res == 201) {
                     val data = response.getJSONObject("data")
                     val username = data.optString("username")
                     goBack.putExtra("username", username)

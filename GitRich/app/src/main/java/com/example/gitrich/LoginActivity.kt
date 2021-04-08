@@ -86,7 +86,7 @@ class LoginActivity : AppCompatActivity() {
             if(requestCode == SIGNUP_CODE) {
                 val username = data?.getStringExtra("username")
                 val goBack = Intent()
-                intent.putExtra("username", username)
+                goBack.putExtra("username", username)
                 setResult(RESULT_OK, goBack)
                 finish()
             }
