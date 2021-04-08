@@ -171,6 +171,8 @@ async def upload_ocrreceipt(username: str, request: dict): # if never specify, i
     # Get json name from request
     image = request["image"]
     filepath = request["filepath"]
+    print(image)
+    print()
 
     try:
         name = request["name"]
@@ -186,6 +188,7 @@ async def upload_ocrreceipt(username: str, request: dict): # if never specify, i
     response = call_ocrspace(image)
     response_json = response.json()
     raw_response = response_json["ParsedResults"][0]["ParsedText"]
+    print(raw_response)
 
     receipt_dict = Receipt(raw_response, filepath, name, category).to_dict()
     
