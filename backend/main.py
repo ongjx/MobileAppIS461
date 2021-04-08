@@ -187,14 +187,28 @@ async def upload_ocrreceipt(username: str, request: dict): # if never specify, i
     # Call OCRSpace
     response = call_ocrspace(image)
     response_json = response.json()
-    raw_response = response_json["ParsedResults"][0]["ParsedText"]
-    print(raw_response)
 
-    receipt_dict = Receipt(raw_response, filepath, name, category).to_dict()
+    try:
+        raw_response = response_json["ParsedResults"][0]["ParsedText"]
+        print(raw_response)
+
+        receipt_dict = Receipt(raw_response, filepath, name, category).to_dict()
     
-    # success, receipt = await add_receipt(username, receipt_dict)
+        # success, receipt = await add_receipt(username, receipt_dict)
+        return ResponseModel(receipt_dict, 200, "Receipt Successfully Uploaded")
+    except:
+        empty_error_dict = {
+            "name": "",
+            "amount": "",
+            "date": "",
+            "items": {},
+            "image": filepath,
+            "category": ""
+        }
 
-    return ResponseModel(receipt_dict, 200, "Receipt Successfully Uploaded")
+        return ResponseModel(empty_error_dict, 200, "Receipt Successfully Uploaded")
+
+    
 
     # if success:
     #     return ResponseModel(receipt, 201, "Receipt Successfully Uploaded")
