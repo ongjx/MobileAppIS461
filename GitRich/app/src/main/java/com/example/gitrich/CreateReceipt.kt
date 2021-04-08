@@ -17,6 +17,8 @@ import org.json.JSONObject
 import java.io.IOException
 import com.android.volley.Request
 import com.android.volley.toolbox.JsonObjectRequest
+import com.google.gson.JsonObject
+import java.lang.Exception
 import java.util.regex.Pattern
 
 class CreateReceipt : AppCompatActivity() {
@@ -95,22 +97,35 @@ class CreateReceipt : AppCompatActivity() {
         date = findViewById<EditText>(R.id.create_date).text.toString()
         store = findViewById<EditText>(R.id.create_store).text.toString()
         desc = findViewById<EditText>(R.id.create_desc).text.toString()
-        val items = desc.splitToSequence("\n")
-        val itemsObject = JSONObject()
-        for (item: String in items) {
-            val l = item.split(',')
-            val name = l[0].trim()
-            val amount = if ("$" in l[1]) l[1].trim() else ("$${l[1].trim()}")
 
-            itemsObject.put(l[0].trim() as String, l[1])
+        var itemsObject = JSONObject()
+
+        if (desc.equals("")) {
+            // do nothing
+        } else {
+            try {
+                val items = desc.splitToSequence("\n")
+
+                for (item: String in items) {
+                    val l = item.split(',')
+                    val name = l[0].trim()
+                    val amount = if ("$" in l[1]) l[1].trim() else ("$${l[1].trim()}")
+
+                    itemsObject.put(l[0].trim() as String, l[1])
+                }
+            } catch (e: Exception) {
+                // We can choose to stop processing unless its empty or appropriate desc is entered
+                println("Inappropriate Description")
+                itemsObject = JSONObject()
+            }
         }
-        val image = null
+
 
         val dateRegex = "^([0-2][0-9]||3[0-1])/(0[0-9]||1[0-2])/([0-9][0-9])?[0-9][0-9]$"
         if (!Pattern.matches(dateRegex, date)){
             Toast.makeText(this, "Invalid date format", Toast.LENGTH_SHORT).show()
         }
-        else if (amount == "" || date == "" || store == "" || desc == "") {
+        else if (amount == "" || date == "" || store == "") {
             Toast.makeText(this, "Please ensure that there are no empty fields!", Toast.LENGTH_SHORT).show()
         }
         else {
@@ -124,7 +139,6 @@ class CreateReceipt : AppCompatActivity() {
             jsonObject.put("date", date)
             jsonObject.put("category", category)
 
-            // TODO: handle name of requester
             val user = MySingleton.getUsername()
             val url = "http://ec2-18-136-119-32.ap-southeast-1.compute.amazonaws.com:8000/users/${user}/qr-receipts"
             val jsonObjectRequest = JsonObjectRequest(
@@ -134,19 +148,15 @@ class CreateReceipt : AppCompatActivity() {
                         Log.e("response", response.toString())
                         if (res == 201){
                             val goBack = Intent()
-//                            goBack.putExtra("message", "Receipt Created")
                             setResult(RESULT_OK)
                             finish()
                         }
                     },
                     { error ->
-                        // TODO: Handle error
                         Log.e("Error", error.toString())
                     }
             )
-
             MySingleton.getInstance(this).addToRequestQueue(jsonObjectRequest)
-
         }
 
 
