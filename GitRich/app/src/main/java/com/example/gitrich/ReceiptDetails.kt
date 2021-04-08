@@ -4,13 +4,14 @@ import android.content.Context
 import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.util.Base64
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import com.example.gitrich.models.Receipt
+import java.io.File
+
 
 class ReceiptDetails : AppCompatActivity() {
     private var height = 0
@@ -21,12 +22,12 @@ class ReceiptDetails : AppCompatActivity() {
     private lateinit var category: TextView
     private lateinit var date: TextView
     private lateinit var itemList: ListView
+    private var username = MySingleton.getUsername()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_receipt_details)
 
         val receipt = intent.extras?.getParcelable<Receipt>("receipt")
-
         receiptImage = findViewById(R.id.ReceiptImage)
         title = findViewById(R.id.receipt_name)
         amount = findViewById(R.id.totalAmount)
@@ -37,21 +38,32 @@ class ReceiptDetails : AppCompatActivity() {
         if (receipt != null) {
             try {
                 var receiptBytes = receipt.image
-                if (receipt.image.contains("data:image")) {
-                    receiptBytes = receipt.image.substringAfter(',')
+                if (receipt.image == "null") {
+                    receiptImage.setImageResource(R.drawable.empty)
+                } else {
+                    if (receipt.image.contains("data:image")) {
+                        receiptBytes = receipt.image.substringAfter(',')
+                        val decodedString = Base64.decode(receiptBytes, Base64.DEFAULT);
+                        val decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.size)
+                        receiptImage.setImageBitmap(decodedByte)
+                    } else {
+                        // .jpg
+                        val root = getExternalFilesDir(username)
+                        val imgFile = File(root, receipt.image)
+
+                        if (imgFile.exists()) {
+                            val decodedByte = BitmapFactory.decodeFile(imgFile.getAbsolutePath())
+                            receiptImage.setImageBitmap(decodedByte)
+                        } else {
+                            receiptImage.setImageResource(R.drawable.empty)
+                        }
+                    }
                 }
-                val decodedString = Base64.decode(receiptBytes, Base64.DEFAULT);
-                val decodedByte = BitmapFactory.decodeByteArray(
-                    decodedString,
-                    0,
-                    decodedString.size
-                )
-                receiptImage.setImageBitmap(decodedByte)
                 height = receiptImage.layoutParams.height
                 width = receiptImage.layoutParams.width
             } catch (error: Exception){
             }
-            title.text = receipt.id
+            title.text = receipt.name
             amount.text = "$${receipt.amount}"
             category.text = receipt.category
             date.text = receipt.date

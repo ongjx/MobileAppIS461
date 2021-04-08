@@ -12,10 +12,13 @@ import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import com.android.volley.Request
 import com.android.volley.toolbox.JsonObjectRequest
-import okhttp3.OkHttpClient
+import com.example.gitrich.models.Receipt
+import com.google.gson.JsonObject
 import org.json.JSONObject
+import java.util.*
 
-class QRScannerResultActivity : AppCompatActivity() {
+class OCRScannerResultActivity : AppCompatActivity() {
+    private val username = MySingleton.getUsername()
     private lateinit var categories: Array<String>;
     private var json = JSONObject();
     private var amount = ""
@@ -23,41 +26,49 @@ class QRScannerResultActivity : AppCompatActivity() {
     private var store = ""
     private var desc = ""
     private var category = ""
+    private var id = ""
+    private var image = ""
     private lateinit var spinner: Spinner
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_create_receipt)
+
         supportActionBar!!.title = "GitRich - Confirm Receipt";
         categories = resources.getStringArray(R.array.Categories)
         spinner = findViewById(R.id.create_category)
 
-        var amountElement = findViewById<EditText>(R.id.create_amount)
-        var dateElement = findViewById<EditText>(R.id.create_date)
-        var storeElement = findViewById<EditText>(R.id.create_store)
-        var descElement = findViewById<EditText>(R.id.create_desc)
-
-        val intent = intent.extras
+        // Get receipt data from API
         if (intent != null) {
-            val data = intent.getString("data")!!
-            json = JSONObject(data)
-            amount = json.get("amount") as String
-            date = json.get("date") as String
-            store = json.get("name") as String
-            category = json.get("category") as String
-            var items = json.get("items") as JSONObject
-            for (i in 0 until items.names().length()) {
-                val key = items.names()[i] as String
-                val value = items.getString(key)
-                desc += "${key},$${value}\n"
+            if (intent.extras != null) {
+                println("in extras")
+                store = intent.extras?.getString("name").toString()
+                amount = intent.extras?.getString("amount").toString()
+                date = intent.extras?.getString("date").toString()
+                image = intent.extras?.getString("image").toString()
+
+                var amountElement = findViewById<EditText>(R.id.create_amount)
+                var dateElement = findViewById<EditText>(R.id.create_date)
+                var storeElement = findViewById<EditText>(R.id.create_store)
+                var descElement = findViewById<EditText>(R.id.create_desc)
+
+                val items = JSONObject(intent.extras?.getString("items").toString())
+                if (items.length() != 0) {
+                    for (i in 0 until items.names().length()) {
+                        val key = items.names()[i] as String
+                        val value = items.getString(key)
+                        desc += "${key},$${value}\n"
+                    }
+                }
+
+                amountElement.setText(amount)
+                dateElement.setText(date.split(" ")[0])
+                storeElement.setText(store)
+                descElement.setText(desc)
+
             }
 
-            amountElement.setText(amount.toString())
-            dateElement.setText(date)
-            storeElement.setText(store)
-            descElement.setText(desc)
         }
-
 
         if (spinner != null) {
             val adapter = object: ArrayAdapter<String>(
@@ -114,34 +125,38 @@ class QRScannerResultActivity : AppCompatActivity() {
             override fun onNothingSelected(parent: AdapterView<*>) {
             }
         }
-
     }
 
-    fun save(view: View) {
-        //TODO: Handle receipt submission to backend
-        val client = OkHttpClient();
-        val user = MySingleton.getUsername()
-        val url = "http://ec2-18-136-119-32.ap-southeast-1.compute.amazonaws.com:8000/users/${user}/qr-receipts"
 
-        // Check if value on form has been edited
-        amount = findViewById<EditText>(R.id.create_amount).text.toString()
-        date = findViewById<EditText>(R.id.create_date).text.toString()
-        store = findViewById<EditText>(R.id.create_store).text.toString()
-        desc = findViewById<EditText>(R.id.create_desc).text.toString()
-        val items = desc.splitToSequence("\n")
-        val itemsObject = JSONObject()
-        for (item: String in items) {
-            if (item != "") {
-                val l = item.split(',')
-                val name = l[0].trim()
-                val amount = if ("$" in l[1]) l[1].trim() else ("$${l[1].trim()}")
-                itemsObject.put(l[0].trim() as String, l[1])
-            }
+    fun save(view: View) {
+        val url = "http://ec2-18-136-119-32.ap-southeast-1.compute.amazonaws.com:8000/users/${username}/qr-receipts"
+
+        var amountElement = findViewById<EditText>(R.id.create_amount)
+        var dateElement = findViewById<EditText>(R.id.create_date)
+        var storeElement = findViewById<EditText>(R.id.create_store)
+        var descElement = findViewById<EditText>(R.id.create_desc)
+
+        json.put("amount", amountElement.text.toString())
+        // parse off the 00:00:00
+        if (dateElement.text.contains(" ")) {
+            date = dateElement.text.toString().split(" ")[0]
+        } else {
+            date = dateElement.text.toString()
         }
-        json.put("name", store)
-        json.put("amount", amount)
-        json.put("items", itemsObject)
-        json.put("date", date)
+        json.put("date", dateElement.text.toString())
+        json.put("name", storeElement.text.toString())
+
+        val items = JSONObject()
+        val scanner = Scanner(descElement.text.toString())
+        while (scanner.hasNextLine()) {
+            val item = scanner.nextLine()
+            val itemList = item.split(",")
+            items.put(itemList[0], itemList[1])
+        }
+
+        json.put("category", category)
+        json.put("image", image)
+        json.put("items", items)
 
         val jsonObjectRequest = JsonObjectRequest(
                 Request.Method.POST, url, json,
@@ -150,8 +165,7 @@ class QRScannerResultActivity : AppCompatActivity() {
 
                     if (res == 201) {
                         val goBack = Intent()
-                        goBack.putExtra("message", "Receipt Created")
-                        setResult(RESULT_OK, goBack)
+                        setResult(RESULT_OK)
                         finish()
                     }
                 },
@@ -162,8 +176,5 @@ class QRScannerResultActivity : AppCompatActivity() {
         )
 
         MySingleton.getInstance(this).addToRequestQueue(jsonObjectRequest)
-        setResult(RESULT_OK)
-        finish()
     }
 }
-

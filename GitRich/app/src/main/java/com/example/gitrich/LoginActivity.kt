@@ -26,8 +26,6 @@ class LoginActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityLoginBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
-
     }
 
     fun signUpAccount(view: View) {
@@ -46,7 +44,8 @@ class LoginActivity : AppCompatActivity() {
             return
         }
 
-        val url = "http://10.0.2.2:8000/users/${binding.editTextUsername.text}/login"
+        // val url = "http://ec2-18-136-119-32.ap-southeast-1.compute.amazonaws.com:8000/users/${binding.editTextUsername.text}/login"
+        val url = "http://ec2-18-136-119-32.ap-southeast-1.compute.amazonaws.com:8000/users/${binding.editTextUsername.text}/login"
         val payload = JSONObject()
         payload.put("password", password)
 
@@ -59,9 +58,8 @@ class LoginActivity : AppCompatActivity() {
                     val data = response.getJSONObject("data")
                     val username = data.optString("username")
                     goBack.putExtra("username", username)
+                    println("this is the username before passing: " + username)
                     setResult(RESULT_OK, goBack)
-                    // Set username in global context
-                    MySingleton.setUsername(username)
                     finish()
                 }
 

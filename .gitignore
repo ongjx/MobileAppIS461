@@ -61,3 +61,4 @@ backend/env/
 backend/venv/
 backend/ENV/
 backend/dialogflow.json
+backend/google-credentials.json

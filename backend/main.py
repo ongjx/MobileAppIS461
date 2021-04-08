@@ -3,15 +3,18 @@ import base64
 import os
 import requests
 import uuid
+import pytz
 import dateutil.parser as dtp
 from datetime import datetime
 from google.cloud import dialogflow
 from pathlib import Path
+from collections import defaultdict, OrderedDict
+from fastapi.middleware.cors import CORSMiddleware
 
 # initializing google cloud credentials
 home = str(Path.home())
 # credential_path = f"{home}\\Desktop\\dialogflow.json"
-credential_path = "./dialogflow.json"
+credential_path = "google-credentials.json"
 os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = credential_path
     
 from database import (
@@ -21,6 +24,8 @@ from database import (
     retrieve_user_receipts,
     add_user,
     check_user_existence,
+    bootstrap_receipts,
+    retrieve_user_receipt,
 )
 
 from models import (
@@ -33,29 +38,39 @@ from models import (
 
 app = FastAPI()
 
+origins = ["*"]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 class Receipt():
 
     name = ""
-    amount = 0
-    date = ""
+    amount = ""
+    date = "01/01/0001 00:00:00"
     items = {}
     image = ""
     category = ""
 
     # Initialization can be dynamic, depending on the receipt given, can parse differently.
     # For instance receipt = Receipt(raw_response, "kenboru") or Receipt(raw_response, "Pasta Express")
-    def __init__(self, raw_response, image, name, category):
+    def __init__(self, raw_response, filepath, name, category):
         self.reset()
         
-        if image is not None:
-            self.image = image
+        if filepath is not None:
+            self.image = filepath
         
         if name is not None:
             self.name = name
         
         if category is not None:
             self.category = category
-
+            
         self.parse(raw_response)
 
     def parse(self, raw_response):
@@ -69,7 +84,8 @@ class Receipt():
                     item, price = line.split("\t")
 
                     if item.lower() == "total":
-                        self.amount = Receipt.to_float(price)
+                        raw_amount = Receipt.to_float(price)
+                        self.amount = f"{raw_amount:.2f}"
                     elif item.lower() in ["subtotal", "rounding", "cash"]:
                         continue
                     else:
@@ -82,8 +98,8 @@ class Receipt():
     def reset(self):
         self.name = ""
         self.category = ""
-        self.amount = 0
-        self.date = ""
+        self.amount = ""
+        self.date = "01/01/0001 00:00:00"
         self.items = {}
         self.image = ""
 
@@ -128,7 +144,7 @@ class Receipt():
     @staticmethod
     def retrieve_date(line):
         dt = dtp.parse(line.split("\t")[1])
-        return dt.strftime("%d/%m/%Y")
+        return dt.strftime("%d/%m/%Y %H:%M:%S")
 
     @staticmethod
     def has_tab(line):
@@ -147,32 +163,47 @@ class Receipt():
 # 2. Call OCRSpace API -> Response
 # 3. Parse the Response -> Receipt Class Object
 # 4. Insert into Database (nosql -> MongoDB)
+def size(b64string):
+    return (len(b64string) * 3) / 4 - b64string.count('=', -2)
+
 @app.post("/users/{username}/ocr-receipts")
 async def upload_ocrreceipt(username: str, request: dict): # if never specify, its gonna be request body from call
-
     # Get json name from request
     image = request["image"]
-    name = request["name"]
-    category = request["category"]
+    filepath = request["filepath"]
+
+    try:
+        name = request["name"]
+    except KeyError:
+        name = ""
+        
+    try:
+        category = request["category"]
+    except KeyError:
+        category = ""
 
     # Call OCRSpace
     response = call_ocrspace(image)
     response_json = response.json()
     raw_response = response_json["ParsedResults"][0]["ParsedText"]
 
-    receipt_dict = Receipt(raw_response, image, name, category).to_dict()
+    receipt_dict = Receipt(raw_response, filepath, name, category).to_dict()
     
-    success, receipt = await add_receipt(username, receipt_dict)
+    # success, receipt = await add_receipt(username, receipt_dict)
 
-    if success:
-        return ResponseModel(receipt, 201, "Receipt Successfully Uploaded")
+    return ResponseModel(receipt_dict, 200, "Receipt Successfully Uploaded")
+
+    # if success:
+    #     return ResponseModel(receipt, 201, "Receipt Successfully Uploaded")
         
-    return ErrorResponseModel("An error occurred.", 400, "There was an error uploading the receipt data")
+    # return ErrorResponseModel("An error occurred.", 400, "There was an error uploading the receipt data")
 
 
 @app.post("/users/{username}/qr-receipts")
 async def upload_qrreceipt(username: str, request: dict): # if never specify, its gonna be request body from call
 
+    # add Hours minutes and seconds to date
+    request["date"] += " 00:00:00"
     success, receipt = await add_receipt(username, request)
 
     if success:
@@ -182,11 +213,9 @@ async def upload_qrreceipt(username: str, request: dict): # if never specify, it
 
 
 # [PUT Endpoint] Allow User to edit each receipt session (cause what we parse might not be accurate) `PUT {{base_url}}/api/v1/users/{{username}}/receipts/{{receipt_id}}`
-# No concrete steps yet
 @app.put("/users/{username}/receipts/{receipt_id}")
 async def update_receipt_data(username: str, receipt_id: str, req: UpdateReceiptModel = Body(...)):
     req = {k: v for k, v in req.dict().items() if v is not None}
-
     updated_receipts = await update_receipt(receipt_id, req)
     if updated_receipts:
         return ResponseModel(
@@ -196,11 +225,25 @@ async def update_receipt_data(username: str, receipt_id: str, req: UpdateReceipt
         )
     return ErrorResponseModel("An error occurred.", 400, "There was an error updating the receipt data")
 
+# [GET Endpoint] user individual receipt
+@app.get("/users/{username}/receipts/{receipt_id}")
+async def get_receipt(username: str, receipt_id: str):
+    receipt = await retrieve_user_receipt(receipt_id)
+    
+    if receipt:
+        return ResponseModel(
+            receipt,
+            200,
+            "Success",
+        )
+
+    return ErrorResponseModel(None, 400, "There was an error updating the receipt data")
+
 
 # [DELETE Endpoint]
 @app.delete("/users/{username}/receipts/{receipt_id}")
 async def delete_receipt_data(username: str, receipt_id: str):
-    deleted_receipt = await delete_receipt(receipt_id)
+    deleted_receipt = await delete_receipt(username, receipt_id)
     if deleted_receipt:
         return ResponseModel(
             "Receipt with ID: {} removed".format(receipt_id),
@@ -215,21 +258,32 @@ async def delete_receipt_data(username: str, receipt_id: str):
 # [GET Endpoint] All receipts for a particular user `GET {{base_url}}/api/v1/users/{{username}}/receipts`
 @app.get("/users/{username}/receipts")
 async def get_receipts(username: str):
-
     receipts = await retrieve_user_receipts(username)
+    receipts.sort(key=lambda x:datetime.strptime(x["date"], '%d/%m/%Y %H:%M:%S'), reverse=True)
+    
+    receipts_without_time = []
+    for receipt in receipts:
+        receipt["date"] = receipt["date"].split(" ")[0]
+        receipts_without_time.append(receipt)
+
     if receipts:
-        return ResponseModel(receipts, 200, "Receipts data retrieved successfully")
+        return ResponseModel(receipts_without_time, 200, "Receipts data retrieved successfully")
     return ResponseModel(receipts, 200, "Empty list returned")
+
+# [DELETE Endpoint] bootstrap
+@app.delete("/users/{username}/receipts")
+async def bootstrap_receipts_endpoint(username: str):
+    status = await bootstrap_receipts(username)
+    
+    if status:
+        return ResponseModel(None, 200, "Receipts data bootstraped")
+    return ErrorResponseModel(None, 400, "Error")
 
 
 @app.post("/users/{username}/dialogflow")
 async def post_dialogflow(username: str, request: dict):
     text = request["text"]
-    
-    if request["name"] is None:
-        name = str(uuid.uuid4())
-    else:
-        name = request["name"]
+    name = request["name"]
     
     session_client = dialogflow.SessionsClient()
     session = session_client.session_path('gitrich-9txq', str(uuid.uuid4()))
@@ -250,7 +304,7 @@ async def post_dialogflow(username: str, request: dict):
         return ErrorResponseModel("Price not found within text", 400, "Please provide the price of the item")
     
     if params["foods"] != "":
-        category = "Food"
+        category = "Food & Drinks"
     else:
         category = "Entertainment"
     
@@ -260,7 +314,7 @@ async def post_dialogflow(username: str, request: dict):
         "items": {},
         "category": category,
         "image": None,
-        "date": datetime.today().strftime('%d/%m/%Y') 
+        "date": datetime.now(pytz.timezone('Asia/Singapore')).strftime('%d/%m/%Y %H:%M:%S')
     }
     
     success, receipt = await add_receipt(username, receipt)
@@ -313,6 +367,58 @@ async def login_user(username: str, request: dict):
         return ErrorResponseModel('User not found', 400, 'Please enter the correct username')
     
     return ResponseModel(user, 200, "User logged in.")
+
+
+
+# ===================================================================================================
+# Analytics
+# [GET Endpoint] Expense
+@app.get("/users/{username}/analytics/expense")
+async def get_expense_analytics(username: str):
+    result = defaultdict(int)
+    # Everything is monthly for now
+    receipts = await retrieve_user_receipts(username)
+    if receipts:
+        for receipt in receipts:
+            receipt_date = receipt["date"]
+            date_time_obj = datetime.strptime(receipt_date, '%d/%m/%Y %H:%M:%S')
+            month_and_year = date_time_obj.strftime('%b %Y')
+            try:
+                result[month_and_year] += float(receipt["amount"])
+            except ValueError:
+                result[month_and_year] += 0
+
+        result= OrderedDict(sorted(result.items(), key=lambda t: datetime.strptime(t[0], '%b %Y'), reverse=True))
+        return ResponseModel(result, 200, "Receipts data retrieved successfully")
+    return ErrorResponseModel([], 400, "No Receipts")
+
+# [GET Endpoint] Category
+@app.get("/users/{username}/analytics/category")
+async def get_category_expense_analytics(username: str):
+    result = defaultdict(dict)
+    # Everything is monthly for now
+    receipts = await retrieve_user_receipts(username)
+    if receipts:
+        for receipt in receipts:
+            receipt_date = receipt["date"]
+            category = receipt["category"]
+            amount = receipt["amount"]
+            date_time_obj = datetime.strptime(receipt_date, '%d/%m/%Y %H:%M:%S')
+            month_and_year = date_time_obj.strftime('%b %Y')
+
+            if category not in result[month_and_year]:
+                result[month_and_year][category] = 0.0
+
+            try:
+                result[month_and_year][category] += float(amount)
+            except ValueError:
+                result[month_and_year][category] += 0
+            
+
+        result= OrderedDict(sorted(result.items(), key=lambda t: datetime.strptime(t[0], '%b %Y'), reverse=True))
+        return ResponseModel(result, 200, "Receipts data retrieved successfully")
+    return ErrorResponseModel([], 400, "No Receipts")
+
 
 
 # NOTE: For sample response

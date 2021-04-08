@@ -4,6 +4,7 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
+import android.view.View
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -41,11 +42,10 @@ class QRScannerActivity : AppCompatActivity() {
         codeScanner.decodeCallback = DecodeCallback {
             runOnUiThread {
                 val jsonObject = JSONObject(it.text)
-                val url = jsonObject["url"].toString()
-                tv_textView.text = url
+                tv_textView.text = it.text
                 val intent = Intent(this, QRScannerResultActivity::class.java)
-                intent.putExtra("url", url)
-                startActivity(intent)
+                intent.putExtra("data", it.text)
+                startActivityForResult(intent, CAMERA_REQUEST_CODE)
             }
         }
         codeScanner.errorCallback = ErrorCallback { // or ErrorCallback.SUPPRESS
@@ -88,6 +88,14 @@ class QRScannerActivity : AppCompatActivity() {
                     Toast.makeText(this, "You need camera permission to use this app", Toast.LENGTH_SHORT)
                 }
             }
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (resultCode == RESULT_OK && requestCode == CAMERA_REQUEST_CODE){
+            setResult(RESULT_OK)
+            finish()
         }
     }
 }

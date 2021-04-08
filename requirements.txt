@@ -7,4 +7,3 @@ requests
 pymongo
 dnspython
 python-dateutil
-pytz

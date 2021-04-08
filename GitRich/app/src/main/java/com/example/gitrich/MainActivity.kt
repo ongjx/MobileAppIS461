@@ -5,19 +5,27 @@ import android.app.Activity
 import android.content.ContentValues
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.os.Environment
 import android.provider.MediaStore
+import android.provider.MediaStore.Images.Thumbnails.getThumbnail
+import android.speech.RecognizerIntent
+import android.util.Log
 import android.view.View
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
+import com.android.volley.Request
+import com.android.volley.toolbox.JsonObjectRequest
 import com.example.gitrich.databinding.ActivityMainBinding
-import java.io.FileNotFoundException
-import java.io.PrintStream
+import org.json.JSONObject
+import java.io.*
 import java.util.*
 
 
@@ -25,8 +33,16 @@ private const val PERMISSION_CODE = 1000
 private const val IMAGE_CAPTURE_CODE = 1001
 private const val IMAGE_PICK_CODE=1002
 private const val LOGIN_USER_CODE = 1003
+private const val RECEIPT_SUBMIT_CODE = 1004
+
+private const val VOICE_CODE = 1005
+private const val VOICE_CONFIRM_CODE = 1006
+private const val OCR_CODE = 1007
+private const val OCR_RESULT_CODE = 1008
+private const val QR_RESULT_CODE = 1009
 
 class MainActivity : AppCompatActivity() {
+    private lateinit var username: String
     private lateinit var binding: ActivityMainBinding
     private var image_uri: Uri? = null
 
@@ -36,6 +52,7 @@ class MainActivity : AppCompatActivity() {
     private val toBottom: Animation by lazy { AnimationUtils.loadAnimation(this, R.anim.to_bottom_anim) }
     private var clicked = false
 
+    private lateinit var transactionsFragment: receipts_summary;
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
@@ -45,7 +62,7 @@ class MainActivity : AppCompatActivity() {
             val scan = Scanner(openFileInput("userProfile.txt"))
 
             // Load username to global context
-            val username = scan.nextLine().toString()
+            username = scan.nextLine().toString()
             MySingleton.setUsername(username)
         } catch(e: FileNotFoundException) {
             loginPage()
@@ -58,10 +75,14 @@ class MainActivity : AppCompatActivity() {
 
         binding.manual.setOnClickListener {
             Toast.makeText(this, "Manual", Toast.LENGTH_SHORT).show()
+            intent = Intent(this, CreateReceipt::class.java)
+            startActivityForResult(intent, RECEIPT_SUBMIT_CODE)
         }
 
         binding.ocr.setOnClickListener {
             Toast.makeText(this, "OCR", Toast.LENGTH_SHORT).show()
+//            intent = Intent(this, OCRScannerActivity::class.java)
+//            startActivityForResult(intent, OCR_CODE)
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
                 if (checkSelfPermission(Manifest.permission.CAMERA) == PackageManager.PERMISSION_DENIED ||
@@ -80,17 +101,22 @@ class MainActivity : AppCompatActivity() {
 
         binding.voice.setOnClickListener {
             Toast.makeText(this, "Voice", Toast.LENGTH_SHORT).show()
-            val intent = Intent(this, Voice::class.java)
-            startActivity(intent)
+            val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH)
+            intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
+            intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault())
+            intent.putExtra(RecognizerIntent.EXTRA_PROMPT,"Say Something")
+            startActivityForResult(intent, VOICE_CODE)
+//            val intent = Intent(this, Voice::class.java)
+//            startActivity(intent)
         }
 
         binding.qr.setOnClickListener {
             Toast.makeText(this, "QR", Toast.LENGTH_SHORT).show()
             val intent = Intent(this, QRScannerActivity::class.java)
-            startActivity(intent)
+            startActivityForResult(intent, QR_RESULT_CODE)
         }
 
-        val transactionsFragment = receipts_summary()
+        transactionsFragment = receipts_summary()
         val analyticsFragment = AnalyticsFragment()
 
         makeCurrentFragment(transactionsFragment)
@@ -200,26 +226,110 @@ class MainActivity : AppCompatActivity() {
 
         //called when image was captured from camera intent
         if (resultCode == Activity.RESULT_OK) {
-            val intent = Intent(this, OCRScannerActivity::class.java )
-
             if(requestCode == IMAGE_CAPTURE_CODE) {
+                val intent = Intent(this, OCRScannerActivity::class.java )
+                // change to bitmap and store
+                val imageStream: InputStream? = contentResolver.openInputStream(image_uri!!)
+                val selectedImage = BitmapFactory.decodeStream(imageStream)
+                val bitmap = Bitmap.createScaledBitmap(selectedImage, 768, 1024, true)
+
+                val root = getExternalFilesDir(username)
+//                val currentFiles = root?.listFiles()
+                val newFileName = UUID.randomUUID().toString() + ".jpg"
+
+                // Saving files
+                println("new file name: " + newFileName)
+                val imageFile = File(root, newFileName)
+                bitmap.compress(Bitmap.CompressFormat.JPEG, 90, FileOutputStream(imageFile))
+
+                // Show all files
+                val files = root?.listFiles()
+                if (files != null) {
+                    for (file in files) {
+                        println(file.toString())
+                    }
+                }
+
                 intent.putExtra("image_uri", image_uri)
-                startActivity(intent)
+                intent.putExtra("filepath", newFileName)
+                startActivityForResult(intent, OCR_CODE)
             }
             else if (requestCode == IMAGE_PICK_CODE) {
+                val intent = Intent(this, OCRScannerActivity::class.java )
                 image_uri = data?.data
                 if (image_uri != null) {
                     intent.putExtra("image_uri", image_uri)
-                    startActivity(intent)
+                    startActivityForResult(intent, OCR_CODE)
                 }
             }
             else if (requestCode == LOGIN_USER_CODE) {
                 val output = PrintStream(openFileOutput("userProfile.txt", MODE_PRIVATE))
-                val username = data?.getStringExtra("username")
+                username = data?.getStringExtra("username").toString()
+                MySingleton.setUsername(username)
                 output.println("${username}")
                 output.close()
             }
+            else if (requestCode == VOICE_CODE) {
+                if (data == null) {
+                    // Cant process voice
+                    Toast.makeText(this, "Can't process your voice, please try again or remember to open your virtual mic", Toast.LENGTH_SHORT)
+                } else {
+                    val res : ArrayList<String> = data!!.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS) as ArrayList<String>
+                    // Go to voice class to confirm
+                    val intent = Intent(this, Voice::class.java )
+                    intent.putExtra("speech", res[0])
+                    startActivityForResult(intent, VOICE_CONFIRM_CODE)
+                }
+
+            }
+            else if (requestCode == VOICE_CONFIRM_CODE) {
+                Toast.makeText(this, "Success! Adhoc Voice Receipt Created!", Toast.LENGTH_SHORT).show()
+                refresh()
+
+            }
+            else if (requestCode == OCR_CODE) {
+                // ocr finished
+                val intent = Intent(this, OCRScannerResultActivity::class.java )
+                // name
+                intent.putExtra("name", data!!.getStringExtra("name"))
+                // amount
+                intent.putExtra("amount", data!!.getStringExtra("amount"))
+                // date
+                intent.putExtra("date", data!!.getStringExtra("date"))
+                // items
+                intent.putExtra("items", data!!.getStringExtra("items"))
+                // image
+                intent.putExtra("image", data!!.getStringExtra("image"))
+                // category
+                intent.putExtra("category", data!!.getStringExtra("category"))
+
+                startActivityForResult(intent, OCR_RESULT_CODE)
+            }
+            else if (requestCode == OCR_RESULT_CODE) {
+                Toast.makeText(this, "Success! OCR Receipt Created!", Toast.LENGTH_SHORT).show()
+                refresh()
+            }
+            else if (requestCode == RECEIPT_SUBMIT_CODE) {
+                refreshFragment()
+            }
+            else if (requestCode == QR_RESULT_CODE) {
+                refreshFragment()
+            }
         }
+    }
+
+    fun refresh() {
+        finish()
+        overridePendingTransition( 0, 0)
+        startActivity(getIntent())
+        overridePendingTransition( 0, 0)
+    }
+
+    fun refreshFragment() {
+        val fragTransaction = supportFragmentManager.beginTransaction()
+        fragTransaction.detach(transactionsFragment)
+        fragTransaction.attach(transactionsFragment)
+        fragTransaction.commit()
     }
 
 

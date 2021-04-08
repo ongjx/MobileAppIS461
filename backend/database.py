@@ -12,13 +12,18 @@ user_collection = database.get_collection("users")
 
 # helpers
 def receipt_helper(receipt) -> dict:
+    try:
+        image = receipt["image"]
+    except KeyError:
+        image = None
+
     return {
         "id": str(receipt["_id"]),
         "name": receipt["name"],
         "date": receipt["date"],
         "amount": receipt["amount"],
         "items": receipt["items"],
-        "image": receipt["image"],
+        "image": image,
         "category": receipt["category"],
     }
 
@@ -102,12 +107,48 @@ async def update_receipt(id: str, data: dict):
 
 
 # Delete a receipt from the database
-async def delete_receipt(id: str):
+async def delete_receipt(username: str, id: str):
     receipt = await receipt_collection.find_one({"_id": ObjectId(id)})
+    
     if receipt:
         await receipt_collection.delete_one({"_id": ObjectId(id)})
-        return True
     
+    user = await user_collection.find_one({"username": username})
+    if user:
+        current_receipt_ids = user_helper(user)["receipt_ids"]
+        current_receipt_ids.remove(ObjectId(id))
+        data = {"receipt_ids": current_receipt_ids}
+        updated_user = await user_collection.update_one(
+            {"username": username}, {"$set": data}
+        )
+        return True
+    return False
+
+# Bootstrap user receipts from the database
+async def bootstrap_receipts(username: str):
+    user = await user_collection.find_one({"username": username})
+
+    if user:
+        user = user_helper(user)
+    else:
+        return False
+
+    for receipt_id in user["receipt_ids"]:
+        # delete that receipt
+        receipt_collection.delete_one({"_id": ObjectId(receipt_id)})
+                                      
+    # empty the user array
+    data = {"receipt_ids": []}
+    updated_user = await user_collection.update_one({"username": username}, {"$set": data})
+
+    return True
+
+async def retrieve_user_receipt(receipt_id: str):
+    receipt = await receipt_collection.find_one({"_id": ObjectId(receipt_id)})
+    if receipt:
+        return receipt_helper(receipt)
+    
+    return None
     
 # ================================================================================
 # Users

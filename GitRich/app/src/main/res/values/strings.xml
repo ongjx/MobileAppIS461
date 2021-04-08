@@ -2,4 +2,16 @@
     <string name="app_name">GitRich</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+
+    <string-array name="Categories">
+        <item>Category</item>
+        <item>Food &amp; Drinks</item>
+        <item>Clothes</item>
+        <item>Shopping</item>
+        <item>Transportation</item>
+        <item>Others</item>
+    </string-array>
+
+    <string name="datehint"><font size="14">Date * (DD/MM/YYYY)</font></string>
+
 </resources>
