@@ -35,7 +35,6 @@ class SignupActivity : AppCompatActivity() {
         val username = binding.editTextUsername.text.toString()
         val password = binding.editTextPassword.text.toString()
 
-        val goBack = Intent()
         if (username == "" || password == "") {
             Toast.makeText(this, "Please do not leave any inputs blank", Toast.LENGTH_SHORT).show()
             return
@@ -54,6 +53,7 @@ class SignupActivity : AppCompatActivity() {
                 if (res == 201) {
                     val data = response.getJSONObject("data")
                     val username = data.optString("username")
+                    val goBack = Intent()
                     goBack.putExtra("username", username)
                     setResult(RESULT_OK, goBack)
 

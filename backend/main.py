@@ -171,8 +171,6 @@ async def upload_ocrreceipt(username: str, request: dict): # if never specify, i
     # Get json name from request
     image = request["image"]
     filepath = request["filepath"]
-    print(image)
-    print()
 
     try:
         name = request["name"]

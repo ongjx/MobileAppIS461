@@ -259,6 +259,7 @@ class MainActivity : AppCompatActivity() {
                 MySingleton.setUsername(username)
                 output.println("${username}")
                 output.close()
+                refresh()
             }
             else if (requestCode == VOICE_CODE) {
                 if (data == null) {
