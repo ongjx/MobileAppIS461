@@ -7,24 +7,19 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.graphics.Matrix
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.os.Environment
 import android.provider.MediaStore
-import android.provider.MediaStore.Images.Thumbnails.getThumbnail
 import android.speech.RecognizerIntent
-import android.util.Log
 import android.view.View
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
-import com.android.volley.Request
-import com.android.volley.toolbox.JsonObjectRequest
 import com.example.gitrich.databinding.ActivityMainBinding
-import org.json.JSONObject
 import java.io.*
 import java.util.*
 
@@ -233,24 +228,20 @@ class MainActivity : AppCompatActivity() {
                 val selectedImage = BitmapFactory.decodeStream(imageStream)
                 val bitmap = Bitmap.createScaledBitmap(selectedImage, 768, 1024, true)
 
+                // Rotate back 90degree becasue by default its landscape
+                val matrix = Matrix()
+                matrix.preRotate(90F)
+                val scaledBitmap = Bitmap.createScaledBitmap(bitmap, 768, 1024, true)
+                val rotatedBitmap = Bitmap.createBitmap(scaledBitmap, 0, 0, scaledBitmap.width, scaledBitmap.height, matrix, true)
+
                 val root = getExternalFilesDir(username)
-//                val currentFiles = root?.listFiles()
                 val newFileName = UUID.randomUUID().toString() + ".jpg"
 
                 // Saving files
                 println("new file name: " + newFileName)
                 val imageFile = File(root, newFileName)
-                bitmap.compress(Bitmap.CompressFormat.JPEG, 90, FileOutputStream(imageFile))
+                rotatedBitmap.compress(Bitmap.CompressFormat.JPEG, 90, FileOutputStream(imageFile))
 
-                // Show all files
-                val files = root?.listFiles()
-                if (files != null) {
-                    for (file in files) {
-                        println(file.toString())
-                    }
-                }
-
-                intent.putExtra("image_uri", image_uri)
                 intent.putExtra("filepath", newFileName)
                 startActivityForResult(intent, OCR_CODE)
             }

@@ -46,6 +46,8 @@ class ReceiptDetails : AppCompatActivity() {
                         val decodedString = Base64.decode(receiptBytes, Base64.DEFAULT);
                         val decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.size)
                         receiptImage.setImageBitmap(decodedByte)
+                    } else if (receipt.image.equals("")) {
+                        receiptImage.setImageResource(R.drawable.empty)
                     } else {
                         // .jpg
                         val root = getExternalFilesDir(username)
