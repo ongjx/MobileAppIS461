@@ -2,14 +2,14 @@ package com.example.gitrich
 
 import android.app.Activity
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import android.view.Window
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import com.android.volley.Request
 import com.android.volley.toolbox.JsonObjectRequest
-import com.example.gitrich.databinding.ActivityMainBinding
 import com.example.gitrich.databinding.ActivitySignupBinding
 import org.json.JSONObject
 
@@ -17,6 +17,8 @@ class SignupActivity : AppCompatActivity() {
     private lateinit var binding: ActivitySignupBinding
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        requestWindowFeature(Window.FEATURE_NO_TITLE)
+        supportActionBar?.hide()
         binding = ActivitySignupBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
@@ -41,7 +43,8 @@ class SignupActivity : AppCompatActivity() {
             return
         }
 
-        val url = "http://ec2-18-136-119-32.ap-southeast-1.compute.amazonaws.com/users/${binding.editTextUsername.text}/signup"
+        //val url = "http://ec2-18-136-119-32.ap-southeast-1.compute.amazonaws.com/users/${binding.editTextUsername.text}/signup"
+        val url = "http://10.0.2.2:8000/users/${binding.editTextUsername.text}/signup"
         val payload = JSONObject()
         payload.put("password", password)
 
@@ -51,7 +54,7 @@ class SignupActivity : AppCompatActivity() {
             { response ->
                 val res = response.getInt("code")
 
-                if (res == 201){
+                if (res == 201) {
                     val data = response.getJSONObject("data")
                     val username = data.optString("username")
                     goBack.putExtra("username", username)
@@ -62,7 +65,7 @@ class SignupActivity : AppCompatActivity() {
                     finish()
                 }
 
-                if (res == 400){
+                if (res == 400) {
                     binding.textView.text = "Error signing up"
                 }
             },

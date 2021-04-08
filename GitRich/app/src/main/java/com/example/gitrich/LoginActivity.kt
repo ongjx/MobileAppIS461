@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import android.view.Window
 import android.widget.Toast
 import com.android.volley.Request
 import com.android.volley.Response
@@ -24,6 +25,8 @@ class LoginActivity : AppCompatActivity() {
     private lateinit var binding:ActivityLoginBinding
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        requestWindowFeature(Window.FEATURE_NO_TITLE)
+        supportActionBar?.hide()
         binding = ActivityLoginBinding.inflate(layoutInflater)
         setContentView(binding.root)
     }
@@ -45,7 +48,8 @@ class LoginActivity : AppCompatActivity() {
         }
 
         // val url = "http://ec2-18-136-119-32.ap-southeast-1.compute.amazonaws.com:8000/users/${binding.editTextUsername.text}/login"
-        val url = "http://ec2-18-136-119-32.ap-southeast-1.compute.amazonaws.com:8000/users/${binding.editTextUsername.text}/login"
+        //val url = "http://ec2-18-136-119-32.ap-southeast-1.compute.amazonaws.com:8000/users/${binding.editTextUsername.text}/login"
+        val url = "http://10.0.2.2:8000/users/${binding.editTextUsername.text}/login"
         val payload = JSONObject()
         payload.put("password", password)
 

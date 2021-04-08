@@ -4,7 +4,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F7FAFE"
     tools:context=".LoginActivity">
 
     <ImageView
@@ -20,35 +19,32 @@
 
     <LinearLayout
         android:id="@+id/linearLayout5"
-        android:layout_width="match_parent"
-        android:layout_height="186dp"
+        android:layout_width="362dp"
+        android:layout_height="wrap_content"
         android:layout_marginBottom="24dp"
         android:gravity="center"
         android:orientation="vertical"
         app:layout_constraintBottom_toTopOf="@+id/Login"
-        tools:layout_editor_absoluteX="0dp">
-
-        <TextView
-            android:id="@+id/textView"
-            android:layout_width="match_parent"
-            android:layout_height="32dp"
-            android:text="TextView" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="45dp"
-            android:gravity="center|center_vertical"
-            android:orientation="horizontal">
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="vertical">
 
             <TextView
                 android:id="@+id/UsernameLabel"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Username" />
+                android:paddingLeft="3dp"
+                android:text="Username"
+                android:textColor="#1C0E0E" />
 
             <EditText
                 android:id="@+id/editTextUsername"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:ems="10"
                 android:inputType="textPersonName"
@@ -58,24 +54,32 @@
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="45dp"
-            android:gravity="center|center_vertical"
-            android:orientation="horizontal">
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="vertical"
+            android:layout_marginTop="10dp">
 
             <TextView
                 android:id="@+id/passwordLabel"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:paddingLeft="3dp"
+                android:textColor="#1C0E0E"
                 android:text="Password" />
 
             <EditText
                 android:id="@+id/editTextPassword"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:ems="10"
                 android:inputType="textPassword" />
 
         </LinearLayout>
+
+        <TextView
+            android:id="@+id/textView"
+            android:layout_width="362dp"
+            android:layout_height="32dp"
+            android:textColor="#FF5555" />
 
     </LinearLayout>
 
@@ -83,7 +87,6 @@
         android:id="@+id/Login"
         android:layout_width="362dp"
         android:layout_height="52dp"
-        android:layout_marginBottom="20dp"
         android:onClick="login"
         android:paddingTop="5dp"
         android:paddingBottom="5dp"
