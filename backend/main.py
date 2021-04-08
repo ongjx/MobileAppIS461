@@ -5,7 +5,7 @@ import requests
 import uuid
 import pytz
 import dateutil.parser as dtp
-from datetime import datetime
+from datetime import datetime, timedelta, date
 from google.cloud import dialogflow
 from pathlib import Path
 from collections import defaultdict, OrderedDict
@@ -390,7 +390,17 @@ async def login_user(username: str, request: dict):
 # [GET Endpoint] Expense
 @app.get("/users/{username}/analytics/expense")
 async def get_expense_analytics(username: str):
-    result = defaultdict(int)
+    result = defaultdict(float)
+    
+    # Initialise past 6 months
+    this_month = date.today().replace(day=1)
+    for i in range(6):
+        if i == 0:
+            result[this_month.strftime('%b %Y')] = 0.0
+        else:
+            this_month = (this_month - timedelta(days=1)).replace(day=1)
+            result[this_month.strftime('%b %Y')] = 0.0
+    
     # Everything is monthly for now
     receipts = await retrieve_user_receipts(username)
     if receipts:
@@ -398,12 +408,13 @@ async def get_expense_analytics(username: str):
             receipt_date = receipt["date"]
             date_time_obj = datetime.strptime(receipt_date, '%d/%m/%Y %H:%M:%S')
             month_and_year = date_time_obj.strftime('%b %Y')
-            try:
+            
+            if month_and_year in result:
                 result[month_and_year] += float(receipt["amount"])
-            except ValueError:
-                result[month_and_year] += 0
+            else:
+                continue
 
-        result= OrderedDict(sorted(result.items(), key=lambda t: datetime.strptime(t[0], '%b %Y'), reverse=True))
+        result= OrderedDict(sorted(result.items(), key=lambda t: datetime.strptime(t[0], '%b %Y')))
         return ResponseModel(result, 200, "Receipts data retrieved successfully")
     return ErrorResponseModel([], 400, "No Receipts")
 
