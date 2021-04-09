@@ -5,7 +5,7 @@ import requests
 import uuid
 import pytz
 import dateutil.parser as dtp
-from datetime import datetime
+from datetime import datetime, timedelta, date
 from google.cloud import dialogflow
 from pathlib import Path
 from collections import defaultdict, OrderedDict
@@ -185,13 +185,28 @@ async def upload_ocrreceipt(username: str, request: dict): # if never specify, i
     # Call OCRSpace
     response = call_ocrspace(image)
     response_json = response.json()
-    raw_response = response_json["ParsedResults"][0]["ParsedText"]
 
-    receipt_dict = Receipt(raw_response, filepath, name, category).to_dict()
+    try:
+        raw_response = response_json["ParsedResults"][0]["ParsedText"]
+        print(raw_response)
+
+        receipt_dict = Receipt(raw_response, filepath, name, category).to_dict()
     
-    # success, receipt = await add_receipt(username, receipt_dict)
+        # success, receipt = await add_receipt(username, receipt_dict)
+        return ResponseModel(receipt_dict, 200, "Receipt Successfully Uploaded")
+    except:
+        empty_error_dict = {
+            "name": "",
+            "amount": "",
+            "date": "",
+            "items": {},
+            "image": filepath,
+            "category": ""
+        }
 
-    return ResponseModel(receipt_dict, 200, "Receipt Successfully Uploaded")
+        return ResponseModel(empty_error_dict, 200, "Receipt Successfully Uploaded")
+
+    
 
     # if success:
     #     return ResponseModel(receipt, 201, "Receipt Successfully Uploaded")
@@ -375,7 +390,17 @@ async def login_user(username: str, request: dict):
 # [GET Endpoint] Expense
 @app.get("/users/{username}/analytics/expense")
 async def get_expense_analytics(username: str):
-    result = defaultdict(int)
+    result = defaultdict(float)
+    
+    # Initialise past 6 months
+    this_month = date.today().replace(day=1)
+    for i in range(6):
+        if i == 0:
+            result[this_month.strftime('%b %Y')] = 0.0
+        else:
+            this_month = (this_month - timedelta(days=1)).replace(day=1)
+            result[this_month.strftime('%b %Y')] = 0.0
+    
     # Everything is monthly for now
     receipts = await retrieve_user_receipts(username)
     if receipts:
@@ -383,12 +408,13 @@ async def get_expense_analytics(username: str):
             receipt_date = receipt["date"]
             date_time_obj = datetime.strptime(receipt_date, '%d/%m/%Y %H:%M:%S')
             month_and_year = date_time_obj.strftime('%b %Y')
-            try:
+            
+            if month_and_year in result:
                 result[month_and_year] += float(receipt["amount"])
-            except ValueError:
-                result[month_and_year] += 0
+            else:
+                continue
 
-        result= OrderedDict(sorted(result.items(), key=lambda t: datetime.strptime(t[0], '%b %Y'), reverse=True))
+        result= OrderedDict(sorted(result.items(), key=lambda t: datetime.strptime(t[0], '%b %Y')))
         return ResponseModel(result, 200, "Receipts data retrieved successfully")
     return ErrorResponseModel([], 400, "No Receipts")
 

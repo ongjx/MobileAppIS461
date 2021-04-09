@@ -16,6 +16,7 @@ import org.json.JSONObject
 import java.io.ByteArrayOutputStream
 import java.io.InputStream
 import okhttp3.*
+import java.io.File
 import java.io.IOException
 
 private const val OCR_RESULT_CODE = 1007
@@ -31,13 +32,17 @@ class OCRScannerActivity : AppCompatActivity() {
 
         val intent = intent.extras
         if (intent != null) {
-            val image_uri = intent.getParcelable<Uri>("image_uri")
-            val imageStream: InputStream? = contentResolver.openInputStream(image_uri!!)
-            val selectedImage = BitmapFactory.decodeStream(imageStream)
-            val bitmap = Bitmap.createScaledBitmap(selectedImage, 768, 1024, true)
-            binding.imageView.setImageBitmap(bitmap)
-            encodedImage_BASE64 = "data:image/jpg;base64," + encodeImage(bitmap)
             filepath = intent.getString("filepath").toString()
+
+            val root = getExternalFilesDir(MySingleton.getUsername())
+            val imgFile = File(root, filepath)
+
+            if (imgFile.exists()) {
+                val decodedByte = BitmapFactory.decodeFile(imgFile.getAbsolutePath())
+                binding.imageView.setImageBitmap(decodedByte)
+
+                encodedImage_BASE64 = "data:image/jpg;base64," + encodeImage(decodedByte)
+            }
         }
     }
 

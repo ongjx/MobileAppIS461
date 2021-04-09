@@ -142,6 +142,8 @@ class receipts_summary : Fragment() {
                             val decodedString = Base64.decode(receiptBytes, Base64.DEFAULT);
                             val decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.size)
                             thumbnail.setImageBitmap(decodedByte)
+                        } else if (receipt.image.equals("")) {
+                            thumbnail.setImageResource(R.drawable.empty)
                         } else {
                             // .jpg
                             val root = mContext.getExternalFilesDir(MySingleton.getUsername())

@@ -7,6 +7,7 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.graphics.Matrix
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -232,24 +233,20 @@ class MainActivity : AppCompatActivity() {
                 val selectedImage = BitmapFactory.decodeStream(imageStream)
                 val bitmap = Bitmap.createScaledBitmap(selectedImage, 768, 1024, true)
 
+                // Rotate back 90degree becasue by default its landscape
+                val matrix = Matrix()
+                matrix.preRotate(90F)
+                val scaledBitmap = Bitmap.createScaledBitmap(bitmap, 768, 1024, true)
+                val rotatedBitmap = Bitmap.createBitmap(scaledBitmap, 0, 0, scaledBitmap.width, scaledBitmap.height, matrix, true)
+
                 val root = getExternalFilesDir(username)
-//                val currentFiles = root?.listFiles()
                 val newFileName = UUID.randomUUID().toString() + ".jpg"
 
                 // Saving files
                 println("new file name: " + newFileName)
                 val imageFile = File(root, newFileName)
-                bitmap.compress(Bitmap.CompressFormat.JPEG, 90, FileOutputStream(imageFile))
+                rotatedBitmap.compress(Bitmap.CompressFormat.JPEG, 90, FileOutputStream(imageFile))
 
-                // Show all files
-                val files = root?.listFiles()
-                if (files != null) {
-                    for (file in files) {
-                        println(file.toString())
-                    }
-                }
-
-                intent.putExtra("image_uri", image_uri)
                 intent.putExtra("filepath", newFileName)
                 startActivityForResult(intent, OCR_CODE)
             }
@@ -267,6 +264,7 @@ class MainActivity : AppCompatActivity() {
                 MySingleton.setUsername(username)
                 output.println("${username}")
                 output.close()
+                refresh()
             }
             else if (requestCode == VOICE_CODE) {
                 if (data == null) {
