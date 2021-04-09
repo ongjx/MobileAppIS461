@@ -52,7 +52,7 @@ class QRScannerResultActivity : AppCompatActivity() {
                 desc += "${key},$${value}\n"
             }
 
-            amountElement.setText(amount.toString())
+            amountElement.setText(amount)
             dateElement.setText(date)
             storeElement.setText(store)
             descElement.setText(desc)
@@ -163,6 +163,13 @@ class QRScannerResultActivity : AppCompatActivity() {
 
         MySingleton.getInstance(this).addToRequestQueue(jsonObjectRequest)
         setResult(RESULT_OK)
+        finish()
+    }
+
+    override fun onBackPressed() {
+        super.onBackPressed()
+//        Toast.makeText(this,"Back Pressed", Toast.LENGTH_SHORT).show()
+        setResult(RESULT_CANCELED)
         finish()
     }
 }
