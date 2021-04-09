@@ -15,6 +15,7 @@ import android.widget.*
 import com.android.volley.Request
 import com.android.volley.toolbox.JsonObjectRequest
 import com.example.gitrich.models.Receipt
+import com.google.gson.Gson
 import okhttp3.OkHttpClient
 import org.json.JSONObject
 import java.util.regex.Pattern
@@ -151,9 +152,12 @@ class EditDelete : AppCompatActivity() {
                     { response ->
                         val res = response.getInt("code")
 
-                        if (res == 201) {
+                        if (res == 200) {
                             val goBack = Intent()
                             goBack.putExtra("message", "Receipt Updated")
+                            json.put("id", receipt.id)
+                            val gson = Gson()
+                            goBack.putExtra("receipt", gson.fromJson(json.toString(), Receipt::class.java))
                             setResult(EDIT_CODE, goBack)
                             finish()
                         }

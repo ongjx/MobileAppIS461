@@ -28,8 +28,12 @@ class ReceiptDetails : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_receipt_details)
-
         receipt = intent.extras?.getParcelable<Receipt>("receipt")!!
+
+        setReceipt(receipt)
+    }
+
+    private fun setReceipt(receipt: Receipt) {
         receiptImage = findViewById(R.id.ReceiptImage)
         title = findViewById(R.id.receipt_name)
         amount = findViewById(R.id.totalAmount)
@@ -65,10 +69,10 @@ class ReceiptDetails : AppCompatActivity() {
                 }
                 height = receiptImage.layoutParams.height
                 width = receiptImage.layoutParams.width
-            } catch (error: Exception){
+            } catch (error: Exception) {
             }
             title.text = receipt.name
-                    amount.text = "$${receipt.amount}"
+            amount.text = "$${receipt.amount}"
             category.text = receipt.category
             date.text = receipt.date
             itemList.adapter = CustomAdapter(this, receipt.items)
@@ -158,9 +162,15 @@ class ReceiptDetails : AppCompatActivity() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == EDIT_DELETE_STATUS_CODE && resultCode == DELETE_STATUS_CODE) {
-            setResult(1010)
-            finish()
+        if (requestCode == EDIT_DELETE_STATUS_CODE ) {
+            if (resultCode == DELETE_STATUS_CODE) {
+                setResult(1010)
+                finish()
+            }
+            else if (resultCode == EDIT_STATUS_CODE) {
+                receipt = data!!.extras!!.get("receipt") as Receipt
+                setReceipt(receipt)
+            }
         }
     }
 }
