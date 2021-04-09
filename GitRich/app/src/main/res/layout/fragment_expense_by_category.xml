@@ -21,6 +21,7 @@
             android:id="@+id/pieChart1"
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
+            android:minWidth="300dp"
 />
 
     </LinearLayout>

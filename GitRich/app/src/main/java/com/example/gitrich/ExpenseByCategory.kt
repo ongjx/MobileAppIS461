@@ -110,7 +110,6 @@ class ExpenseByCategory : Fragment() {
         var pieChart = requireView().findViewById<PieChart>(R.id.pieChart1)
 
         val pieEntries: ArrayList<PieEntry> = ArrayList()
-        val label = "type"
 
         //initializing data
         val typeAmountMap: MutableMap<String, Int> = HashMap()
@@ -143,9 +142,10 @@ class ExpenseByCategory : Fragment() {
 
         //collecting the entries with label name
 
-        val pieDataSet = PieDataSet(pieEntries, label)
+        val pieDataSet = PieDataSet(pieEntries, "")
         //setting text size of the value
-        pieDataSet.valueTextSize = 12f
+        pieDataSet.valueTextSize = 14f
+        pieDataSet.xValuePosition = PieDataSet.ValuePosition.OUTSIDE_SLICE
         //providing color list for coloring different entries
         pieDataSet.colors = colors
         //grouping the data set from entry to chart
@@ -153,10 +153,13 @@ class ExpenseByCategory : Fragment() {
         //showing the value of the entries, default true if not set
         pieData.setDrawValues(true)
 
-        pieChart.holeRadius = 58f
+        pieChart.holeRadius = 48f
 
-
+//        pieChart.setBackgroundColor(Color)
+        pieChart.description.isEnabled = false
         pieChart.data = pieData
+        pieChart.setEntryLabelColor(Color.BLACK)
+        pieChart.setExtraOffsets(26f,26f,26f,26f)
         pieChart.invalidate()
         pieChart.animateXY(2000,2000)
 
