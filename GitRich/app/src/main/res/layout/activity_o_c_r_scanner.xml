@@ -8,20 +8,21 @@
 
     <ImageView
         android:id="@+id/imageView"
-        android:layout_width="398dp"
-        android:layout_height="512dp"
-        android:layout_marginBottom="92dp"
+        android:layout_width="362dp"
+        android:layout_height="424dp"
+        android:layout_marginTop="33dp"
+        android:layout_marginBottom="44dp"
         app:layout_constraintBottom_toTopOf="@+id/submitImage"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.004"
+        app:layout_constraintTop_toBottomOf="@+id/textView2"
         tools:srcCompat="@tools:sample/avatars" />
 
     <Button
         android:id="@+id/submitImage"
-        android:layout_width="250sp"
-        android:layout_height="wrap_content"
+        android:layout_width="362dp"
+        android:layout_height="52dp"
         android:layout_marginTop="66dp"
         android:onClick="processReceipt"
         android:text="Process Receipt"
@@ -34,15 +35,28 @@
 
     <Button
         android:id="@+id/cancelSubmit"
-        android:layout_width="250sp"
-        android:layout_height="wrap_content"
+        android:layout_width="362dp"
+        android:layout_height="52dp"
         android:layout_marginTop="66dp"
         android:onClick="retry"
-        android:text="cancel"
+        android:text="Retake"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.496"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.938" />
+
+    <TextView
+        android:id="@+id/textView2"
+        android:layout_width="362dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="56dp"
+        android:text="Please ensure your receipt is within the frame"
+        android:textAlignment="center"
+        android:textSize="18sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>
