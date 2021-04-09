@@ -48,8 +48,8 @@ class LoginActivity : AppCompatActivity() {
         }
 
         // val url = "http://ec2-18-136-119-32.ap-southeast-1.compute.amazonaws.com:8000/users/${binding.editTextUsername.text}/login"
-        //val url = "http://ec2-18-136-119-32.ap-southeast-1.compute.amazonaws.com:8000/users/${binding.editTextUsername.text}/login"
-        val url = "http://10.0.2.2:8000/users/${binding.editTextUsername.text}/login"
+        val url = "http://ec2-18-136-119-32.ap-southeast-1.compute.amazonaws.com:8000/users/${binding.editTextUsername.text}/login"
+        //val url = "http://10.0.2.2:8000/users/${binding.editTextUsername.text}/login"
         val payload = JSONObject()
         payload.put("password", password)
 

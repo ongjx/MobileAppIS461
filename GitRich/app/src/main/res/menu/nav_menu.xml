@@ -4,11 +4,13 @@
     <item
         android:id="@+id/ic_transaction"
         android:icon="@drawable/ic_transactions"
+        android:enabled="true"
         android:title="Transactions"/>
 
     <item
         android:id="@+id/ic_analytics"
         android:icon="@drawable/ic_analytics"
+        android:enabled="true"
         android:title="Analytics"/>
 
 </menu>

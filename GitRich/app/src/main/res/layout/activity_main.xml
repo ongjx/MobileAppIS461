@@ -2,6 +2,7 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/background"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".MainActivity">
@@ -21,15 +22,24 @@
         android:id="@+id/bottom_nav"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:background="?android:attr/windowBackground"
-        app:itemBackground="@color/design_default_color_on_primary"
-        app:itemIconTint="#000"
-        app:itemTextColor="#000"
+        android:layout_alignParentBottom="false"
+        android:background="@color/dark"
+        app:itemBackground="@color/dark"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:menu="@menu/nav_menu" />
+
+        app:menu="@menu/nav_menu" >
+
+    </com.google.android.material.bottomnavigation.BottomNavigationView>
+
+    <FrameLayout
+        android:id="@+id/fl_wrapper"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/bottom_nav"
+        app:layout_constraintTop_toTopOf="parent">
+
+
+    </FrameLayout>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/drawer"
@@ -37,7 +47,7 @@
         android:layout_height="wrap_content"
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="36dp"
-        android:backgroundTint="@color/design_default_color_primary_variant"
+        android:backgroundTint="@color/green"
         android:clickable="true"
         android:focusable="true"
         app:layout_constraintBottom_toTopOf="@+id/bottom_nav"
@@ -45,63 +55,136 @@
         app:srcCompat="@drawable/ic_add" />
 
     <FrameLayout
-        android:id="@+id/fl_wrapper"
+        android:id="@+id/overlay"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:layout_above="@id/bottom_nav"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:layout_editor_absoluteX="0dp">
+        android:background="#BE2E2C2C"
+        android:visibility="invisible"
+        app:layout_constraintTop_toTopOf="parent">
 
 
     </FrameLayout>
 
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/voice"
+    <LinearLayout
+        android:id="@+id/voiceGroup"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="30dp"
-        android:clickable="true"
-        android:focusable="true"
+        android:gravity="center|center_vertical"
+        android:paddingBottom="2dp"
         android:visibility="invisible"
         app:layout_constraintBottom_toTopOf="@+id/drawer"
-        app:layout_constraintEnd_toEndOf="@+id/drawer"
-        app:srcCompat="@drawable/ic_voice" />
+        app:layout_constraintEnd_toEndOf="@+id/drawer">
 
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/ocr"
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="10dp"
+            android:text="Add via Voice"
+            android:textColor="@color/white" />
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/voice"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:clickable="true"
+            android:focusable="true"
+            android:visibility="visible"
+            app:backgroundTint="@color/green"
+            app:srcCompat="@drawable/ic_voice" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/ocrGroup"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="24dp"
-        android:clickable="true"
-        android:focusable="true"
+        android:gravity="center|center_vertical"
+        android:paddingBottom="2dp"
         android:visibility="invisible"
-        app:layout_constraintBottom_toTopOf="@+id/voice"
-        app:layout_constraintEnd_toEndOf="@+id/voice"
-        app:srcCompat="@drawable/ic_ocr" />
+        app:layout_constraintBottom_toTopOf="@+id/voiceGroup"
+        app:layout_constraintEnd_toEndOf="@+id/voiceGroup">
 
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/qr"
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="10dp"
+            android:text="Add via OCR"
+            android:textColor="@color/white" />
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/ocr"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:clickable="true"
+            android:focusable="true"
+            android:visibility="visible"
+            app:backgroundTint="@color/green"
+            app:srcCompat="@drawable/ic_ocr" />
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:id="@+id/qrGroup"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="24dp"
-        android:clickable="true"
-        android:focusable="true"
+        android:gravity="center|center_vertical"
+        android:paddingBottom="2dp"
         android:visibility="invisible"
-        app:layout_constraintBottom_toTopOf="@+id/ocr"
-        app:layout_constraintEnd_toEndOf="@+id/ocr"
-        app:srcCompat="@drawable/ic_qr" />
+        app:layout_constraintBottom_toTopOf="@+id/ocrGroup"
+        app:layout_constraintEnd_toEndOf="@+id/ocrGroup">
 
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/manual"
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="10dp"
+            android:text="Add via QR"
+            android:textColor="@color/white" />
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/qr"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:clickable="true"
+            android:focusable="true"
+            android:visibility="visible"
+            app:backgroundTint="@color/green"
+            app:srcCompat="@drawable/ic_qr" />
+
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:id="@+id/manualGroup"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="21dp"
-        android:clickable="true"
-        android:focusable="true"
+        android:gravity="center|center_vertical"
+        android:paddingBottom="2dp"
         android:visibility="invisible"
-        app:layout_constraintBottom_toTopOf="@+id/qr"
-        app:layout_constraintEnd_toEndOf="@+id/qr"
-        app:srcCompat="@drawable/ic_manual" />
+        app:layout_constraintBottom_toTopOf="@+id/qrGroup"
+        app:layout_constraintEnd_toEndOf="@+id/qrGroup">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="10dp"
+            android:text="Add manually"
+            android:textColor="@color/white" />
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/manual"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:clickable="true"
+            android:focusable="true"
+            android:visibility="visible"
+            app:backgroundTint="@color/green"
+            app:srcCompat="@drawable/ic_manual" />
+
+    </LinearLayout>
 
 
     <!--    <Button-->

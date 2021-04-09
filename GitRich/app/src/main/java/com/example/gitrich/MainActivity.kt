@@ -10,22 +10,15 @@ import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.os.Environment
 import android.provider.MediaStore
-import android.provider.MediaStore.Images.Thumbnails.getThumbnail
 import android.speech.RecognizerIntent
-import android.util.Log
 import android.view.View
-import android.view.Window
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
-import com.android.volley.Request
-import com.android.volley.toolbox.JsonObjectRequest
 import com.example.gitrich.databinding.ActivityMainBinding
-import org.json.JSONObject
 import java.io.*
 import java.util.*
 
@@ -56,6 +49,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var transactionsFragment: receipts_summary;
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+//        actionBar?.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM)
+//        actionBar?.setCustomView(R.layout.actionbar_center)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
@@ -173,15 +168,18 @@ class MainActivity : AppCompatActivity() {
 
     private fun setVisibility(clicked: Boolean) {
         if(!clicked){
-            binding.manual.visibility = View.VISIBLE
-            binding.qr.visibility = View.VISIBLE
-            binding.ocr.visibility = View.VISIBLE
-            binding.voice.visibility = View.VISIBLE
+            binding.manualGroup.visibility = View.VISIBLE
+            binding.qrGroup.visibility = View.VISIBLE
+            binding.ocrGroup.visibility = View.VISIBLE
+            binding.voiceGroup.visibility = View.VISIBLE
+//            binding.background.setBackgroundColor(Color.parseColor("#C92E2C2C"))
+            binding.overlay.visibility = View.VISIBLE
         }else{
-            binding.manual.visibility = View.INVISIBLE
-            binding.qr.visibility = View.INVISIBLE
-            binding.ocr.visibility = View.INVISIBLE
-            binding.voice.visibility = View.INVISIBLE
+            binding.manualGroup.visibility = View.INVISIBLE
+            binding.qrGroup.visibility = View.INVISIBLE
+            binding.ocrGroup.visibility = View.INVISIBLE
+            binding.voiceGroup.visibility = View.INVISIBLE
+            binding.overlay.visibility = View.INVISIBLE
         }
     }
 

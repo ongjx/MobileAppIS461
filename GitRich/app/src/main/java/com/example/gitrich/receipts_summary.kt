@@ -16,6 +16,7 @@ import android.widget.ListView
 import android.widget.TextView
 import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.RecyclerView
 import com.android.volley.Request
 import com.android.volley.toolbox.JsonObjectRequest
 import com.example.gitrich.models.Receipt
@@ -79,6 +80,7 @@ class receipts_summary : Fragment() {
     private fun getReceipts () {
         val gson = Gson()
         val listView = activity!!.findViewById<ListView>(R.id.receipt_summary_list)
+//        val recyclerView = activity!!.findViewById<RecyclerView>(R.id.receipt_summary_list)
         username = MySingleton.getUsername()
         // val url = "http://ec2-18-136-119-32.ap-southeast-1.compute.amazonaws.com:8000/users/${username}/receipts"
         val url = "http://ec2-18-136-119-32.ap-southeast-1.compute.amazonaws.com:8000/users/${username}/receipts"
@@ -177,6 +179,7 @@ class receipts_summary : Fragment() {
 
     fun startListListener(listView: ListView) {
         listView.setOnItemClickListener { _, _, position, id ->
+            Log.i("position", position.toString())
             val receipt = receipts[position]
             val intent = Intent(activity!!, ReceiptDetails::class.java)
             intent.putExtra("receipt", receipt)
