@@ -36,7 +36,7 @@ private const val ARG_PARAM2 = "param2"
  */
 
 var receipts = ArrayList<Receipt>()
-
+private const val VIEW_RECEIPT = 1010
 class receipts_summary : Fragment() {
     private lateinit var username:String
 
@@ -177,12 +177,12 @@ class receipts_summary : Fragment() {
 //    }
 
 
-    fun startListListener(listView: ListView) {
+    private fun startListListener(listView: ListView) {
         listView.setOnItemClickListener { _, _, position, id ->
             val receipt = receipts[position]
             val intent = Intent(activity!!, ReceiptDetails::class.java)
             intent.putExtra("receipt", receipt)
-            startActivity(intent)
+            activity!!.startActivityForResult(intent, VIEW_RECEIPT)
         }
     }
 }

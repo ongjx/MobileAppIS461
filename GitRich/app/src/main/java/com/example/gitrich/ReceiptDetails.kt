@@ -1,18 +1,19 @@
 package com.example.gitrich
 
 import android.content.Context
+import android.content.Intent
 import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.util.Base64
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import com.example.gitrich.models.Receipt
 import java.io.File
 
-
+private const val EDIT_DELETE_STATUS_CODE = 999
+private const val EDIT_STATUS_CODE = 998
+private const val DELETE_STATUS_CODE = 999
 class ReceiptDetails : AppCompatActivity() {
     private var height = 0
     private var width = 0
@@ -22,12 +23,13 @@ class ReceiptDetails : AppCompatActivity() {
     private lateinit var category: TextView
     private lateinit var date: TextView
     private lateinit var itemList: ListView
+    private lateinit var receipt: Receipt
     private var username = MySingleton.getUsername()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_receipt_details)
 
-        val receipt = intent.extras?.getParcelable<Receipt>("receipt")
+        receipt = intent.extras?.getParcelable<Receipt>("receipt")!!
         receiptImage = findViewById(R.id.ReceiptImage)
         title = findViewById(R.id.receipt_name)
         amount = findViewById(R.id.totalAmount)
@@ -66,7 +68,7 @@ class ReceiptDetails : AppCompatActivity() {
             } catch (error: Exception){
             }
             title.text = receipt.name
-            amount.text = "$${receipt.amount}"
+                    amount.text = "$${receipt.amount}"
             category.text = receipt.category
             date.text = receipt.date
             itemList.adapter = CustomAdapter(this, receipt.items)
@@ -98,6 +100,26 @@ class ReceiptDetails : AppCompatActivity() {
                 receiptImage.setScaleType(ImageView.ScaleType.FIT_XY)
             }
         }
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        val inflater = menuInflater
+        inflater.inflate(R.menu.edit_menu, menu)
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            R.id.edit -> {
+                intent = Intent(this, EditDelete::class.java)
+                intent.putExtra("receipt", receipt)
+                startActivityForResult(intent, EDIT_DELETE_STATUS_CODE)
+
+            }
+
+        }
+
+        return super.onOptionsItemSelected(item)
     }
 
     class CustomAdapter(context: Context, items: HashMap<String, String>): BaseAdapter() {
@@ -134,4 +156,11 @@ class ReceiptDetails : AppCompatActivity() {
         }
     }
 
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == EDIT_DELETE_STATUS_CODE && resultCode == DELETE_STATUS_CODE) {
+            setResult(1010)
+            finish()
+        }
+    }
 }

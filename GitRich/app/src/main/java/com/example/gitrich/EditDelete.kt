@@ -42,7 +42,7 @@ class EditDelete : AppCompatActivity() {
         itemList = findViewById(R.id.create_desc)
 
         title.setText(receipt.name)
-        amount.setText("$${receipt.amount}")
+        amount.setText("${receipt.amount}")
         date.setText(receipt.date)
 
         var desc = ""
