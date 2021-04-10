@@ -331,7 +331,7 @@ async def post_dialogflow(username: str, request: dict):
         "amount": price,
         "items": {},
         "category": category,
-        "image": None,
+        "image": "",
         "date": datetime.now(pytz.timezone('Asia/Singapore')).strftime('%d/%m/%Y %H:%M:%S')
     }
     
