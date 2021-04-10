@@ -60,16 +60,16 @@ class ExpenseByCategory : Fragment() {
     @RequiresApi(Build.VERSION_CODES.O)
     private fun getAnalytics () {
         username = MySingleton.getUsername()
-        // val url = "http://ec2-18-136-119-32.ap-southeast-1.compute.amazonaws.com:8000/users/${username}/receipts"
         val url = "http://ec2-18-136-119-32.ap-southeast-1.compute.amazonaws.com:8000/users/${username}/analytics/category"
 
         val jsonObjectRequest = JsonObjectRequest(
             Request.Method.GET, url, null,
             { response ->
-                records = response.getJSONObject("data")
-                Log.i("response", records.toString())
+                if (response.getInt("code") == 200) {
+                    records = response.getJSONObject("data")
 
-                setSpinner(records)
+                    setSpinner(records)
+                }
             },
 
             { error ->
@@ -96,24 +96,28 @@ class ExpenseByCategory : Fragment() {
 
         if (spinner != null) {
             spinner.setItems(monthList)
+            if (monthList.size > 0) {
+                spinner.selectItemByIndex(0)
+            }
             spinner.setOnSpinnerItemSelectedListener<String> { oldIndex, oldItem, newIndex, newItem ->
                 setPieChart(newItem)
             }
         }
 
-        setPieChart(monthList[0])
+        if (monthList.size > 0) {
+            setPieChart(monthList[0])
+        }
+
 
     }
 
     private fun setPieChart(month: String) {
-        val view = getView()
         var pieChart = requireView().findViewById<PieChart>(R.id.pieChart1)
 
         val pieEntries: ArrayList<PieEntry> = ArrayList()
 
         //initializing data
         val typeAmountMap: MutableMap<String, Int> = HashMap()
-
 
         var latest = records.getJSONObject(month)
         var keys = latest.names()
@@ -123,7 +127,6 @@ class ExpenseByCategory : Fragment() {
             val value: Int = latest.getInt(keys)
             typeAmountMap[keys] = value
         }
-
 
         //initializing colors for the entries
         val colors: ArrayList<Int> = ArrayList()

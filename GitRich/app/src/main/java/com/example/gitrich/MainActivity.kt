@@ -75,13 +75,11 @@ class MainActivity : AppCompatActivity() {
         }
 
         binding.manual.setOnClickListener {
-            Toast.makeText(this, "Manual", Toast.LENGTH_SHORT).show()
             intent = Intent(this, CreateReceipt::class.java)
             startActivityForResult(intent, RECEIPT_SUBMIT_CODE)
         }
 
         binding.ocr.setOnClickListener {
-            Toast.makeText(this, "OCR", Toast.LENGTH_SHORT).show()
 //            intent = Intent(this, OCRScannerActivity::class.java)
 //            startActivityForResult(intent, OCR_CODE)
 
@@ -101,7 +99,6 @@ class MainActivity : AppCompatActivity() {
         }
 
         binding.voice.setOnClickListener {
-            Toast.makeText(this, "Voice", Toast.LENGTH_SHORT).show()
             val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH)
             intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
             intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault())
@@ -112,7 +109,6 @@ class MainActivity : AppCompatActivity() {
         }
 
         binding.qr.setOnClickListener {
-            Toast.makeText(this, "QR", Toast.LENGTH_SHORT).show()
             val intent = Intent(this, QRScannerActivity::class.java)
             startActivityForResult(intent, QR_RESULT_CODE)
         }

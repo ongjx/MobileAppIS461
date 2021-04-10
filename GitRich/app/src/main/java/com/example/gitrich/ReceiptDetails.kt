@@ -45,7 +45,7 @@ class ReceiptDetails : AppCompatActivity() {
             try {
                 var receiptBytes = receipt.image
                 if (receipt.image == "null") {
-                    receiptImage.setImageResource(R.drawable.empty)
+                    receiptImage.setImageResource(R.drawable.logo)
                 } else {
                     if (receipt.image.contains("data:image")) {
                         receiptBytes = receipt.image.substringAfter(',')
@@ -53,7 +53,7 @@ class ReceiptDetails : AppCompatActivity() {
                         val decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.size)
                         receiptImage.setImageBitmap(decodedByte)
                     } else if (receipt.image.equals("")) {
-                        receiptImage.setImageResource(R.drawable.empty)
+                        receiptImage.setImageResource(R.drawable.logo)
                     } else {
                         // .jpg
                         val root = getExternalFilesDir(username)
@@ -63,7 +63,7 @@ class ReceiptDetails : AppCompatActivity() {
                             val decodedByte = BitmapFactory.decodeFile(imgFile.getAbsolutePath())
                             receiptImage.setImageBitmap(decodedByte)
                         } else {
-                            receiptImage.setImageResource(R.drawable.empty)
+                            receiptImage.setImageResource(R.drawable.logo)
                         }
                     }
                 }

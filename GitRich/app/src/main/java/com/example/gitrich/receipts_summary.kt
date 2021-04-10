@@ -131,7 +131,7 @@ class receipts_summary : Fragment() {
                 try {
                     var receiptBytes = receipt.image
                     if (receipt.image == null) {
-                        thumbnail.setImageResource(R.drawable.empty)
+                        thumbnail.setImageResource(R.drawable.logo)
                     } else {
                         if (receipt.image.contains("data:image")) {
                             receiptBytes = receipt.image.substringAfter(',')
@@ -139,7 +139,7 @@ class receipts_summary : Fragment() {
                             val decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.size)
                             thumbnail.setImageBitmap(decodedByte)
                         } else if (receipt.image.equals("")) {
-                            thumbnail.setImageResource(R.drawable.empty)
+                            thumbnail.setImageResource(R.drawable.logo)
                         } else {
                             // .jpg
                             val root = mContext.getExternalFilesDir(MySingleton.getUsername())
@@ -149,7 +149,7 @@ class receipts_summary : Fragment() {
                                 val decodedByte = BitmapFactory.decodeFile(imgFile.getAbsolutePath())
                                 thumbnail.setImageBitmap(decodedByte)
                             } else {
-                                thumbnail.setImageResource(R.drawable.empty)
+                                thumbnail.setImageResource(R.drawable.logo)
                             }
                         }
                     }
