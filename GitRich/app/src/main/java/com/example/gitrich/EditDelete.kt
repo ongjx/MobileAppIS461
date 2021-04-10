@@ -1,63 +1,59 @@
 package com.example.gitrich
 
+import android.content.Context
 import android.content.Intent
 import android.graphics.Color
 import android.graphics.Typeface
 import android.graphics.drawable.ColorDrawable
+import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
-import androidx.appcompat.app.AppCompatActivity
 import com.android.volley.Request
 import com.android.volley.toolbox.JsonObjectRequest
+import com.example.gitrich.models.Receipt
+import com.google.gson.Gson
 import okhttp3.OkHttpClient
 import org.json.JSONObject
+import java.util.regex.Pattern
 
-class QRScannerResultActivity : AppCompatActivity() {
-    private lateinit var categories: Array<String>;
-    private var json = JSONObject();
-    private var amount = ""
-    private var date = ""
-    private var store = ""
-    private var desc = ""
-    private var category = ""
+private const val EDIT_CODE = 998
+private const val DELETE_CODE = 999
+class EditDelete : AppCompatActivity() {
+    private lateinit var receipt: Receipt
+    private lateinit var title: EditText
+    private lateinit var amount: EditText
     private lateinit var spinner: Spinner
-
+    private lateinit var date: EditText
+    private lateinit var itemList: EditText
+    private var category = ""
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_create_receipt)
-        supportActionBar!!.title = "GitRich - Confirm Receipt";
-        categories = resources.getStringArray(R.array.Categories)
+        setContentView(R.layout.activity_edit_delete)
+        var categories = resources.getStringArray(R.array.Categories)
+
+        receipt = intent.extras?.getParcelable<Receipt>("receipt")!!
+        title = findViewById(R.id.create_store)
+        amount = findViewById(R.id.create_amount)
         spinner = findViewById(R.id.create_category)
+        date = findViewById(R.id.create_date)
+        itemList = findViewById(R.id.create_desc)
 
-        var amountElement = findViewById<EditText>(R.id.create_amount)
-        var dateElement = findViewById<EditText>(R.id.create_date)
-        var storeElement = findViewById<EditText>(R.id.create_store)
-        var descElement = findViewById<EditText>(R.id.create_desc)
+        title.setText(receipt.name)
+        amount.setText("${receipt.amount}")
+        date.setText(receipt.date)
 
-        val intent = intent.extras
-        if (intent != null) {
-            val data = intent.getString("data")!!
-            json = JSONObject(data)
-            amount = json.get("amount") as String
-            date = json.get("date") as String
-            store = json.get("name") as String
-            category = json.get("category") as String
-            var items = json.get("items") as JSONObject
-            for (i in 0 until items.names().length()) {
-                val key = items.names()[i] as String
-                val value = items.getString(key)
-                desc += "${key},$${value}\n"
-            }
-
-            amountElement.setText(amount)
-            dateElement.setText(date)
-            storeElement.setText(store)
-            descElement.setText(desc)
+        var desc = ""
+        receipt.items.mapKeys { item ->
+            desc += "${item.key},${item.value}\n"
         }
 
+        itemList.setText(desc)
+
+        category = receipt.category
 
         if (spinner != null) {
             val adapter = object: ArrayAdapter<String>(
@@ -114,21 +110,20 @@ class QRScannerResultActivity : AppCompatActivity() {
             override fun onNothingSelected(parent: AdapterView<*>) {
             }
         }
-
     }
 
+
+
     fun save(view: View) {
-        //TODO: Handle receipt submission to backend
         val client = OkHttpClient();
         val user = MySingleton.getUsername()
-        val url = "http://ec2-18-136-119-32.ap-southeast-1.compute.amazonaws.com:8000/users/${user}/qr-receipts"
+        val url = "http://ec2-18-136-119-32.ap-southeast-1.compute.amazonaws.com:8000/users/${user}/receipts/${receipt.id}"
 
         // Check if value on form has been edited
-        amount = findViewById<EditText>(R.id.create_amount).text.toString()
-        date = findViewById<EditText>(R.id.create_date).text.toString()
-        store = findViewById<EditText>(R.id.create_store).text.toString()
-        desc = findViewById<EditText>(R.id.create_desc).text.toString()
-        val items = desc.splitToSequence("\n")
+        val amount = amount.text.toString()
+        val date = findViewById<EditText>(R.id.create_date).text.toString()
+        val title = findViewById<EditText>(R.id.create_store).text.toString()
+        val items = itemList.text.splitToSequence("\n")
         val itemsObject = JSONObject()
         for (item: String in items) {
             if (item != "") {
@@ -138,20 +133,58 @@ class QRScannerResultActivity : AppCompatActivity() {
                 itemsObject.put(l[0].trim() as String, l[1])
             }
         }
-        json.put("name", store)
+        val json = JSONObject()
+        json.put("name", title)
         json.put("amount", amount)
         json.put("items", itemsObject)
         json.put("date", date)
+        json.put("category", category)
 
+        val dateRegex = "^([0-2][0-9]||3[0-1])/(0[0-9]||1[0-2])/([0-9][0-9])?[0-9][0-9]$"
+        if (!Pattern.matches(dateRegex, date)){
+            Toast.makeText(this, "Invalid date format", Toast.LENGTH_SHORT).show()
+        }
+        else if (amount == "" || date == "" || title == "") {
+            Toast.makeText(this, "Please ensure that there are no empty fields!", Toast.LENGTH_SHORT).show()
+        } else {
+            val jsonObjectRequest = JsonObjectRequest(
+                    Request.Method.PUT, url, json,
+                    { response ->
+                        val res = response.getInt("code")
+
+                        if (res == 200) {
+                            val goBack = Intent()
+                            goBack.putExtra("message", "Receipt Updated")
+                            json.put("id", receipt.id)
+                            val gson = Gson()
+                            goBack.putExtra("receipt", gson.fromJson(json.toString(), Receipt::class.java))
+                            setResult(EDIT_CODE, goBack)
+                            finish()
+                        }
+                    },
+                    { error ->
+                        // TODO: Handle error
+                        Log.e("Error", error.toString())
+                    }
+            )
+
+            MySingleton.getInstance(this).addToRequestQueue(jsonObjectRequest)
+
+        }
+    }
+    fun delete(view: View) {
+        val client = OkHttpClient();
+        val user = MySingleton.getUsername()
+        val url = "http://ec2-18-136-119-32.ap-southeast-1.compute.amazonaws.com:8000/users/${user}/receipts/${receipt.id}"
         val jsonObjectRequest = JsonObjectRequest(
-                Request.Method.POST, url, json,
+                Request.Method.DELETE, url, JSONObject(),
                 { response ->
                     val res = response.getInt("code")
 
-                    if (res == 201) {
+                    if (res == 200) {
                         val goBack = Intent()
-                        goBack.putExtra("message", "Receipt Created")
-                        setResult(RESULT_OK, goBack)
+                        goBack.putExtra("message", "Receipt Deleted")
+                        setResult(DELETE_CODE, goBack)
                         finish()
                     }
                 },
@@ -162,15 +195,5 @@ class QRScannerResultActivity : AppCompatActivity() {
         )
 
         MySingleton.getInstance(this).addToRequestQueue(jsonObjectRequest)
-        setResult(RESULT_OK)
-        finish()
-    }
-
-    override fun onBackPressed() {
-        super.onBackPressed()
-//        Toast.makeText(this,"Back Pressed", Toast.LENGTH_SHORT).show()
-        setResult(RESULT_CANCELED)
-        finish()
     }
 }
-

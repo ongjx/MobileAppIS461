@@ -16,7 +16,8 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.GitRich"
         android:usesCleartextTraffic="true">
-        <activity android:name=".OCRScannerResultActivity"></activity>
+        <activity android:name=".EditDelete"></activity>
+        <activity android:name=".OCRScannerResultActivity" />
         <activity android:name=".CreateReceipt" />
         <activity android:name=".SignupActivity" />
         <activity android:name=".LoginActivity" />
@@ -44,7 +45,7 @@
             android:screenOrientation="portrait" />
         <activity
             android:name=".Voice"
-            android:screenOrientation="portrait"></activity>
+            android:screenOrientation="portrait" />
     </application>
 
 </manifest>

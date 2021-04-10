@@ -26,7 +26,6 @@ class QRScannerActivity : AppCompatActivity() {
 
         val scannerView = findViewById<CodeScannerView>(R.id.scanner_view)
         val tv_textView = findViewById<TextView>(R.id.tv_textView)
-
         codeScanner = CodeScanner(this, scannerView)
 
         // Parameters (default values)
@@ -42,10 +41,11 @@ class QRScannerActivity : AppCompatActivity() {
         codeScanner.decodeCallback = DecodeCallback {
             runOnUiThread {
                 val jsonObject = JSONObject(it.text)
-                tv_textView.text = it.text
+                tv_textView.text = "Scan Complete"
                 val intent = Intent(this, QRScannerResultActivity::class.java)
                 intent.putExtra("data", it.text)
                 startActivityForResult(intent, CAMERA_REQUEST_CODE)
+                tv_textView.text = "Scan QR Code"
             }
         }
         codeScanner.errorCallback = ErrorCallback { // or ErrorCallback.SUPPRESS

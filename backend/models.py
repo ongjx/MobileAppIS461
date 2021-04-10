@@ -24,8 +24,8 @@ class ReceiptSchema(BaseModel):
 
 class UpdateReceiptModel(BaseModel):
     name: Optional[str]
-    date: Optional[datetime]
-    amount: Optional[float]
+    date: Optional[str]
+    amount: Optional[str]
     items: Optional[dict]
     image: Optional[str]
     category: Optional[str]

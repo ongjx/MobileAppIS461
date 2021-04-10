@@ -35,6 +35,7 @@ private const val VOICE_CONFIRM_CODE = 1006
 private const val OCR_CODE = 1007
 private const val OCR_RESULT_CODE = 1008
 private const val QR_RESULT_CODE = 1009
+private const val VIEW_RECEIPT = 1010
 
 class MainActivity : AppCompatActivity() {
     private lateinit var username: String
@@ -318,12 +319,12 @@ class MainActivity : AppCompatActivity() {
                 Toast.makeText(this, "Success! OCR Receipt Created!", Toast.LENGTH_SHORT).show()
                 refresh()
             }
-            else if (requestCode == RECEIPT_SUBMIT_CODE) {
+            else if (requestCode == RECEIPT_SUBMIT_CODE || requestCode == QR_RESULT_CODE) {
                 refreshFragment()
             }
-            else if (requestCode == QR_RESULT_CODE) {
-                refreshFragment()
-            }
+        }
+        else if (resultCode == VIEW_RECEIPT) {
+            refreshFragment()
         }
     }
 
