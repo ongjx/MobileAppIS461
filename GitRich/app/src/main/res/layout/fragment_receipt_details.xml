@@ -30,7 +30,7 @@
                     android:layout_width="150dp"
                     android:layout_height="wrap_content"
                     android:layout_marginRight="30dp"
-                    android:hint="Enter Amount2 *"
+                    android:hint="Enter Amount *"
                     android:textColorHint="@color/dark"
                     app:boxBackgroundColor="#65979797">
 
