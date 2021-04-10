@@ -7,13 +7,16 @@
     tools:context=".receipt_details">
 
     <ScrollView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:paddingBottom="40dp"
+        android:layout_gravity="center_horizontal">
 
         <LinearLayout
-            android:layout_width="380dp"
+            android:layout_width="362dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
+            android:layout_marginTop="30dp"
             android:orientation="vertical">
 
             <LinearLayout
@@ -26,8 +29,7 @@
                     style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox"
                     android:layout_width="150dp"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="left"
-                    android:layout_marginRight="20dp"
+                    android:layout_marginRight="30dp"
                     android:hint="Enter Amount2 *"
                     android:textColorHint="@color/dark"
                     app:boxBackgroundColor="#65979797">
@@ -44,6 +46,7 @@
                     style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox"
                     android:layout_width="200dp"
                     android:layout_height="wrap_content"
+                    android:gravity="end"
                     android:hint="Date *(DD/MM/YYYY)"
                     android:textColorHint="@color/dark"
                     app:boxBackgroundColor="#65979797">
@@ -52,7 +55,6 @@
                         android:id="@+id/receipt_date"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:layout_gravity="right"
                         android:inputType="date|textUri|datetime"
                         android:textColor="@color/black" />
                 </com.google.android.material.textfield.TextInputLayout>
@@ -70,9 +72,11 @@
                     style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
                     android:gravity="center"
                     android:hint="Receipt Name *"
                     android:textColorHint="@color/dark"
+
                     app:boxBackgroundColor="#65979797">
 
                     <com.google.android.material.textfield.TextInputEditText
@@ -89,6 +93,7 @@
                     style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox.ExposedDropdownMenu"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
+                    android:layout_marginTop="20dp"
                     android:hint="Category *"
                     android:textColorHint="@color/dark"
                     app:boxBackgroundColor="#65979797">
@@ -106,32 +111,31 @@
                     style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
                     android:gravity="center"
                     android:hint='Description * (eg. "Chicken Rice, $10")'
                     android:textColorHint="@color/dark"
                     app:boxBackgroundColor="#65979797">
 
-                    <ListView
+                    <!--                    <ListView-->
 
-                        android:id="@+id/breakdown_list"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginBottom="40sp"
-                        android:visibility="visible"/>
+                    <!--                        android:id="@+id/breakdown_list"-->
+                    <!--                        android:layout_width="wrap_content"-->
+                    <!--                        android:layout_height="wrap_content"-->
+                    <!--                        android:layout_marginBottom="40sp" />-->
 
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/create_desc"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
-                        android:textColor="@color/black"
                         android:inputType="textShortMessage|textLongMessage|textMultiLine|textPersonName"
-                        android:visibility="invisible" />
+                        android:textColor="@color/black" />
 
                 </com.google.android.material.textfield.TextInputLayout>
-
                 <com.google.android.material.textfield.TextInputLayout
                     style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox"
+                    android:id="@id/image"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center|center_horizontal"
@@ -155,25 +159,38 @@
 
                 </com.google.android.material.textfield.TextInputLayout>
 
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center">
-
                 <Button
                     android:id="@+id/create_save"
-                    android:layout_width="320dp"
+                    android:layout_width="362dp"
                     android:layout_height="49dp"
                     android:text="save"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintHorizontal_bias="0.493"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/create_desc"
+                    app:layout_constraintTop_toBottomOf="@+id/image"
                     app:layout_constraintVertical_bias="0.799" />
+
+                <Button
+                    android:id="@+id/create_delete"
+                    android:layout_width="362dp"
+                    android:layout_height="49dp"
+                    android:text="Delete"
+                    android:layout_marginTop="5dp"
+                    android:layout_marginBottom="30dp"
+                    app:layout_constraintHorizontal_bias="0.493"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/create_save"
+                    app:layout_constraintVertical_bias="0.799" />
+
             </LinearLayout>
+
+<!--            <LinearLayout-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_marginTop="10dp"-->
+<!--                android:gravity="center">-->
+
+
+<!--            </LinearLayout>-->
 
         </LinearLayout>
     </ScrollView>

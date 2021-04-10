@@ -16,6 +16,7 @@ import com.android.volley.Request
 import com.android.volley.toolbox.JsonObjectRequest
 import com.example.gitrich.models.Receipt
 import com.google.android.material.textfield.TextInputEditText
+import com.google.gson.Gson
 import okhttp3.OkHttpClient
 import org.json.JSONObject
 import java.io.File
@@ -41,15 +42,17 @@ class receipt_details : Fragment() {
     private lateinit var date: TextInputEditText
     private lateinit var itemList: ListView
     private lateinit var desc: TextInputEditText
-    private lateinit var categories: Array<String>;
+    private lateinit var categories: Array<String>
+    private lateinit var saveBtn: Button
+    private lateinit var deleteBtn: Button
     private var username = MySingleton.getUsername()
     private var height = 0
     private var width = 0
-    private var amountCreated = "";
-    private var dateCreated = "";
-    private var storeCreated = "";
-    private var descCreated = "";
-    private var categoryCreated = "";
+    private var amountNew = "";
+    private var dateNew = "";
+    private var storeNew = "";
+    private var descNew = "";
+    private var categoryNew = "";
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -65,18 +68,40 @@ class receipt_details : Fragment() {
     ): View? {
         // Inflate the layout for this fragment
         var view = inflater.inflate(R.layout.fragment_receipt_details, container, false)
-
-        receiptImage = view.findViewById(R.id.ReceiptImage)
-        title = view.findViewById(R.id.receipt_name)
-        amount = view.findViewById(R.id.totalAmount)
-        category = view.findViewById(R.id.receipt_category)
-        date = view.findViewById(R.id.receipt_date)
-        itemList = view.findViewById(R.id.breakdown_list)
-        desc = view.findViewById(R.id.create_desc)
-
-
+        saveBtn = view.findViewById<View>(R.id.create_save) as Button
+        deleteBtn = view.findViewById<View>(R.id.create_delete) as Button
+        saveBtn.setOnClickListener {
+            save()
+        }
+        deleteBtn.setOnClickListener {
+            delete()
+        }
         return view
     }
+
+    private fun delete() {
+        val client = OkHttpClient();
+        val user = MySingleton.getUsername()
+        val url = "http://ec2-18-136-119-32.ap-southeast-1.compute.amazonaws.com:8000/users/${user}/receipts/${receipt.id}"
+        val jsonObjectRequest = JsonObjectRequest(
+            Request.Method.DELETE, url, JSONObject(),
+            { response ->
+                val res = response.getInt("code")
+
+                if (res == 200) {
+                    Toast.makeText(requireContext(), "DELETED", Toast.LENGTH_SHORT).show()
+                    (context as MainActivity).refresh()
+                }
+            },
+            { error ->
+                // TODO: Handle error
+                Log.e("Error", error.toString())
+            }
+        )
+
+        MySingleton.getInstance(requireContext()).addToRequestQueue(jsonObjectRequest)
+    }
+
 
     override fun onResume() {
         super.onResume()
@@ -85,8 +110,19 @@ class receipt_details : Fragment() {
         category.setAdapter(arrayAdapter)
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
+    override fun onActivityCreated(savedInstanceState: Bundle?) {
+        super.onActivityCreated(savedInstanceState)
+        Log.i("ACTIVITY CREATED", "asdkvasn")
+
+        val act = activity
+        if(act != null){
+            receiptImage = act.findViewById(R.id.ReceiptImage)
+            title = act.findViewById(R.id.receipt_name)
+            amount = act.findViewById(R.id.totalAmount)
+            category = act.findViewById(R.id.receipt_category)
+            date = act.findViewById(R.id.receipt_date)
+            //itemList = view.findViewById(R.id.breakdown_list)
+            desc = act.findViewById(R.id.create_desc)
             if(receipt != null){
                 try {
                     var receiptBytes = receipt?.image
@@ -118,86 +154,81 @@ class receipt_details : Fragment() {
                 } catch (error: Exception){
 
                 }
+
+
                 title.setText(receipt?.name)
                 amount.setText("$${receipt?.amount}")
                 category.setText(receipt?.category)
                 date.setText(receipt?.date)
-                itemList.adapter = ReceiptDetails.CustomAdapter(requireContext(), receipt.items)
+
+                var x = ""
+                receipt.items.mapKeys { item ->
+                    x += "${item.key}, ${item.value}\n"
+                }
+                desc.setText(x)
                 modifyReceiptImageSize()
             }else{
                 category.isClickable = true
-                itemList.visibility = View.VISIBLE
-
             }
+        }
+
     }
 
-    fun save(view: View){
-        amountCreated = amount.text.toString()
-        dateCreated = date.text.toString()
-        storeCreated = title.text.toString()
-        descCreated = desc.text.toString()
-        categoryCreated = category.text.toString()
+    fun save(){
+        val amountNew = amount.text.toString()
+        val dateNew = date.text.toString()
+        val storeNew = title.text.toString()
+        val descNew = desc.text?.splitToSequence("\n")
+        val categoryNew = category.text.toString()
 
-        var itemsObject = JSONObject()
+        val client = OkHttpClient();
+        val user = MySingleton.getUsername()
+        val url = "http://ec2-18-136-119-32.ap-southeast-1.compute.amazonaws.com:8000/users/${user}/receipts/${receipt.id}"
 
-        if (descCreated.equals("")) {
-            // do nothing
-        } else {
-            try {
-                val items = descCreated.splitToSequence("\n")
-
-                for (item: String in items) {
+        // Check if value on form has been edited
+        val itemsObject = JSONObject()
+        if (descNew != null) {
+            for (item: String in descNew) {
+                if (item != "") {
                     val l = item.split(',')
                     val name = l[0].trim()
                     val amount = if ("$" in l[1]) l[1].trim() else ("$${l[1].trim()}")
-
                     itemsObject.put(l[0].trim() as String, l[1])
                 }
-            } catch (e: java.lang.Exception) {
-                // We can choose to stop processing unless its empty or appropriate desc is entered
-                println("Inappropriate Description")
-                itemsObject = JSONObject()
             }
         }
-
+        val json = JSONObject()
+        json.put("name", storeNew)
+        json.put("amount", amountNew.removePrefix("$"))
+        json.put("items", itemsObject)
+        json.put("date", dateNew)
+        json.put("category", categoryNew)
 
         val dateRegex = "^([0-2][0-9]||3[0-1])/(0[0-9]||1[0-2])/([0-9][0-9])?[0-9][0-9]$"
-        if (!Pattern.matches(dateRegex, dateCreated)){
+        if (!Pattern.matches(dateRegex, dateNew)){
             Toast.makeText(requireContext(), "Invalid date format", Toast.LENGTH_SHORT).show()
         }
-        else if (amountCreated == "" || dateCreated == "" || storeCreated == "") {
+        else if (amountNew == "" || dateNew == "" || storeNew == "") {
             Toast.makeText(requireContext(), "Please ensure that there are no empty fields!", Toast.LENGTH_SHORT).show()
-        }
-        else {
-            val client = OkHttpClient();
-            val jsonObject = JSONObject()
-
-            jsonObject.put("name", storeCreated)
-            jsonObject.put("amount", amountCreated)
-            jsonObject.put("items", itemsObject)
-            jsonObject.put("image", "")
-            jsonObject.put("date", dateCreated)
-            jsonObject.put("category", categoryCreated)
-
-            val user = MySingleton.getUsername()
-            val url = "http://ec2-18-136-119-32.ap-southeast-1.compute.amazonaws.com:8000/users/${user}/qr-receipts"
+        } else {
             val jsonObjectRequest = JsonObjectRequest(
-                Request.Method.POST, url, jsonObject,
+                Request.Method.PUT, url, json,
                 { response ->
                     val res = response.getInt("code")
-                    Log.e("response", response.toString())
-                    if (res == 201){
 
-                        val goBack = Intent()
-                        requireActivity().setResult(AppCompatActivity.RESULT_OK)
-                        requireActivity().finish()
+                    if (res == 200) {
+                        Toast.makeText(requireContext(), "UPDATED", Toast.LENGTH_SHORT).show()
+                        (context as MainActivity).refresh()
                     }
                 },
                 { error ->
+                    // TODO: Handle error
                     Log.e("Error", error.toString())
                 }
             )
+
             MySingleton.getInstance(requireContext()).addToRequestQueue(jsonObjectRequest)
+
         }
 
     }

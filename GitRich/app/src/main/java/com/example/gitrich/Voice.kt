@@ -50,6 +50,7 @@ class Voice : AppCompatActivity() {
         val payload = JSONObject()
         payload.put("text", speech)
         payload.put("name", name)
+        payload.put("image", "")
         val JSON = MediaType.parse("application/json; charset=utf-8")
         val body = RequestBody.create(JSON, payload.toString())
 

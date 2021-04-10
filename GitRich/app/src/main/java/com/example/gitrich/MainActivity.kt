@@ -73,7 +73,6 @@ class MainActivity : AppCompatActivity() {
 
         binding.manual.setOnClickListener {
             Toast.makeText(this, "Manual", Toast.LENGTH_SHORT).show()
-//            makeCurrentFragment(receipt_details.newInstance(null), "manual")
             intent = Intent(this, CreateReceipt::class.java)
             startActivityForResult(intent, RECEIPT_SUBMIT_CODE)
         }
@@ -117,7 +116,6 @@ class MainActivity : AppCompatActivity() {
 
         transactionsFragment = receipts_summary()
         val analyticsFragment = AnalyticsFragment()
-        val receiptDetails = receipt_details()
 
         makeCurrentFragment(transactionsFragment, "transaction")
 
@@ -207,12 +205,34 @@ class MainActivity : AppCompatActivity() {
         startActivityForResult(it, LOGIN_USER_CODE)
     }
 
-    fun makeCurrentFragment(fragment: Fragment, tag: String) =
+    fun makeCurrentFragment(fragment: Fragment, tag: String) {
+        if(tag == "transaction" || tag =="analytics"){
+            binding.drawer.visibility = View.VISIBLE
+            binding.drawer.isClickable = true
+        }else{
+            binding.drawer.visibility = View.INVISIBLE
+            binding.drawer.isClickable = false
+        }
+
         supportFragmentManager.beginTransaction().apply{
             replace(R.id.fl_wrapper, fragment)
             addToBackStack(tag)
             commit()
         }
+    }
+
+    fun enableFAB(isShow: Boolean){
+        if(isShow){
+            binding.drawer.visibility = View.VISIBLE
+            binding.drawer.isClickable = true
+        }else{
+            binding.drawer.visibility = View.INVISIBLE
+            binding.drawer.isClickable = false
+        }
+    }
+
+
+
 
 
     private fun openCamera() {

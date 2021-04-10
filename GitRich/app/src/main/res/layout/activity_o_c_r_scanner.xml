@@ -39,7 +39,7 @@
         android:layout_height="52dp"
         android:layout_marginTop="66dp"
         android:onClick="retry"
-        android:text="Retake"
+        android:text="Cancel"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.496"

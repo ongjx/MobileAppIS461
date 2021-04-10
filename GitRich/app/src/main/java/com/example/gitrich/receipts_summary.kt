@@ -62,6 +62,7 @@ class receipts_summary : Fragment() {
             startActivity(intent)
         }
 
+        (context as MainActivity).enableFAB(true)
         return view
     }
 
