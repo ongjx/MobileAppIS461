@@ -13,6 +13,8 @@ import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
 import android.speech.RecognizerIntent
+import android.view.Menu
+import android.view.MenuItem
 import android.view.View
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
@@ -130,6 +132,24 @@ class MainActivity : AppCompatActivity() {
         }
 
 
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        val inflater = menuInflater
+        inflater.inflate(R.menu.logout_menu, menu)
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            R.id.logout -> {
+                val file = File("userProfile.txt").delete()
+
+            }
+
+        }
+
+        return super.onOptionsItemSelected(item)
     }
 
     override fun onBackPressed() {

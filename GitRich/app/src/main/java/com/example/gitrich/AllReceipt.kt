@@ -30,7 +30,7 @@ class AllReceipt : Fragment() {
         arguments?.let {
             receipts = it.getSerializable("receipts") as ArrayList<Receipt>
         }
-        
+
     }
 
     override fun onCreateView(

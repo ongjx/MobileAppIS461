@@ -54,18 +54,6 @@ class receipts_summary : Fragment() {
         // Inflate the layout for this fragment
         val view = inflater.inflate(R.layout.fragment_receipts_summary, container, false)
 
-        val seeAll = view.findViewById<TextView>(R.id.see_all_receipts_btn)
-
-        seeAll.setOnClickListener {
-            if ((context as MainActivity).clicked == false) {
-                (context as MainActivity).makeCurrentFragment(AllReceipt.newInstance(receipts), "receipts")
-//                val intent = Intent(requireActivity(), AllReceipts::class.java)
-//                intent.putExtra("receipts", receipts)
-//                startActivity(intent)
-            }
-
-        }
-
         (context as MainActivity).enableFAB(true)
         return view
     }

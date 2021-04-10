@@ -7,19 +7,19 @@
 
     <!-- TODO: Update blank fragment layout -->
 
-    <TextView
-        android:id="@+id/see_all_receipts_btn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentEnd="true"
-        android:layout_gravity="end"
-        android:layout_marginTop="20dp"
-        android:layout_marginEnd="15dp"
-        android:autoLink="all"
-        android:text="See All"
-        android:textAlignment="textEnd"
-        android:textColor="#0B55EA"
-        android:textSize="14sp" />
+<!--    <TextView-->
+<!--        android:id="@+id/see_all_receipts_btn"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:layout_alignParentEnd="true"-->
+<!--        android:layout_gravity="end"-->
+<!--        android:layout_marginTop="20dp"-->
+<!--        android:layout_marginEnd="15dp"-->
+<!--        android:autoLink="all"-->
+<!--        android:text="Logout"-->
+<!--        android:textAlignment="textEnd"-->
+<!--        android:textColor="#0B55EA"-->
+<!--        android:textSize="14sp" />-->
 
     <ListView
         android:id="@+id/receipt_summary_list"

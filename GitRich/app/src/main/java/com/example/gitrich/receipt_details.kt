@@ -8,6 +8,7 @@ import android.util.Base64
 import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
+import android.view.Menu
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
@@ -232,6 +233,7 @@ class receipt_details : Fragment() {
         }
 
     }
+
 
     private fun modifyReceiptImageSize() {
         var isImageFitToScreen = false

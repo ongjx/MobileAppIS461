@@ -22,14 +22,16 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="By Category" />
+            android:text="By Category"
+            app:backgroundTint="@color/dark" />
 
         <Button
             android:id="@+id/byMonth"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="By Monthly Expense" />
+            android:text="By Monthly Expense"
+            app:backgroundTint="@color/dark" />
 
     </LinearLayout>
 
