@@ -16,12 +16,12 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.GitRich"
         android:usesCleartextTraffic="true">
-        <activity android:name=".EditDelete"></activity>
-        <activity android:name=".OCRScannerResultActivity" />
-        <activity android:name=".CreateReceipt" />
-        <activity android:name=".SignupActivity" />
-        <activity android:name=".LoginActivity" />
-        <activity android:name=".ReceiptDetails" />
+        <activity android:name=".EditDelete" android:screenOrientation="portrait"/>
+        <activity android:name=".OCRScannerResultActivity" android:screenOrientation="portrait"/>
+        <activity android:name=".CreateReceipt" android:screenOrientation="portrait" />
+        <activity android:name=".SignupActivity" android:screenOrientation="portrait"/>
+        <activity android:name=".LoginActivity" android:screenOrientation="portrait" />
+        <activity android:name=".ReceiptDetails" android:screenOrientation="portrait"/>
         <activity
             android:name=".MainActivity"
             android:screenOrientation="portrait">
