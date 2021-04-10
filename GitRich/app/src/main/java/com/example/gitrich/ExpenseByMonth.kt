@@ -57,68 +57,62 @@ class ExpenseByMonth : Fragment() {
 
     private fun getAnalytics () {
         username = MySingleton.getUsername()
-        // val url = "http://ec2-18-136-119-32.ap-southeast-1.compute.amazonaws.com:8000/users/${username}/receipts"
         val url = "http://ec2-18-136-119-32.ap-southeast-1.compute.amazonaws.com:8000/users/${username}/analytics/expense"
 
         val jsonObjectRequest = JsonObjectRequest(
             Request.Method.GET, url, null,
             { response ->
-                var res = response.getJSONObject("data")
-                Log.i("response", res.toString())
 
-                val view = view
+                if (response.getInt("code") == 200) {
+                    var res = response.getJSONObject("data")
 
-                val xValue = ArrayList<String>()
-                var months = res.names()
+                    val view = view
 
-                val lineEntry = ArrayList<Entry>()
+                    val xValue = ArrayList<String>()
+                    var months = res.names()
 
-                for (i in 0 until months.length()) {
-                    val keys: String = months.getString(i)
-                    val amount: Int = res.getInt(keys)
-                    xValue.add(keys)
-                    lineEntry.add(
-                        Entry(
-                            i.toFloat(),
-                            amount.toFloat()
+                    val lineEntry = ArrayList<Entry>()
+
+                    for (i in 0 until months.length()) {
+                        val keys: String = months.getString(i)
+                        val amount: Int = res.getInt(keys)
+                        xValue.add(keys)
+                        lineEntry.add(
+                            Entry(
+                                i.toFloat(),
+                                amount.toFloat()
+                            )
                         )
-                    )
+                    }
+
+                    Log.i("xValue", xValue.toString())
+
+                    val expenseChart = view?.findViewById<LineChart>(R.id.expenseChart);
+                    if (expenseChart != null) {
+                        expenseChart.setTouchEnabled(true)
+                        expenseChart.setPinchZoom(true)
+
+                        val yAxisRight = expenseChart.axisRight
+                        yAxisRight.isEnabled = false
+
+                        val xAxis = expenseChart.xAxis
+                        xAxis.position = XAxis.XAxisPosition.BOTTOM
+                        xAxis.setDrawGridLines(false)
+                        xAxis.setLabelCount(months.length(), true)
+                        xAxis.valueFormatter = IndexAxisValueFormatter(xValue)
+                        xAxis.labelRotationAngle = 315f
+                    }
+
+                    val lineDataSet = LineDataSet(lineEntry, "Monthly Expense")
+                    lineDataSet.color = Color.BLUE
+
+                    val lineData = LineData(lineDataSet)
+                    expenseChart?.description?.isEnabled = false
+                    expenseChart?.data = lineData
+                    expenseChart?.setBackgroundColor(Color.WHITE)
+                    expenseChart?.animateXY(1500, 1500)
+                    expenseChart?.invalidate()
                 }
-
-                Log.i("xValue", xValue.toString())
-
-                val expenseChart = view?.findViewById<LineChart>(R.id.expenseChart);
-                if (expenseChart != null) {
-                    expenseChart.setTouchEnabled(true)
-                    expenseChart.setPinchZoom(true)
-
-                    val yAxisRight = expenseChart.axisRight
-                    yAxisRight.isEnabled = false
-
-                    val yAxisLeft = expenseChart.axisLeft
-
-
-
-                    val xAxis = expenseChart.xAxis
-                    xAxis.position = XAxis.XAxisPosition.BOTTOM
-                    xAxis.setDrawGridLines(false)
-                    xAxis.setLabelCount(months.length(), true)
-                    xAxis.valueFormatter = IndexAxisValueFormatter(xValue)
-                    xAxis.labelRotationAngle=315f
-
-
-                }
-
-                val lineDataSet = LineDataSet(lineEntry, "Monthly Expense")
-                lineDataSet.color = Color.BLUE
-
-                val lineData = LineData(lineDataSet)
-                expenseChart?.description?.isEnabled = false
-                expenseChart?.data = lineData
-                expenseChart?.setBackgroundColor(Color.WHITE)
-                expenseChart?.animateXY(3000,3000)
-                expenseChart?.invalidate()
-
             },
 
             { error ->
