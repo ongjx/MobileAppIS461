@@ -145,6 +145,7 @@ class QRScannerResultActivity : AppCompatActivity() {
         json.put("amount", amount)
         json.put("items", itemsObject)
         json.put("date", date)
+        json.put("category", category)
 
         val jsonObjectRequest = JsonObjectRequest(
                 Request.Method.POST, url, json,

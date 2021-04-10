@@ -25,7 +25,7 @@ class OCRScannerResultActivity : AppCompatActivity() {
     private var date = ""
     private var store = ""
     private var desc = ""
-    private var category = ""
+    private var category = "Food & Drinks"
     private var id = ""
     private var image = ""
     private lateinit var spinner: Spinner
