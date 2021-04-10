@@ -99,7 +99,7 @@ class Receipt():
         self.name = ""
         self.category = ""
         self.amount = ""
-        self.date = "01/01/0001 00:00:00"
+        self.date = datetime.now(pytz.timezone('Asia/Singapore')).strftime('%d/%m/%Y %H:%M:%S')
         self.items = {}
         self.image = ""
 
