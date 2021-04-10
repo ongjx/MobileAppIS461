@@ -113,6 +113,7 @@ class ExpenseByMonth : Fragment() {
                 lineDataSet.color = Color.BLUE
 
                 val lineData = LineData(lineDataSet)
+                expenseChart?.description?.isEnabled = false
                 expenseChart?.data = lineData
                 expenseChart?.setBackgroundColor(Color.WHITE)
                 expenseChart?.animateXY(3000,3000)
