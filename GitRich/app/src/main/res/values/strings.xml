@@ -4,7 +4,6 @@
     <string name="hello_blank_fragment">Hello blank fragment</string>
 
     <string-array name="Categories">
-        <item>Category</item>
         <item>Food &amp; Drinks</item>
         <item>Clothes</item>
         <item>Shopping</item>

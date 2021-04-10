@@ -16,7 +16,6 @@ import android.widget.ListView
 import android.widget.TextView
 import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
-import androidx.recyclerview.widget.RecyclerView
 import com.android.volley.Request
 import com.android.volley.toolbox.JsonObjectRequest
 import com.example.gitrich.models.Receipt
@@ -56,8 +55,9 @@ class receipts_summary : Fragment() {
         val view = inflater.inflate(R.layout.fragment_receipts_summary, container, false)
 
         val seeAll = view.findViewById<TextView>(R.id.see_all_receipts_btn)
+
         seeAll.setOnClickListener {
-            val intent = Intent(activity!!, AllReceipts::class.java)
+            val intent = Intent(requireActivity(), AllReceipts::class.java)
             intent.putExtra("receipts", receipts)
             startActivity(intent)
         }
@@ -74,14 +74,17 @@ class receipts_summary : Fragment() {
         } else {
             receipts.clear()
             getReceipts()
+
         }
     }
     @RequiresApi(Build.VERSION_CODES.O)
     private fun getReceipts () {
         val gson = Gson()
-        val listView = activity!!.findViewById<ListView>(R.id.receipt_summary_list)
+        val listView = requireActivity().findViewById<ListView>(R.id.receipt_summary_list)
+        val user = requireActivity().findViewById<TextView>(R.id.greetings)
 //        val recyclerView = activity!!.findViewById<RecyclerView>(R.id.receipt_summary_list)
         username = MySingleton.getUsername()
+        user.text = "Hi, ${username}"
         // val url = "http://ec2-18-136-119-32.ap-southeast-1.compute.amazonaws.com:8000/users/${username}/receipts"
         val url = "http://ec2-18-136-119-32.ap-southeast-1.compute.amazonaws.com:8000/users/${username}/receipts"
 
@@ -92,7 +95,7 @@ class receipts_summary : Fragment() {
                     val receipt = gson.fromJson(res[i].toString(), Receipt::class.java)
                     receipts.add(receipt)
                 }
-                listView.adapter = CustomAdapter(activity!!, receipts)
+                listView.adapter = CustomAdapter(requireActivity(), receipts)
             },
 
             { error ->
@@ -102,7 +105,7 @@ class receipts_summary : Fragment() {
 
         startListListener(listView)
 
-        MySingleton.getInstance(activity!!).addToRequestQueue(jsonObjectRequest)
+        MySingleton.getInstance(requireActivity()).addToRequestQueue(jsonObjectRequest)
     }
     class CustomAdapter(context: Context, receipts: ArrayList<Receipt>): BaseAdapter() {
         private val mContext: Context = context
@@ -183,9 +186,11 @@ class receipts_summary : Fragment() {
         listView.setOnItemClickListener { _, _, position, id ->
             Log.i("position", position.toString())
             val receipt = receipts[position]
-            val intent = Intent(activity!!, ReceiptDetails::class.java)
-            intent.putExtra("receipt", receipt)
-            startActivity(intent)
+            (context as MainActivity).makeCurrentFragment(receipt_details.newInstance(receipt), "receipt_details")
+
+//            val intent = Intent(requireActivity(), ReceiptDetails::class.java)
+//            intent.putExtra("receipt", receipt)
+//            startActivity(intent)
         }
     }
 }

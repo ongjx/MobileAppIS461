@@ -36,6 +36,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_above="@id/bottom_nav"
+        android:clickable="true"
         app:layout_constraintTop_toTopOf="parent">
 
 

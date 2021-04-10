@@ -72,6 +72,7 @@ class MainActivity : AppCompatActivity() {
 
         binding.manual.setOnClickListener {
             Toast.makeText(this, "Manual", Toast.LENGTH_SHORT).show()
+//            makeCurrentFragment(receipt_details.newInstance(null), "manual")
             intent = Intent(this, CreateReceipt::class.java)
             startActivityForResult(intent, RECEIPT_SUBMIT_CODE)
         }
@@ -115,13 +116,14 @@ class MainActivity : AppCompatActivity() {
 
         transactionsFragment = receipts_summary()
         val analyticsFragment = AnalyticsFragment()
+        val receiptDetails = receipt_details()
 
-        makeCurrentFragment(transactionsFragment)
+        makeCurrentFragment(transactionsFragment, "transaction")
 
         binding.bottomNav.setOnNavigationItemSelectedListener {
             when (it.itemId) {
-                R.id.ic_transaction -> makeCurrentFragment(transactionsFragment)
-                R.id.ic_analytics -> makeCurrentFragment(analyticsFragment)
+                R.id.ic_transaction -> makeCurrentFragment(transactionsFragment, "transaction")
+                R.id.ic_analytics -> makeCurrentFragment(analyticsFragment, "analytics")
 
             }
             true
@@ -130,6 +132,14 @@ class MainActivity : AppCompatActivity() {
 
     }
 
+    override fun onBackPressed() {
+        val fragManager = supportFragmentManager
+        if(fragManager.backStackEntryCount > 0){
+            fragManager.popBackStackImmediate()
+        }else{
+            super.onBackPressed()
+        }
+    }
     private fun onDrawerBtnClicked() {
         setVisibility(clicked)
         setAnimation(clicked)
@@ -159,11 +169,13 @@ class MainActivity : AppCompatActivity() {
             binding.ocr.isClickable = true
             binding.qr.isClickable = true
             binding.voice.isClickable = true
+            binding.flWrapper.isClickable = false
         }else{
             binding.manual.isClickable = false
             binding.ocr.isClickable = false
             binding.qr.isClickable = false
             binding.voice.isClickable = false
+            binding.flWrapper.isClickable = true
         }
     }
 
@@ -173,7 +185,6 @@ class MainActivity : AppCompatActivity() {
             binding.qrGroup.visibility = View.VISIBLE
             binding.ocrGroup.visibility = View.VISIBLE
             binding.voiceGroup.visibility = View.VISIBLE
-//            binding.background.setBackgroundColor(Color.parseColor("#C92E2C2C"))
             binding.overlay.visibility = View.VISIBLE
         }else{
             binding.manualGroup.visibility = View.INVISIBLE
@@ -195,9 +206,10 @@ class MainActivity : AppCompatActivity() {
         startActivityForResult(it, LOGIN_USER_CODE)
     }
 
-    private fun makeCurrentFragment(fragment: Fragment) =
+    fun makeCurrentFragment(fragment: Fragment, tag: String) =
         supportFragmentManager.beginTransaction().apply{
             replace(R.id.fl_wrapper, fragment)
+            addToBackStack(tag)
             commit()
         }
 

@@ -34,6 +34,7 @@ class CreateReceipt : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_create_receipt)
         supportActionBar!!.setTitle("GitRich - Add New Receipt");
+
         categories = resources.getStringArray(R.array.Categories)
         spinner = findViewById(R.id.create_category)
         if (spinner != null) {
