@@ -46,11 +46,14 @@ class QRScannerResultActivity : AppCompatActivity() {
             store = json.get("name") as String
             category = json.get("category") as String
             var items = json.get("items") as JSONObject
-            for (i in 0 until items.names().length()) {
-                val key = items.names()[i] as String
-                val value = items.getString(key)
-                desc += "${key},$${value}\n"
+            if (items.length() > 0) {
+                for (i in 0 until items.names().length()) {
+                    val key = items.names()[i] as String
+                    val value = items.getString(key)
+                    desc += "${key},$${value}\n"
+                }
             }
+
 
             amountElement.setText(amount)
             dateElement.setText(date)
