@@ -98,6 +98,7 @@ class ExpenseByCategory : Fragment() {
             spinner.setItems(monthList)
             if (monthList.size > 0) {
                 spinner.selectItemByIndex(0)
+
             }
             spinner.setOnSpinnerItemSelectedListener<String> { oldIndex, oldItem, newIndex, newItem ->
                 setPieChart(newItem)

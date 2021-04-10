@@ -5,4 +5,5 @@
     android:text="TextView"
     android:padding="14dp"
     android:textColor="@color/black"
+    android:layout_margin="20dp"
     xmlns:android="http://schemas.android.com/apk/res/android" />

@@ -44,15 +44,11 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/buttons">
+        app:layout_constraintTop_toBottomOf="@+id/buttons"
+        app:layout_constraintVertical_bias="0.329">
 
 
     </FrameLayout>
-
-
-
-
-
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

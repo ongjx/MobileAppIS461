@@ -46,7 +46,7 @@ private const val QR_RESULT_CODE = 1009
 private const val VIEW_RECEIPT = 1010
 
 class MainActivity : AppCompatActivity() {
-    lateinit var username: String
+    private lateinit var username: String
     private lateinit var binding: ActivityMainBinding
     private var image_uri: Uri? = null
 

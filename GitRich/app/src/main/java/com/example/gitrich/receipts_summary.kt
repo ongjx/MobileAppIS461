@@ -53,13 +53,13 @@ class receipts_summary : Fragment() {
         val view = inflater.inflate(R.layout.fragment_receipts_summary, container, false)
 
         (context as MainActivity).enableFAB(true)
-        username = (context as MainActivity).username
         return view
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        username = MySingleton.getUsername()
         val user = requireActivity().findViewById<TextView>(R.id.greetings)
         user.text = "Hi, ${username}"
 
@@ -124,9 +124,12 @@ class receipts_summary : Fragment() {
             return position.toLong()
         }
 
+        @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
         override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
             val layoutInflater = LayoutInflater.from(mContext)
             val row = layoutInflater.inflate(R.layout.main_row, parent, false)
+
+            row.setBackground(mContext.getDrawable(R.drawable.listview_border));
 
             val thumbnail = row.findViewById<ImageView>(R.id.thumbnail_display)
             val title = row.findViewById<TextView>(R.id.row_title)

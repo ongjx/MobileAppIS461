@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".ExpenseByCategory">
 
     <LinearLayout
@@ -11,14 +12,27 @@
         android:orientation="vertical">
 
         <com.skydoves.powerspinner.PowerSpinnerView
-            android:gravity="center"
             android:id="@+id/spinner"
             android:layout_width="match_parent"
-            android:layout_height="40dp"
-            android:hint="Select Month" />
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"
+            android:background="@drawable/rectangle"
+            android:foreground="#70FFFFFF"
+            android:gravity="center"
+            android:hint="Select Month"
+            android:paddingVertical="10dp"
+            android:textColor="@color/black"
+            android:textColorHint="@color/dark"
+            android:textStyle="bold"
+            app:spinner_divider_show="false"
+            app:spinner_popup_animation="dropdown"
+            app:spinner_popup_background="#E1E1E1"
+            app:spinner_popup_elevation="14dp" />
 
         <com.github.mikephil.charting.charts.PieChart
             android:id="@+id/pieChart1"
+            android:layout_marginTop="15dp"
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
             android:minWidth="300dp"
