@@ -16,6 +16,7 @@ import android.speech.RecognizerIntent
 import android.view.View
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
+import android.widget.FrameLayout
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
@@ -46,7 +47,7 @@ class MainActivity : AppCompatActivity() {
     private val rotateClose: Animation by lazy { AnimationUtils.loadAnimation(this, R.anim.rotate_close_anim) }
     private val fromBottom: Animation by lazy { AnimationUtils.loadAnimation(this, R.anim.from_bottom_anim) }
     private val toBottom: Animation by lazy { AnimationUtils.loadAnimation(this, R.anim.to_bottom_anim) }
-    private var clicked = false
+    var clicked = false
 
     private lateinit var transactionsFragment: receipts_summary;
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -133,7 +134,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onBackPressed() {
         val fragManager = supportFragmentManager
-        if(fragManager.backStackEntryCount > 0){
+        if(fragManager.backStackEntryCount > 1){
             fragManager.popBackStackImmediate()
         }else{
             super.onBackPressed()
@@ -169,12 +170,18 @@ class MainActivity : AppCompatActivity() {
             binding.qr.isClickable = true
             binding.voice.isClickable = true
             binding.flWrapper.isClickable = false
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                binding.flWrapper.focusable = FrameLayout.NOT_FOCUSABLE
+            }
         }else{
             binding.manual.isClickable = false
             binding.ocr.isClickable = false
             binding.qr.isClickable = false
             binding.voice.isClickable = false
             binding.flWrapper.isClickable = true
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                binding.flWrapper.focusable = FrameLayout.FOCUSABLE
+            }
         }
     }
 
@@ -230,9 +237,6 @@ class MainActivity : AppCompatActivity() {
             binding.drawer.isClickable = false
         }
     }
-
-
-
 
 
     private fun openCamera() {

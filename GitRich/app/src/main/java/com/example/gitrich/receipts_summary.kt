@@ -57,9 +57,13 @@ class receipts_summary : Fragment() {
         val seeAll = view.findViewById<TextView>(R.id.see_all_receipts_btn)
 
         seeAll.setOnClickListener {
-            val intent = Intent(requireActivity(), AllReceipts::class.java)
-            intent.putExtra("receipts", receipts)
-            startActivity(intent)
+            if ((context as MainActivity).clicked == false) {
+                (context as MainActivity).makeCurrentFragment(AllReceipt.newInstance(receipts), "receipts")
+//                val intent = Intent(requireActivity(), AllReceipts::class.java)
+//                intent.putExtra("receipts", receipts)
+//                startActivity(intent)
+            }
+
         }
 
         (context as MainActivity).enableFAB(true)
@@ -185,9 +189,11 @@ class receipts_summary : Fragment() {
 
     fun startListListener(listView: ListView) {
         listView.setOnItemClickListener { _, _, position, id ->
-            Log.i("position", position.toString())
-            val receipt = receipts[position]
-            (context as MainActivity).makeCurrentFragment(receipt_details.newInstance(receipt), "receipt_details")
+            if ((context as MainActivity).clicked == false) {
+                Log.i("position", position.toString())
+                val receipt = receipts[position]
+                (context as MainActivity).makeCurrentFragment(receipt_details.newInstance(receipt), "receipt_details")
+            }
 
 //            val intent = Intent(requireActivity(), ReceiptDetails::class.java)
 //            intent.putExtra("receipt", receipt)

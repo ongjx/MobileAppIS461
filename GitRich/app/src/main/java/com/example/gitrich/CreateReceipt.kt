@@ -27,7 +27,7 @@ class CreateReceipt : AppCompatActivity() {
     private var date = "";
     private var store = "";
     private var desc = "";
-    private var category = "";
+    private var category = "Food & Drinks";
 
     private lateinit var spinner: Spinner
     override fun onCreate(savedInstanceState: Bundle?) {
