@@ -1,12 +1,10 @@
 package com.example.gitrich
 
 import android.content.Context
-import android.content.Intent
 import android.graphics.BitmapFactory
 import android.os.Build
 import android.os.Bundle
 import android.util.Base64
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -55,7 +53,16 @@ class receipts_summary : Fragment() {
         val view = inflater.inflate(R.layout.fragment_receipts_summary, container, false)
 
         (context as MainActivity).enableFAB(true)
+        username = (context as MainActivity).username
         return view
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        val user = requireActivity().findViewById<TextView>(R.id.greetings)
+        user.text = "Hi, ${username}"
+
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -63,7 +70,9 @@ class receipts_summary : Fragment() {
         super.onActivityCreated(savedInstanceState)
         if (savedInstanceState != null) {
             //Restore the fragment's state here
-            receipts = savedInstanceState.getParcelableArrayList<Receipt>("receipts") as ArrayList<Receipt>
+                if(receipts != null){
+                    receipts = savedInstanceState.getParcelableArrayList<Receipt>("receipts") as ArrayList<Receipt>
+                }
         } else {
             receipts.clear()
             getReceipts()
@@ -74,10 +83,9 @@ class receipts_summary : Fragment() {
     private fun getReceipts () {
         val gson = Gson()
         val listView = requireActivity().findViewById<ListView>(R.id.receipt_summary_list)
-        val user = requireActivity().findViewById<TextView>(R.id.greetings)
+
 //        val recyclerView = activity!!.findViewById<RecyclerView>(R.id.receipt_summary_list)
-        username = MySingleton.getUsername()
-        user.text = "Hi, ${username}"
+
         // val url = "http://ec2-18-136-119-32.ap-southeast-1.compute.amazonaws.com:8000/users/${username}/receipts"
         val url = "http://ec2-18-136-119-32.ap-southeast-1.compute.amazonaws.com:8000/users/${username}/receipts"
 
@@ -178,7 +186,6 @@ class receipts_summary : Fragment() {
     fun startListListener(listView: ListView) {
         listView.setOnItemClickListener { _, _, position, id ->
             if ((context as MainActivity).clicked == false) {
-                Log.i("position", position.toString())
                 val receipt = receipts[position]
                 (context as MainActivity).makeCurrentFragment(receipt_details.newInstance(receipt), "receipt_details")
             }

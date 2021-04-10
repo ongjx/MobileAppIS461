@@ -157,7 +157,7 @@ class QRScannerResultActivity : AppCompatActivity() {
                 },
                 { error ->
                     // TODO: Handle error
-                    Log.e("Error", error.toString())
+//                    Log.e("Error", error.toString())
                 }
         )
 

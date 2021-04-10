@@ -90,13 +90,12 @@ class receipt_details : Fragment() {
                 val res = response.getInt("code")
 
                 if (res == 200) {
-                    Toast.makeText(requireContext(), "DELETED", Toast.LENGTH_SHORT).show()
                     (context as MainActivity).refresh()
                 }
             },
             { error ->
                 // TODO: Handle error
-                Log.e("Error", error.toString())
+//                Log.e("Error", error.toString())
             }
         )
 
@@ -113,7 +112,6 @@ class receipt_details : Fragment() {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        Log.i("ACTIVITY CREATED", "asdkvasn")
 
         val act = activity
         if(act != null){
@@ -218,13 +216,13 @@ class receipt_details : Fragment() {
                     val res = response.getInt("code")
 
                     if (res == 200) {
-                        Toast.makeText(requireContext(), "UPDATED", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(requireContext(), "Receipt saved", Toast.LENGTH_SHORT).show()
                         (context as MainActivity).refresh()
                     }
                 },
                 { error ->
                     // TODO: Handle error
-                    Log.e("Error", error.toString())
+                    //Log.e("Error", error.toString())
                 }
             )
 

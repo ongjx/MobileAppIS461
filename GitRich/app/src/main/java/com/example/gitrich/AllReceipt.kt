@@ -1,9 +1,6 @@
 package com.example.gitrich
 
-import android.content.Context
-import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -45,7 +42,6 @@ class AllReceipt : Fragment() {
 
         listView.setOnItemClickListener { parent, view, position, id ->
             val receipt = receipts[position];
-            Log.e("Receipt", receipt.toString())
             (context as MainActivity).makeCurrentFragment(receipt_details.newInstance(receipt), "receipt_details")
         }
 

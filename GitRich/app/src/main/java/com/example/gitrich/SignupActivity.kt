@@ -71,7 +71,7 @@ class SignupActivity : AppCompatActivity() {
             },
             { error ->
                 // TODO: Handle error
-                Log.e("Error", error.toString())
+                //Log.e("Error", error.toString())
                 binding.textView.text = "Error signing up"
             }
         )

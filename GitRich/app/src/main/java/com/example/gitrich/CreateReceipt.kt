@@ -145,7 +145,6 @@ class CreateReceipt : AppCompatActivity() {
                     Request.Method.POST, url, jsonObject,
                     { response ->
                         val res = response.getInt("code")
-                        Log.e("response", response.toString())
                         if (res == 201){
                             val goBack = Intent()
                             setResult(RESULT_OK)

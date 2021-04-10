@@ -13,6 +13,7 @@ import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
 import android.speech.RecognizerIntent
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -20,10 +21,14 @@ import android.view.animation.Animation
 import android.view.animation.AnimationUtils
 import android.widget.FrameLayout
 import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import com.example.gitrich.databinding.ActivityMainBinding
 import java.io.*
+import java.nio.file.Files
+import java.nio.file.Path
+import java.nio.file.Paths
 import java.util.*
 
 
@@ -41,7 +46,7 @@ private const val QR_RESULT_CODE = 1009
 private const val VIEW_RECEIPT = 1010
 
 class MainActivity : AppCompatActivity() {
-    private lateinit var username: String
+    lateinit var username: String
     private lateinit var binding: ActivityMainBinding
     private var image_uri: Uri? = null
 
@@ -62,9 +67,11 @@ class MainActivity : AppCompatActivity() {
         try{
             val scan = Scanner(openFileInput("userProfile.txt"))
 
+
             // Load username to global context
             username = scan.nextLine().toString()
             MySingleton.setUsername(username)
+            scan.close()
         } catch(e: FileNotFoundException) {
             loginPage()
         }
@@ -136,10 +143,18 @@ class MainActivity : AppCompatActivity() {
         return super.onCreateOptionsMenu(menu);
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.logout -> {
-                val file = File("userProfile.txt").delete()
+                val path = Paths.get("/data/data/com.example.gitrich/files/userProfile.txt")
+                if(!Files.isDirectory(path) && Files.exists(path)){
+                    Files.delete(path)
+                    Log.i("Delete", "LOGOUT")
+                    loginPage()
+                }else{
+                    Log.i("Error", "Could Not delete file")
+                }
 
             }
 
@@ -216,12 +231,6 @@ class MainActivity : AppCompatActivity() {
             binding.overlay.visibility = View.INVISIBLE
         }
     }
-
-
-    fun launchOCR(view: View) {
-
-    }
-
 
     private fun loginPage() {
         val it = Intent(this, LoginActivity::class.java)
@@ -381,6 +390,17 @@ class MainActivity : AppCompatActivity() {
         fragTransaction.attach(transactionsFragment)
         fragTransaction.commit()
     }
+
+//    @RequiresApi(Build.VERSION_CODES.O)
+//    private fun Logout(){
+//        val path = Paths.get("userProfile.txt")
+//
+//        if(!Files.isDirectory(path) && Files.exists(path)){
+//            Files.delete(path)
+//            Log.i("Delete", "LOGOUT")
+//            loginPage()
+//        }
+//    }
 
 
 }

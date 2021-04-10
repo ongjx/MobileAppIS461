@@ -106,25 +106,6 @@ class ReceiptDetails : AppCompatActivity() {
         }
     }
 
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        val inflater = menuInflater
-        inflater.inflate(R.menu.logout_menu, menu)
-        return super.onCreateOptionsMenu(menu);
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
-            R.id.edit -> {
-                intent = Intent(this, EditDelete::class.java)
-                intent.putExtra("receipt", receipt)
-                startActivityForResult(intent, EDIT_DELETE_STATUS_CODE)
-
-            }
-
-        }
-
-        return super.onOptionsItemSelected(item)
-    }
 
     class CustomAdapter(context: Context, items: HashMap<String, String>): BaseAdapter() {
 

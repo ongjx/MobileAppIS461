@@ -85,7 +85,6 @@ class ExpenseByMonth : Fragment() {
                         )
                     }
 
-                    Log.i("xValue", xValue.toString())
 
                     val expenseChart = view?.findViewById<LineChart>(R.id.expenseChart);
                     if (expenseChart != null) {

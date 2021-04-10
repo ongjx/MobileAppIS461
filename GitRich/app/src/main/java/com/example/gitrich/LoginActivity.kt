@@ -74,7 +74,7 @@ class LoginActivity : AppCompatActivity() {
             },
             { error ->
                 // TODO: Handle error
-                Log.e("Error", error.toString())
+//                Log.e("Error", error.toString())
                 binding.textView.text = "Wrong Username/Password"
             }
         )
