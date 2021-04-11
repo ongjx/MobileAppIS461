@@ -71,7 +71,9 @@ class receipts_summary : Fragment() {
         if (savedInstanceState != null) {
             //Restore the fragment's state here
                 if(receipts != null){
-                    receipts = savedInstanceState.getParcelableArrayList<Receipt>("receipts") as ArrayList<Receipt>
+                    if (savedInstanceState?.getParcelableArrayList<Receipt>("receipts") != null) {
+                        receipts = savedInstanceState?.getParcelableArrayList<Receipt>("receipts") as ArrayList<Receipt>
+                    }
                 }
         } else {
             receipts.clear()
