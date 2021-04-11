@@ -90,7 +90,7 @@ class receipt_details : Fragment() {
                 val res = response.getInt("code")
 
                 if (res == 200) {
-                    (context as MainActivity).refresh()
+                    (context as MainActivity).fragManager.popBackStack()
                 }
             },
             { error ->

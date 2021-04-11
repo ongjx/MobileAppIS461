@@ -17,6 +17,7 @@ import org.json.JSONObject
 import java.io.IOException
 import com.android.volley.Request
 import com.android.volley.toolbox.JsonObjectRequest
+import com.google.android.material.textfield.TextInputEditText
 import com.google.gson.JsonObject
 import java.lang.Exception
 import java.util.regex.Pattern
@@ -44,10 +45,10 @@ class CreateReceipt : AppCompatActivity() {
 
     fun save(view: View) {
 
-        amount = findViewById<EditText>(R.id.totalAmount).text.toString()
-        date = findViewById<EditText>(R.id.receipt_date).text.toString()
-        store = findViewById<EditText>(R.id.receipt_name).text.toString()
-        desc = findViewById<EditText>(R.id.create_desc).text.toString()
+        amount = findViewById<TextInputEditText>(R.id.totalAmount).text.toString()
+        date = findViewById<TextInputEditText>(R.id.receipt_date).text.toString()
+        store = findViewById<TextInputEditText>(R.id.receipt_name).text.toString()
+        desc = findViewById<TextInputEditText>(R.id.create_desc).text.toString()
         category = spinner.text.toString()
 
         var itemsObject = JSONObject()

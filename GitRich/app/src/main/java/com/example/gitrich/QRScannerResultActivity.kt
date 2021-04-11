@@ -12,6 +12,7 @@ import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import com.android.volley.Request
 import com.android.volley.toolbox.JsonObjectRequest
+import com.google.android.material.textfield.TextInputEditText
 import okhttp3.OkHttpClient
 import org.json.JSONObject
 
@@ -23,19 +24,22 @@ class QRScannerResultActivity : AppCompatActivity() {
     private var store = ""
     private var desc = ""
     private var category = ""
-    private lateinit var spinner: Spinner
+    private lateinit var spinner: AutoCompleteTextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_create_receipt)
         supportActionBar!!.title = "Confirm Receipt";
         categories = resources.getStringArray(R.array.Categories)
-        spinner = findViewById(R.id.create_category)
+        spinner = findViewById(R.id.receipt_category)
+        val arrayAdapter = ArrayAdapter(this, R.layout.dropdown_items, categories)
+        spinner.setAdapter(arrayAdapter)
 
-        var amountElement = findViewById<EditText>(R.id.create_amount)
-        var dateElement = findViewById<EditText>(R.id.create_date)
-        var storeElement = findViewById<EditText>(R.id.create_store)
-        var descElement = findViewById<EditText>(R.id.create_desc)
+        var amountElement = findViewById<TextInputEditText>(R.id.totalAmount)
+        var dateElement = findViewById<TextInputEditText>(R.id.receipt_date)
+        var storeElement = findViewById<TextInputEditText>(R.id.receipt_name)
+        var descElement = findViewById<TextInputEditText>(R.id.create_desc)
+        var catElement = findViewById<AutoCompleteTextView>(R.id.receipt_category)
 
         val intent = intent.extras
         if (intent != null) {
@@ -59,65 +63,8 @@ class QRScannerResultActivity : AppCompatActivity() {
             dateElement.setText(date)
             storeElement.setText(store)
             descElement.setText(desc)
+            catElement.setText(category)
         }
-
-
-        if (spinner != null) {
-            val adapter = object: ArrayAdapter<String>(
-                    this,
-                    android.R.layout.simple_spinner_item, categories
-            ) {
-                override fun getDropDownView(
-                        position: Int,
-                        convertView: View?,
-                        parent: ViewGroup
-                ): View {
-                    val view: TextView = super.getDropDownView(
-                            position,
-                            convertView,
-                            parent
-                    ) as TextView
-
-                    // set item text bold and sans serif font
-                    view.setTypeface(Typeface.SANS_SERIF, Typeface.BOLD)
-
-                    if (position == 0){
-                        // set the spinner disabled item text color
-                        view.setTextColor(Color.LTGRAY)
-                    }
-
-                    // set selected item style
-                    if (position == spinner.selectedItemPosition){
-                        view.background = ColorDrawable(Color.parseColor("#F5F5F5"))
-                    }
-
-                    return view
-                }
-
-                override fun isEnabled(position: Int): Boolean {
-                    // disable the third item of spinner
-                    return position != 0
-                }
-
-            }
-            spinner.adapter = adapter
-            spinner.setSelection(adapter.getPosition(category))
-
-        }
-
-        spinner.onItemSelectedListener = object :
-                AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(parent: AdapterView<*>,
-                                        view: View, position: Int, id: Long) {
-                if (position > 0) {
-                    category = categories[position];
-                }
-            }
-
-            override fun onNothingSelected(parent: AdapterView<*>) {
-            }
-        }
-
     }
 
     fun save(view: View) {
@@ -127,10 +74,11 @@ class QRScannerResultActivity : AppCompatActivity() {
         val url = "http://ec2-18-136-119-32.ap-southeast-1.compute.amazonaws.com:8000/users/${user}/qr-receipts"
 
         // Check if value on form has been edited
-        amount = findViewById<EditText>(R.id.create_amount).text.toString()
-        date = findViewById<EditText>(R.id.create_date).text.toString()
-        store = findViewById<EditText>(R.id.create_store).text.toString()
-        desc = findViewById<EditText>(R.id.create_desc).text.toString()
+        amount = findViewById<TextInputEditText>(R.id.create_amount).text.toString()
+        date = findViewById<TextInputEditText>(R.id.create_date).text.toString()
+        store = findViewById<TextInputEditText>(R.id.create_store).text.toString()
+        desc = findViewById<TextInputEditText>(R.id.create_desc).text.toString()
+        category = findViewById<AutoCompleteTextView>(R.id.receipt_category).text.toString()
         val items = desc.splitToSequence("\n")
         val itemsObject = JSONObject()
         for (item: String in items) {

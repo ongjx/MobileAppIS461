@@ -57,6 +57,7 @@ class MainActivity : AppCompatActivity() {
     var clicked = false
 
     private lateinit var transactionsFragment: receipts_summary;
+    val fragManager = supportFragmentManager
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 //        actionBar?.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM)
@@ -83,6 +84,7 @@ class MainActivity : AppCompatActivity() {
 
         binding.manual.setOnClickListener {
             intent = Intent(this, CreateReceipt::class.java)
+            onDrawerBtnClicked()
             startActivityForResult(intent, RECEIPT_SUBMIT_CODE)
         }
 
@@ -168,13 +170,14 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onBackPressed() {
-        val fragManager = supportFragmentManager
+        //val fragManager = supportFragmentManager
         if(fragManager.backStackEntryCount > 1){
             fragManager.popBackStackImmediate()
         }else{
             super.onBackPressed()
         }
     }
+
     private fun onDrawerBtnClicked() {
         setVisibility(clicked)
         setAnimation(clicked)
