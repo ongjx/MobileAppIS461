@@ -30,7 +30,7 @@
         android:layout_marginLeft="12dp"
         android:layout_marginTop="10dp"
         android:layout_marginRight="12dp"
-        android:divider="#F2F2F2"
+        android:divider="@android:color/transparent"
         android:dividerHeight="10.0sp" />
 
 

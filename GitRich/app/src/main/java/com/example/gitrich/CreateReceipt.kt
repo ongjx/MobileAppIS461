@@ -29,74 +29,26 @@ class CreateReceipt : AppCompatActivity() {
     private var desc = "";
     private var category = "Food & Drinks";
 
-    private lateinit var spinner: Spinner
+    private lateinit var spinner: AutoCompleteTextView
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_create_receipt)
-        supportActionBar!!.title = "GitRich - Add New Receipt";
+        supportActionBar!!.title = "Add New Receipt";
         categories = resources.getStringArray(R.array.Categories)
-        spinner = findViewById(R.id.create_category)
-        if (spinner != null) {
-            val adapter = object: ArrayAdapter<String>(
-                this,
-                android.R.layout.simple_spinner_item, categories
-            ) {
-                override fun getDropDownView(
-                    position: Int,
-                    convertView: View?,
-                    parent: ViewGroup
-                ): View {
-                    val view: TextView = super.getDropDownView(
-                        position,
-                        convertView,
-                        parent
-                    ) as TextView
+        spinner = findViewById(R.id.receipt_category)
+        val arrayAdapter = ArrayAdapter(this, R.layout.dropdown_items, categories)
+        spinner.setAdapter(arrayAdapter)
 
-                    // set item text bold and sans serif font
-                    view.setTypeface(Typeface.SANS_SERIF, Typeface.BOLD)
-
-                    if (position == 0){
-                        // set the spinner disabled item text color
-                        view.setTextColor(Color.LTGRAY)
-                    }
-
-                    // set selected item style
-                    if (position == spinner.selectedItemPosition){
-                        view.background = ColorDrawable(Color.parseColor("#F5F5F5"))
-                    }
-
-                    return view
-                }
-
-                override fun isEnabled(position: Int): Boolean {
-                    // disable the third item of spinner
-                    return position != 0
-                }
-
-            }
-            spinner.adapter = adapter
-        }
-
-        spinner.onItemSelectedListener = object :
-            AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(parent: AdapterView<*>,
-                                        view: View, position: Int, id: Long) {
-                if (position > 0) {
-                    category = categories[position];
-                }
-            }
-
-            override fun onNothingSelected(parent: AdapterView<*>) {
-            }
-        }
     }
 
     fun save(view: View) {
 
-        amount = findViewById<EditText>(R.id.create_amount).text.toString()
-        date = findViewById<EditText>(R.id.create_date).text.toString()
-        store = findViewById<EditText>(R.id.create_store).text.toString()
+        amount = findViewById<EditText>(R.id.totalAmount).text.toString()
+        date = findViewById<EditText>(R.id.receipt_date).text.toString()
+        store = findViewById<EditText>(R.id.receipt_name).text.toString()
         desc = findViewById<EditText>(R.id.create_desc).text.toString()
+        category = spinner.text.toString()
 
         var itemsObject = JSONObject()
 

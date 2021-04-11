@@ -120,6 +120,10 @@ class MainActivity : AppCompatActivity() {
             startActivityForResult(intent, QR_RESULT_CODE)
         }
 
+        binding.overlay.setOnClickListener{
+            onDrawerBtnClicked()
+        }
+
         transactionsFragment = receipts_summary()
         val analyticsFragment = AnalyticsFragment()
 

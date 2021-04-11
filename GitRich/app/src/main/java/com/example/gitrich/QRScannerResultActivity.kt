@@ -28,7 +28,7 @@ class QRScannerResultActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_create_receipt)
-        supportActionBar!!.title = "GitRich - Confirm Receipt";
+        supportActionBar!!.title = "Confirm Receipt";
         categories = resources.getStringArray(R.array.Categories)
         spinner = findViewById(R.id.create_category)
 
