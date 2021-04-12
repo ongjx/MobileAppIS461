@@ -102,7 +102,7 @@ class EditDelete : AppCompatActivity() {
             override fun onItemSelected(parent: AdapterView<*>,
                                         view: View, position: Int, id: Long) {
                 if (position > 0) {
-                    category = categories[position];
+                    category = categories[position]
                 }
             }
 
@@ -114,7 +114,7 @@ class EditDelete : AppCompatActivity() {
 
 
     fun save(view: View) {
-        val client = OkHttpClient();
+        val client = OkHttpClient()
         val user = RequestQueueSingleton.getUsername()
         val url = "http://ec2-18-136-119-32.ap-southeast-1.compute.amazonaws.com:8000/users/${user}/receipts/${receipt.id}"
 
@@ -129,7 +129,7 @@ class EditDelete : AppCompatActivity() {
                 val l = item.split(',')
                 val name = l[0].trim()
                 val amount = if ("$" in l[1]) l[1].trim() else ("$${l[1].trim()}")
-                itemsObject.put(l[0].trim() as String, l[1])
+                itemsObject.put(l[0].trim(), l[1])
             }
         }
         val json = JSONObject()
@@ -172,7 +172,7 @@ class EditDelete : AppCompatActivity() {
         }
     }
     fun delete(view: View) {
-        val client = OkHttpClient();
+        val client = OkHttpClient()
         val user = RequestQueueSingleton.getUsername()
         val url = "http://ec2-18-136-119-32.ap-southeast-1.compute.amazonaws.com:8000/users/${user}/receipts/${receipt.id}"
         val jsonObjectRequest = JsonObjectRequest(

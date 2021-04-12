@@ -51,7 +51,7 @@ class ReceiptDetails : AppCompatActivity() {
                 } else {
                     if (receipt.image.contains("data:image")) {
                         receiptBytes = receipt.image.substringAfter(',')
-                        val decodedString = Base64.decode(receiptBytes, Base64.DEFAULT);
+                        val decodedString = Base64.decode(receiptBytes, Base64.DEFAULT)
                         val decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.size)
                         receiptImage.setImageBitmap(decodedByte)
                     } else if (receipt.image.equals("")) {
@@ -62,7 +62,7 @@ class ReceiptDetails : AppCompatActivity() {
                         val imgFile = File(root, receipt.image)
 
                         if (imgFile.exists()) {
-                            val decodedByte = BitmapFactory.decodeFile(imgFile.getAbsolutePath())
+                            val decodedByte = BitmapFactory.decodeFile(imgFile.absolutePath)
                             receiptImage.setImageBitmap(decodedByte)
                         } else {
                             receiptImage.setImageResource(R.drawable.logo)
@@ -88,22 +88,18 @@ class ReceiptDetails : AppCompatActivity() {
         receiptImage.setOnClickListener{
             if (isImageFitToScreen) {
                 isImageFitToScreen = false
-                receiptImage.setLayoutParams(
-                    LinearLayout.LayoutParams(
+                receiptImage.layoutParams = LinearLayout.LayoutParams(
                         width,
                         height
-                    )
                 )
-                receiptImage.setAdjustViewBounds(true)
+                receiptImage.adjustViewBounds = true
             } else {
                 isImageFitToScreen = true
-                receiptImage.setLayoutParams(
-                    LinearLayout.LayoutParams(
+                receiptImage.layoutParams = LinearLayout.LayoutParams(
                         LinearLayout.LayoutParams.MATCH_PARENT,
                         LinearLayout.LayoutParams.MATCH_PARENT
-                    )
                 )
-                receiptImage.setScaleType(ImageView.ScaleType.FIT_XY)
+                receiptImage.scaleType = ImageView.ScaleType.FIT_XY
             }
         }
     }
@@ -120,7 +116,7 @@ class ReceiptDetails : AppCompatActivity() {
         }
 
         override fun getItem(position: Int): Any {
-            return mItems.getValue(mKeys[position]);
+            return mItems.getValue(mKeys[position])
         }
 
         override fun getItemId(position: Int): Long {

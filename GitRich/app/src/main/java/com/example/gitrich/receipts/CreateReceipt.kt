@@ -17,19 +17,19 @@ import java.lang.Exception
 import java.util.regex.Pattern
 
 class CreateReceipt : AppCompatActivity() {
-    private lateinit var categories: Array<String>;
-    private var amount = "";
-    private var date = "";
-    private var store = "";
-    private var desc = "";
-    private var category = "Food & Drinks";
+    private lateinit var categories: Array<String>
+    private var amount = ""
+    private var date = ""
+    private var store = ""
+    private var desc = ""
+    private var category = "Food & Drinks"
 
     private lateinit var spinner: AutoCompleteTextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_create_receipt)
-        supportActionBar!!.title = "Add New Receipt";
+        supportActionBar!!.title = "Add New Receipt"
         categories = resources.getStringArray(R.array.Categories)
         spinner = findViewById(R.id.receipt_category)
         val arrayAdapter = ArrayAdapter(this, R.layout.dropdown_items, categories)
@@ -58,7 +58,7 @@ class CreateReceipt : AppCompatActivity() {
                     val name = l[0].trim()
                     val amount = if ("$" in l[1]) l[1].trim() else ("$${l[1].trim()}")
 
-                    itemsObject.put(l[0].trim() as String, l[1])
+                    itemsObject.put(l[0].trim(), l[1])
                 }
             } catch (e: Exception) {
                 // We can choose to stop processing unless its empty or appropriate desc is entered
@@ -76,7 +76,7 @@ class CreateReceipt : AppCompatActivity() {
             Toast.makeText(this, "Please ensure that there are no empty fields!", Toast.LENGTH_SHORT).show()
         }
         else {
-            val client = OkHttpClient();
+            val client = OkHttpClient()
             val jsonObject = JSONObject()
 
             jsonObject.put("name", store)

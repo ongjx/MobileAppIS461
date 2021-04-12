@@ -14,8 +14,8 @@ import okhttp3.OkHttpClient
 import org.json.JSONObject
 
 class QRScannerResultActivity : AppCompatActivity() {
-    private lateinit var categories: Array<String>;
-    private var json = JSONObject();
+    private lateinit var categories: Array<String>
+    private var json = JSONObject()
     private var amount = ""
     private var date = ""
     private var store = ""
@@ -26,7 +26,7 @@ class QRScannerResultActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_create_receipt)
-        supportActionBar!!.title = "Confirm Receipt";
+        supportActionBar!!.title = "Confirm Receipt"
         categories = resources.getStringArray(R.array.Categories)
         spinner = findViewById(R.id.receipt_category)
         val arrayAdapter = ArrayAdapter(this, R.layout.dropdown_items, categories)
@@ -66,7 +66,7 @@ class QRScannerResultActivity : AppCompatActivity() {
 
     fun save(view: View) {
         //TODO: Handle receipt submission to backend
-        val client = OkHttpClient();
+        val client = OkHttpClient()
         val user = RequestQueueSingleton.getUsername()
         val url = "http://ec2-18-136-119-32.ap-southeast-1.compute.amazonaws.com:8000/users/${user}/qr-receipts"
 
@@ -83,7 +83,7 @@ class QRScannerResultActivity : AppCompatActivity() {
                 val l = item.split(',')
                 val name = l[0].trim()
                 val amount = if ("$" in l[1]) l[1].trim() else ("$${l[1].trim()}")
-                itemsObject.put(l[0].trim() as String, l[1])
+                itemsObject.put(l[0].trim(), l[1])
             }
         }
         json.put("name", store)

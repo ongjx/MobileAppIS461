@@ -59,7 +59,7 @@ class MainActivity : AppCompatActivity() {
     private val toBottom: Animation by lazy { AnimationUtils.loadAnimation(this, R.anim.to_bottom_anim) }
     var clicked = false
 
-    private lateinit var transactionsFragment: receipts_summary;
+    private lateinit var transactionsFragment: receipts_summary
     val fragManager = supportFragmentManager
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -149,7 +149,7 @@ class MainActivity : AppCompatActivity() {
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         val inflater = menuInflater
         inflater.inflate(R.menu.logout_menu, menu)
-        return super.onCreateOptionsMenu(menu);
+        return super.onCreateOptionsMenu(menu)
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -343,7 +343,7 @@ class MainActivity : AppCompatActivity() {
                     // Cant process voice
                     Toast.makeText(this, "Can't process your voice, please try again or remember to open your virtual mic", Toast.LENGTH_SHORT)
                 } else {
-                    val res : ArrayList<String> = data!!.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS) as ArrayList<String>
+                    val res : ArrayList<String> = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS) as ArrayList<String>
                     // Go to voice class to confirm
                     val intent = Intent(this, Voice::class.java )
                     intent.putExtra("speech", res[0])
@@ -362,15 +362,15 @@ class MainActivity : AppCompatActivity() {
                 // name
                 intent.putExtra("name", data!!.getStringExtra("name"))
                 // amount
-                intent.putExtra("amount", data!!.getStringExtra("amount"))
+                intent.putExtra("amount", data.getStringExtra("amount"))
                 // date
-                intent.putExtra("date", data!!.getStringExtra("date"))
+                intent.putExtra("date", data.getStringExtra("date"))
                 // items
-                intent.putExtra("items", data!!.getStringExtra("items"))
+                intent.putExtra("items", data.getStringExtra("items"))
                 // image
-                intent.putExtra("image", data!!.getStringExtra("image"))
+                intent.putExtra("image", data.getStringExtra("image"))
                 // category
-                intent.putExtra("category", data!!.getStringExtra("category"))
+                intent.putExtra("category", data.getStringExtra("category"))
 
                 startActivityForResult(intent, OCR_RESULT_CODE)
             }
@@ -390,7 +390,7 @@ class MainActivity : AppCompatActivity() {
     fun refresh() {
         finish()
         overridePendingTransition( 0, 0)
-        startActivity(getIntent())
+        startActivity(intent)
         overridePendingTransition( 0, 0)
     }
 

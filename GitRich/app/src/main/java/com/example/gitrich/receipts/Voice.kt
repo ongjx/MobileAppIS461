@@ -60,7 +60,7 @@ class Voice : AppCompatActivity() {
             }
 
             override fun onResponse(call: Call, response: Response) {
-                val body = response?.body()?.string()
+                val body = response.body()?.string()
                 if (body != null) {
                     val status = JSONObject(body).getInt("code")
                     if (status == 201) {

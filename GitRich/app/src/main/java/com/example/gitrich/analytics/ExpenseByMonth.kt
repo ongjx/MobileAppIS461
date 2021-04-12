@@ -25,10 +25,6 @@ import com.github.mikephil.charting.formatter.IndexAxisValueFormatter
 class ExpenseByMonth : Fragment() {
     private lateinit var username:String
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-    }
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -73,7 +69,7 @@ class ExpenseByMonth : Fragment() {
                     }
 
 
-                    val expenseChart = view?.findViewById<LineChart>(R.id.expenseChart);
+                    val expenseChart = view?.findViewById<LineChart>(R.id.expenseChart)
                     if (expenseChart != null) {
                         expenseChart.setTouchEnabled(true)
                         expenseChart.setPinchZoom(true)

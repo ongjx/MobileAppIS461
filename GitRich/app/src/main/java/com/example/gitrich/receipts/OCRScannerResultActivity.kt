@@ -15,8 +15,8 @@ import java.util.*
 
 class OCRScannerResultActivity : AppCompatActivity() {
     private val username = RequestQueueSingleton.getUsername()
-    private lateinit var categories: Array<String>;
-    private var json = JSONObject();
+    private lateinit var categories: Array<String>
+    private var json = JSONObject()
     private var amount = ""
     private var date = ""
     private var store = ""
@@ -30,7 +30,7 @@ class OCRScannerResultActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_create_receipt)
 
-        supportActionBar!!.title = "Confirm Receipt";
+        supportActionBar!!.title = "Confirm Receipt"
         categories = resources.getStringArray(R.array.Categories)
         spinner = findViewById(R.id.receipt_category)
         val arrayAdapter = ArrayAdapter(this, R.layout.dropdown_items, categories)

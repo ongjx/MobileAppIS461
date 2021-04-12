@@ -41,13 +41,6 @@ var receipts = ArrayList<Receipt>()
 class receipts_summary : Fragment() {
     private lateinit var username:String
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-//        retainInstance = true
-//        if (savedInstanceState != null) {
-//            receipts = savedInstanceState.getParcelableArrayList<Receipt>("receipts") as ArrayList<Receipt>
-//        }
-    }
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -74,8 +67,8 @@ class receipts_summary : Fragment() {
         if (savedInstanceState != null) {
             //Restore the fragment's state here
                 if(receipts != null){
-                    if (savedInstanceState?.getParcelableArrayList<Receipt>("receipts") != null) {
-                        receipts = savedInstanceState?.getParcelableArrayList<Receipt>("receipts") as ArrayList<Receipt>
+                    if (savedInstanceState.getParcelableArrayList<Receipt>("receipts") != null) {
+                        receipts = savedInstanceState.getParcelableArrayList<Receipt>("receipts") as ArrayList<Receipt>
                     }
                 }
         } else {
@@ -134,7 +127,7 @@ class receipts_summary : Fragment() {
             val layoutInflater = LayoutInflater.from(mContext)
             val row = layoutInflater.inflate(R.layout.main_row, parent, false)
 
-            row.setBackground(mContext.getDrawable(R.drawable.listview_border));
+            row.background = mContext.getDrawable(R.drawable.listview_border)
 
             val thumbnail = row.findViewById<ImageView>(R.id.thumbnail_display)
             val title = row.findViewById<TextView>(R.id.row_title)
@@ -151,7 +144,7 @@ class receipts_summary : Fragment() {
                     } else {
                         if (receipt.image.contains("data:image")) {
                             receiptBytes = receipt.image.substringAfter(',')
-                            val decodedString = Base64.decode(receiptBytes, Base64.DEFAULT);
+                            val decodedString = Base64.decode(receiptBytes, Base64.DEFAULT)
                             val decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.size)
                             thumbnail.setImageBitmap(decodedByte)
                         } else if (receipt.image.equals("")) {
@@ -162,7 +155,7 @@ class receipts_summary : Fragment() {
                             val imgFile = File(root, receipt.image)
 
                             if (imgFile.exists()) {
-                                val decodedByte = BitmapFactory.decodeFile(imgFile.getAbsolutePath())
+                                val decodedByte = BitmapFactory.decodeFile(imgFile.absolutePath)
                                 thumbnail.setImageBitmap(decodedByte)
                             } else {
                                 thumbnail.setImageResource(R.drawable.logo)

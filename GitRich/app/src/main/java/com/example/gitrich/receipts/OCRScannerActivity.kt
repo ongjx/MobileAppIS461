@@ -35,7 +35,7 @@ class OCRScannerActivity : AppCompatActivity() {
             val imgFile = File(root, filepath)
 
             if (imgFile.exists()) {
-                val decodedByte = BitmapFactory.decodeFile(imgFile.getAbsolutePath())
+                val decodedByte = BitmapFactory.decodeFile(imgFile.absolutePath)
                 binding.imageView.setImageBitmap(decodedByte)
 
                 encodedImage_BASE64 = "data:image/jpg;base64," + encodeImage(decodedByte)
@@ -91,7 +91,7 @@ class OCRScannerActivity : AppCompatActivity() {
             }
 
             override fun onResponse(call: Call, response: Response) {
-                val body = response?.body()?.string()
+                val body = response.body()?.string()
                 if (body != null) {
                     val status = JSONObject(body).getInt("code")
                     if (status == 200) {

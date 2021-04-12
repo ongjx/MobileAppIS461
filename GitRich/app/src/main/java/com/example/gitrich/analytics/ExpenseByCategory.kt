@@ -68,7 +68,7 @@ class ExpenseByCategory : Fragment() {
     }
 
     private fun setSpinner(data:JSONObject) {
-        val view = getView()
+        val view = view
 
         var months = data.names()
         val spinner = view?.findViewById<PowerSpinnerView>(R.id.spinner)

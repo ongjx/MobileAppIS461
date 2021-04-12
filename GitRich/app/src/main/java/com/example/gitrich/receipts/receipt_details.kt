@@ -47,11 +47,11 @@ class receipt_details : Fragment() {
     private var username = RequestQueueSingleton.getUsername()
     private var height = 0
     private var width = 0
-    private var amountNew = "";
-    private var dateNew = "";
-    private var storeNew = "";
-    private var descNew = "";
-    private var categoryNew = "";
+    private var amountNew = ""
+    private var dateNew = ""
+    private var storeNew = ""
+    private var descNew = ""
+    private var categoryNew = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -79,7 +79,7 @@ class receipt_details : Fragment() {
     }
 
     private fun delete() {
-        val client = OkHttpClient();
+        val client = OkHttpClient()
         val user = RequestQueueSingleton.getUsername()
         val url = "http://ec2-18-136-119-32.ap-southeast-1.compute.amazonaws.com:8000/users/${user}/receipts/${receipt.id}"
         val jsonObjectRequest = JsonObjectRequest(
@@ -122,24 +122,24 @@ class receipt_details : Fragment() {
             desc = act.findViewById(R.id.create_desc)
             if(receipt != null){
                 try {
-                    var receiptBytes = receipt?.image
-                    if (receipt?.image == "null") {
+                    var receiptBytes = receipt.image
+                    if (receipt.image == "null") {
                         receiptImage.setImageResource(R.drawable.logo)
                     } else {
-                        if (receipt?.image!!.contains("data:image")) {
-                            receiptBytes = receipt?.image!!.substringAfter(',')
-                            val decodedString = Base64.decode(receiptBytes, Base64.DEFAULT);
+                        if (receipt.image.contains("data:image")) {
+                            receiptBytes = receipt.image.substringAfter(',')
+                            val decodedString = Base64.decode(receiptBytes, Base64.DEFAULT)
                             val decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.size)
                             receiptImage.setImageBitmap(decodedByte)
-                        } else if (receipt?.image.equals("")) {
+                        } else if (receipt.image.equals("")) {
                             receiptImage.setImageResource(R.drawable.logo)
                         } else {
                             // .jpg
                             val root = activity?.getExternalFilesDir(username)
-                            val imgFile = File(root, receipt!!.image)
+                            val imgFile = File(root, receipt.image)
 
                             if (imgFile.exists()) {
-                                val decodedByte = BitmapFactory.decodeFile(imgFile.getAbsolutePath())
+                                val decodedByte = BitmapFactory.decodeFile(imgFile.absolutePath)
                                 receiptImage.setImageBitmap(decodedByte)
                             } else {
                                 receiptImage.setImageResource(R.drawable.logo)
@@ -153,10 +153,10 @@ class receipt_details : Fragment() {
                 }
 
 
-                title.setText(receipt?.name)
-                amount.setText("$${receipt?.amount}")
-                category.setText(receipt?.category)
-                date.setText(receipt?.date)
+                title.setText(receipt.name)
+                amount.setText("$${receipt.amount}")
+                category.setText(receipt.category)
+                date.setText(receipt.date)
 
                 var x = ""
                 receipt.items.mapKeys { item ->
@@ -178,7 +178,7 @@ class receipt_details : Fragment() {
         val descNew = desc.text?.splitToSequence("\n")
         val categoryNew = category.text.toString()
 
-        val client = OkHttpClient();
+        val client = OkHttpClient()
         val user = RequestQueueSingleton.getUsername()
         val url = "http://ec2-18-136-119-32.ap-southeast-1.compute.amazonaws.com:8000/users/${user}/receipts/${receipt.id}"
 
@@ -190,7 +190,7 @@ class receipt_details : Fragment() {
                     val l = item.split(',')
                     val name = l[0].trim()
                     val amount = if ("$" in l[1]) l[1].trim() else ("$${l[1].trim()}")
-                    itemsObject.put(l[0].trim() as String, l[1])
+                    itemsObject.put(l[0].trim(), l[1])
                 }
             }
         }
@@ -237,22 +237,18 @@ class receipt_details : Fragment() {
         receiptImage.setOnClickListener{
             if (isImageFitToScreen) {
                 isImageFitToScreen = false
-                receiptImage.setLayoutParams(
-                    LinearLayout.LayoutParams(
+                receiptImage.layoutParams = LinearLayout.LayoutParams(
                         width,
                         height
-                    )
                 )
-                receiptImage.setAdjustViewBounds(true)
+                receiptImage.adjustViewBounds = true
             } else {
                 isImageFitToScreen = true
-                receiptImage.setLayoutParams(
-                    LinearLayout.LayoutParams(
+                receiptImage.layoutParams = LinearLayout.LayoutParams(
                         LinearLayout.LayoutParams.MATCH_PARENT,
                         LinearLayout.LayoutParams.MATCH_PARENT
-                    )
                 )
-                receiptImage.setScaleType(ImageView.ScaleType.FIT_XY)
+                receiptImage.scaleType = ImageView.ScaleType.FIT_XY
             }
         }
     }
@@ -268,7 +264,7 @@ class receipt_details : Fragment() {
         }
 
         override fun getItem(position: Int): Any {
-            return mItems.getValue(mKeys[position]);
+            return mItems.getValue(mKeys[position])
         }
 
         override fun getItemId(position: Int): Long {

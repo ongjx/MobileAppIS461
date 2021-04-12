@@ -42,7 +42,7 @@ class AllReceipt : Fragment() {
         listView.adapter = receipts_summary.CustomAdapter(requireActivity(), receipts)
 
         listView.setOnItemClickListener { parent, view, position, id ->
-            val receipt = receipts[position];
+            val receipt = receipts[position]
             (context as MainActivity).makeCurrentFragment(receipt_details.newInstance(receipt), "receipt_details")
         }
 
