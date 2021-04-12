@@ -92,9 +92,6 @@ class MainActivity : AppCompatActivity() {
         }
 
         binding.ocr.setOnClickListener {
-//            intent = Intent(this, OCRScannerActivity::class.java)
-//            startActivityForResult(intent, OCR_CODE)
-
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
                 if (checkSelfPermission(Manifest.permission.CAMERA) == PackageManager.PERMISSION_DENIED ||
                         checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED){
@@ -116,8 +113,6 @@ class MainActivity : AppCompatActivity() {
             intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault())
             intent.putExtra(RecognizerIntent.EXTRA_PROMPT,"Say Something")
             startActivityForResult(intent, VOICE_CODE)
-//            val intent = Intent(this, Voice::class.java)
-//            startActivity(intent)
         }
 
         binding.qr.setOnClickListener {
@@ -400,17 +395,4 @@ class MainActivity : AppCompatActivity() {
         fragTransaction.attach(transactionsFragment)
         fragTransaction.commit()
     }
-
-//    @RequiresApi(Build.VERSION_CODES.O)
-//    private fun Logout(){
-//        val path = Paths.get("userProfile.txt")
-//
-//        if(!Files.isDirectory(path) && Files.exists(path)){
-//            Files.delete(path)
-//            Log.i("Delete", "LOGOUT")
-//            loginPage()
-//        }
-//    }
-
-
 }

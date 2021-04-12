@@ -82,9 +82,6 @@ class receipts_summary : Fragment() {
         val gson = Gson()
         val listView = requireActivity().findViewById<ListView>(R.id.receipt_summary_list)
 
-//        val recyclerView = activity!!.findViewById<RecyclerView>(R.id.receipt_summary_list)
-
-        // val url = "http://ec2-18-136-119-32.ap-southeast-1.compute.amazonaws.com:8000/users/${username}/receipts"
         val url = "http://ec2-18-136-119-32.ap-southeast-1.compute.amazonaws.com:8000/users/${username}/receipts"
 
         val jsonObjectRequest = JsonObjectRequest(Request.Method.GET, url, null,
@@ -178,11 +175,6 @@ class receipts_summary : Fragment() {
         }
     }
 
-//    override fun onSaveInstanceState(outState: Bundle) {
-//        super.onSaveInstanceState(outState)
-//        outState.putParcelableArrayList("receipts", receipts)
-//    }
-
 
     fun startListListener(listView: ListView) {
         listView.setOnItemClickListener { _, _, position, id ->
@@ -190,10 +182,6 @@ class receipts_summary : Fragment() {
                 val receipt = receipts[position]
                 (context as MainActivity).makeCurrentFragment(receipt_details.newInstance(receipt), "receipt_details")
             }
-
-//            val intent = Intent(requireActivity(), ReceiptDetails::class.java)
-//            intent.putExtra("receipt", receipt)
-//            startActivity(intent)
         }
     }
 }

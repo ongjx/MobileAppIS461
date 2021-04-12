@@ -70,7 +70,6 @@ class OCRScannerActivity : AppCompatActivity() {
         val username = RequestQueueSingleton.getUsername()
         val client = OkHttpClient()
 
-        // val url = "http://ec2-18-136-119-32.ap-southeast-1.compute.amazonaws.com:8000/users/" + username + "/ocr-receipts"
         val url = "http://ec2-18-136-119-32.ap-southeast-1.compute.amazonaws.com:8000/users/" + username + "/ocr-receipts"
         val payload = JSONObject()
         payload.put("image", encodedImage_BASE64)
