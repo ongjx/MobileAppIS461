@@ -1,19 +1,14 @@
-package com.example.gitrich
+package com.example.gitrich.receipts
 
-import android.app.Activity
-import android.content.Intent
 import android.os.Bundle
-import android.speech.RecognizerIntent
-import android.util.Log
 import android.view.View
 import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
-import com.android.volley.Request
-import com.android.volley.toolbox.JsonObjectRequest
+import com.example.gitrich.R
+import com.example.gitrich.request.RequestQueueSingleton
 import okhttp3.*
-import java.util.*
 import org.json.JSONObject
 import java.io.IOException
 
@@ -37,7 +32,7 @@ class Voice : AppCompatActivity() {
 
     fun postVoiceReceipt() {
         val speech = speechTv.text.toString()
-        val username = MySingleton.getUsername()
+        val username = RequestQueueSingleton.getUsername()
         val client = OkHttpClient()
 
         // Get editTextName

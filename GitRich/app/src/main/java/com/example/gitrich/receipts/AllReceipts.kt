@@ -1,9 +1,10 @@
-package com.example.gitrich
+package com.example.gitrich.receipts
 
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.ListView
+import com.example.gitrich.R
 import com.example.gitrich.models.Receipt
 
 class AllReceipts : AppCompatActivity() {

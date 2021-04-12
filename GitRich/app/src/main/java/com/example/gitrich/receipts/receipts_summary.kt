@@ -1,4 +1,4 @@
-package com.example.gitrich
+package com.example.gitrich.receipts
 
 import android.content.Context
 import android.graphics.BitmapFactory
@@ -16,7 +16,10 @@ import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
 import com.android.volley.Request
 import com.android.volley.toolbox.JsonObjectRequest
+import com.example.gitrich.MainActivity
+import com.example.gitrich.R
 import com.example.gitrich.models.Receipt
+import com.example.gitrich.request.RequestQueueSingleton
 import com.google.gson.Gson
 import java.io.File
 import kotlin.collections.ArrayList
@@ -59,7 +62,7 @@ class receipts_summary : Fragment() {
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        username = MySingleton.getUsername()
+        username = RequestQueueSingleton.getUsername()
         val user = requireActivity().findViewById<TextView>(R.id.greetings)
         user.text = "Hi, ${username}"
 
@@ -108,7 +111,7 @@ class receipts_summary : Fragment() {
 
         startListListener(listView)
 
-        MySingleton.getInstance(requireActivity()).addToRequestQueue(jsonObjectRequest)
+        RequestQueueSingleton.getInstance(requireActivity()).addToRequestQueue(jsonObjectRequest)
     }
     class CustomAdapter(context: Context, receipts: ArrayList<Receipt>): BaseAdapter() {
         private val mContext: Context = context
@@ -155,7 +158,7 @@ class receipts_summary : Fragment() {
                             thumbnail.setImageResource(R.drawable.logo)
                         } else {
                             // .jpg
-                            val root = mContext.getExternalFilesDir(MySingleton.getUsername())
+                            val root = mContext.getExternalFilesDir(RequestQueueSingleton.getUsername())
                             val imgFile = File(root, receipt.image)
 
                             if (imgFile.exists()) {

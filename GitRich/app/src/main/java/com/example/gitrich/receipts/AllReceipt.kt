@@ -1,4 +1,4 @@
-package com.example.gitrich
+package com.example.gitrich.receipts
 
 import android.os.Bundle
 import androidx.fragment.app.Fragment
@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ListView
+import com.example.gitrich.*
 import com.example.gitrich.models.Receipt
 
 // TODO: Rename parameter arguments, choose names that match

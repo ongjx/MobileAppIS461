@@ -1,22 +1,16 @@
-package com.example.gitrich
+package com.example.gitrich.accounts
 
 import android.app.Activity
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.view.Window
 import android.widget.Toast
 import com.android.volley.Request
-import com.android.volley.Response
 import com.android.volley.toolbox.JsonObjectRequest
-import com.android.volley.toolbox.StringRequest
-import com.android.volley.toolbox.Volley
 import com.example.gitrich.databinding.ActivityLoginBinding
-import com.example.gitrich.databinding.ActivityMainBinding
-import com.example.gitrich.models.Receipt
-import com.google.gson.Gson
+import com.example.gitrich.request.RequestQueueSingleton
 import org.json.JSONObject
 
 private const val SIGNUP_CODE = 1004
@@ -79,7 +73,7 @@ class LoginActivity : AppCompatActivity() {
             }
         )
 
-        MySingleton.getInstance(this).addToRequestQueue(jsonObjectRequest)
+        RequestQueueSingleton.getInstance(this).addToRequestQueue(jsonObjectRequest)
 
     }
 

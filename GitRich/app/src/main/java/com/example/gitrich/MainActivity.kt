@@ -24,10 +24,13 @@ import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
+import com.example.gitrich.accounts.LoginActivity
+import com.example.gitrich.analytics.AnalyticsFragment
 import com.example.gitrich.databinding.ActivityMainBinding
+import com.example.gitrich.receipts.*
+import com.example.gitrich.request.RequestQueueSingleton
 import java.io.*
 import java.nio.file.Files
-import java.nio.file.Path
 import java.nio.file.Paths
 import java.util.*
 
@@ -71,7 +74,7 @@ class MainActivity : AppCompatActivity() {
 
             // Load username to global context
             username = scan.nextLine().toString()
-            MySingleton.setUsername(username)
+            RequestQueueSingleton.setUsername(username)
             scan.close()
         } catch(e: FileNotFoundException) {
             loginPage()
@@ -330,7 +333,7 @@ class MainActivity : AppCompatActivity() {
             else if (requestCode == LOGIN_USER_CODE) {
                 val output = PrintStream(openFileOutput("userProfile.txt", MODE_PRIVATE))
                 username = data?.getStringExtra("username").toString()
-                MySingleton.setUsername(username)
+                RequestQueueSingleton.setUsername(username)
                 output.println("${username}")
                 output.close()
                 refresh()

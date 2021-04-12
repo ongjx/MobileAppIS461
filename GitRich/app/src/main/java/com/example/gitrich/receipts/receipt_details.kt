@@ -1,23 +1,21 @@
-package com.example.gitrich
+package com.example.gitrich.receipts
 
 import android.content.Context
-import android.content.Intent
 import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.util.Base64
-import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
-import android.view.Menu
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
-import androidx.appcompat.app.AppCompatActivity
 import com.android.volley.Request
 import com.android.volley.toolbox.JsonObjectRequest
+import com.example.gitrich.MainActivity
+import com.example.gitrich.R
 import com.example.gitrich.models.Receipt
+import com.example.gitrich.request.RequestQueueSingleton
 import com.google.android.material.textfield.TextInputEditText
-import com.google.gson.Gson
 import okhttp3.OkHttpClient
 import org.json.JSONObject
 import java.io.File
@@ -46,7 +44,7 @@ class receipt_details : Fragment() {
     private lateinit var categories: Array<String>
     private lateinit var saveBtn: Button
     private lateinit var deleteBtn: Button
-    private var username = MySingleton.getUsername()
+    private var username = RequestQueueSingleton.getUsername()
     private var height = 0
     private var width = 0
     private var amountNew = "";
@@ -82,7 +80,7 @@ class receipt_details : Fragment() {
 
     private fun delete() {
         val client = OkHttpClient();
-        val user = MySingleton.getUsername()
+        val user = RequestQueueSingleton.getUsername()
         val url = "http://ec2-18-136-119-32.ap-southeast-1.compute.amazonaws.com:8000/users/${user}/receipts/${receipt.id}"
         val jsonObjectRequest = JsonObjectRequest(
             Request.Method.DELETE, url, JSONObject(),
@@ -99,7 +97,7 @@ class receipt_details : Fragment() {
             }
         )
 
-        MySingleton.getInstance(requireContext()).addToRequestQueue(jsonObjectRequest)
+        RequestQueueSingleton.getInstance(requireContext()).addToRequestQueue(jsonObjectRequest)
     }
 
 
@@ -181,7 +179,7 @@ class receipt_details : Fragment() {
         val categoryNew = category.text.toString()
 
         val client = OkHttpClient();
-        val user = MySingleton.getUsername()
+        val user = RequestQueueSingleton.getUsername()
         val url = "http://ec2-18-136-119-32.ap-southeast-1.compute.amazonaws.com:8000/users/${user}/receipts/${receipt.id}"
 
         // Check if value on form has been edited
@@ -226,7 +224,7 @@ class receipt_details : Fragment() {
                 }
             )
 
-            MySingleton.getInstance(requireContext()).addToRequestQueue(jsonObjectRequest)
+            RequestQueueSingleton.getInstance(requireContext()).addToRequestQueue(jsonObjectRequest)
 
         }
 

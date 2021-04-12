@@ -1,17 +1,16 @@
-package com.example.gitrich
+package com.example.gitrich.accounts
 
 import android.app.Activity
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.view.Window
 import android.widget.Toast
 import com.android.volley.Request
 import com.android.volley.toolbox.JsonObjectRequest
-import com.example.gitrich.databinding.ActivityMainBinding
 import com.example.gitrich.databinding.ActivitySignupBinding
+import com.example.gitrich.request.RequestQueueSingleton
 import org.json.JSONObject
 
 class SignupActivity : AppCompatActivity() {
@@ -61,7 +60,7 @@ class SignupActivity : AppCompatActivity() {
                     setResult(RESULT_OK, goBack)
 
                     // Set username in global context
-                    MySingleton.setUsername(username)
+                    RequestQueueSingleton.setUsername(username)
                     finish()
                 }
 
@@ -76,7 +75,7 @@ class SignupActivity : AppCompatActivity() {
             }
         )
 
-        MySingleton.getInstance(this).addToRequestQueue(jsonObjectRequest)
+        RequestQueueSingleton.getInstance(this).addToRequestQueue(jsonObjectRequest)
     }
 
 

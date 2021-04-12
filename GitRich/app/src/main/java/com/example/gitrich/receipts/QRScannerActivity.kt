@@ -1,16 +1,15 @@
-package com.example.gitrich
+package com.example.gitrich.receipts
 
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.net.Uri
 import android.os.Bundle
-import android.view.View
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.budiyev.android.codescanner.*
+import com.example.gitrich.R
 import org.json.JSONObject
 
 private const val CAMERA_REQUEST_CODE = 101

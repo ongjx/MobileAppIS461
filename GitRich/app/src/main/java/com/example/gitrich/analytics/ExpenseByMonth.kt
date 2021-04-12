@@ -1,20 +1,20 @@
-package com.example.gitrich
+package com.example.gitrich.analytics
 
 import android.graphics.Color
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.android.volley.Request
 import com.android.volley.toolbox.JsonObjectRequest
+import com.example.gitrich.R
+import com.example.gitrich.request.RequestQueueSingleton
 import com.github.mikephil.charting.charts.LineChart
 import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.data.LineDataSet
-import com.github.mikephil.charting.formatter.IAxisValueFormatter
 import com.github.mikephil.charting.formatter.IndexAxisValueFormatter
 
 
@@ -56,7 +56,7 @@ class ExpenseByMonth : Fragment() {
     }
 
     private fun getAnalytics () {
-        username = MySingleton.getUsername()
+        username = RequestQueueSingleton.getUsername()
         val url = "http://ec2-18-136-119-32.ap-southeast-1.compute.amazonaws.com:8000/users/${username}/analytics/expense"
 
         val jsonObjectRequest = JsonObjectRequest(
@@ -119,7 +119,7 @@ class ExpenseByMonth : Fragment() {
             }
         )
 
-        MySingleton.getInstance(requireActivity()).addToRequestQueue(jsonObjectRequest)
+        RequestQueueSingleton.getInstance(requireActivity()).addToRequestQueue(jsonObjectRequest)
     }
 
 }

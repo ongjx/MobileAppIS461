@@ -1,24 +1,18 @@
-package com.example.gitrich
+package com.example.gitrich.receipts
 
 import android.content.Intent
-import android.graphics.Color
-import android.graphics.Typeface
-import android.graphics.drawable.ColorDrawable
-import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.View
-import android.view.ViewGroup
 import android.widget.*
-import androidx.annotation.RequiresApi
 import okhttp3.*
 import org.json.JSONObject
-import java.io.IOException
 import com.android.volley.Request
 import com.android.volley.toolbox.JsonObjectRequest
+import com.example.gitrich.R
+import com.example.gitrich.request.RequestQueueSingleton
 import com.google.android.material.textfield.TextInputEditText
-import com.google.gson.JsonObject
 import java.lang.Exception
 import java.util.regex.Pattern
 
@@ -92,7 +86,7 @@ class CreateReceipt : AppCompatActivity() {
             jsonObject.put("date", date)
             jsonObject.put("category", category)
 
-            val user = MySingleton.getUsername()
+            val user = RequestQueueSingleton.getUsername()
             val url = "http://ec2-18-136-119-32.ap-southeast-1.compute.amazonaws.com:8000/users/${user}/qr-receipts"
             val jsonObjectRequest = JsonObjectRequest(
                     Request.Method.POST, url, jsonObject,
@@ -108,7 +102,7 @@ class CreateReceipt : AppCompatActivity() {
                         Log.e("Error", error.toString())
                     }
             )
-            MySingleton.getInstance(this).addToRequestQueue(jsonObjectRequest)
+            RequestQueueSingleton.getInstance(this).addToRequestQueue(jsonObjectRequest)
         }
 
 

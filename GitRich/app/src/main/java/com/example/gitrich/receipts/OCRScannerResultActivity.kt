@@ -1,25 +1,20 @@
-package com.example.gitrich
+package com.example.gitrich.receipts
 
 import android.content.Intent
-import android.graphics.Color
-import android.graphics.Typeface
-import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
-import android.util.Log
 import android.view.View
-import android.view.ViewGroup
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import com.android.volley.Request
 import com.android.volley.toolbox.JsonObjectRequest
-import com.example.gitrich.models.Receipt
+import com.example.gitrich.R
+import com.example.gitrich.request.RequestQueueSingleton
 import com.google.android.material.textfield.TextInputEditText
-import com.google.gson.JsonObject
 import org.json.JSONObject
 import java.util.*
 
 class OCRScannerResultActivity : AppCompatActivity() {
-    private val username = MySingleton.getUsername()
+    private val username = RequestQueueSingleton.getUsername()
     private lateinit var categories: Array<String>;
     private var json = JSONObject();
     private var amount = ""
@@ -128,6 +123,6 @@ class OCRScannerResultActivity : AppCompatActivity() {
                 }
         )
 
-        MySingleton.getInstance(this).addToRequestQueue(jsonObjectRequest)
+        RequestQueueSingleton.getInstance(this).addToRequestQueue(jsonObjectRequest)
     }
 }

@@ -9,7 +9,7 @@
 
     <!--    <fragment-->
     <!--        android:id="@+id/receipt_summary"-->
-    <!--        android:name="com.example.gitrich.receipts_summary"-->
+    <!--        android:name="com.example.gitrich.receipts.receipts_summary"-->
     <!--        android:layout_width="match_parent"-->
     <!--        android:layout_height="wrap_content"-->
     <!--        app:layout_constraintBottom_toBottomOf="parent"-->

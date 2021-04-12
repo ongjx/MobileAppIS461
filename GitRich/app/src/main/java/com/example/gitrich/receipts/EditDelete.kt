@@ -1,20 +1,19 @@
-package com.example.gitrich
+package com.example.gitrich.receipts
 
-import android.content.Context
 import android.content.Intent
 import android.graphics.Color
 import android.graphics.Typeface
 import android.graphics.drawable.ColorDrawable
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
-import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import com.android.volley.Request
 import com.android.volley.toolbox.JsonObjectRequest
+import com.example.gitrich.R
 import com.example.gitrich.models.Receipt
+import com.example.gitrich.request.RequestQueueSingleton
 import com.google.gson.Gson
 import okhttp3.OkHttpClient
 import org.json.JSONObject
@@ -116,7 +115,7 @@ class EditDelete : AppCompatActivity() {
 
     fun save(view: View) {
         val client = OkHttpClient();
-        val user = MySingleton.getUsername()
+        val user = RequestQueueSingleton.getUsername()
         val url = "http://ec2-18-136-119-32.ap-southeast-1.compute.amazonaws.com:8000/users/${user}/receipts/${receipt.id}"
 
         // Check if value on form has been edited
@@ -168,13 +167,13 @@ class EditDelete : AppCompatActivity() {
                     }
             )
 
-            MySingleton.getInstance(this).addToRequestQueue(jsonObjectRequest)
+            RequestQueueSingleton.getInstance(this).addToRequestQueue(jsonObjectRequest)
 
         }
     }
     fun delete(view: View) {
         val client = OkHttpClient();
-        val user = MySingleton.getUsername()
+        val user = RequestQueueSingleton.getUsername()
         val url = "http://ec2-18-136-119-32.ap-southeast-1.compute.amazonaws.com:8000/users/${user}/receipts/${receipt.id}"
         val jsonObjectRequest = JsonObjectRequest(
                 Request.Method.DELETE, url, JSONObject(),
@@ -194,6 +193,6 @@ class EditDelete : AppCompatActivity() {
                 }
         )
 
-        MySingleton.getInstance(this).addToRequestQueue(jsonObjectRequest)
+        RequestQueueSingleton.getInstance(this).addToRequestQueue(jsonObjectRequest)
     }
 }

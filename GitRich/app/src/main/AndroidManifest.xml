@@ -16,12 +16,12 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.GitRich"
         android:usesCleartextTraffic="true">
-        <activity android:name=".EditDelete" android:screenOrientation="portrait"/>
-        <activity android:name=".OCRScannerResultActivity" android:screenOrientation="portrait"/>
-        <activity android:name=".CreateReceipt" android:screenOrientation="portrait" />
-        <activity android:name=".SignupActivity" android:screenOrientation="portrait"/>
-        <activity android:name=".LoginActivity" android:screenOrientation="portrait" />
-        <activity android:name=".ReceiptDetails" android:screenOrientation="portrait"/>
+        <activity android:name=".receipts.EditDelete" android:screenOrientation="portrait"/>
+        <activity android:name=".receipts.OCRScannerResultActivity" android:screenOrientation="portrait"/>
+        <activity android:name=".receipts.CreateReceipt" android:screenOrientation="portrait" />
+        <activity android:name=".accounts.SignupActivity" android:screenOrientation="portrait"/>
+        <activity android:name=".accounts.LoginActivity" android:screenOrientation="portrait" />
+        <activity android:name=".receipts.ReceiptDetails" android:screenOrientation="portrait"/>
         <activity
             android:name=".MainActivity"
             android:screenOrientation="portrait">
@@ -32,19 +32,19 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".AllReceipts"
+            android:name=".receipts.AllReceipts"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".OCRScannerActivity"
+            android:name=".receipts.OCRScannerActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".QRScannerResultActivity"
+            android:name=".receipts.QRScannerResultActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".QRScannerActivity"
+            android:name=".receipts.QRScannerActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".Voice"
+            android:name=".receipts.Voice"
             android:screenOrientation="portrait" />
     </application>
 

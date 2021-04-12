@@ -1,17 +1,14 @@
-package com.example.gitrich
+package com.example.gitrich.receipts
 
 import android.content.Intent
-import android.graphics.Color
-import android.graphics.Typeface
-import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
-import android.util.Log
 import android.view.View
-import android.view.ViewGroup
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import com.android.volley.Request
 import com.android.volley.toolbox.JsonObjectRequest
+import com.example.gitrich.R
+import com.example.gitrich.request.RequestQueueSingleton
 import com.google.android.material.textfield.TextInputEditText
 import okhttp3.OkHttpClient
 import org.json.JSONObject
@@ -70,7 +67,7 @@ class QRScannerResultActivity : AppCompatActivity() {
     fun save(view: View) {
         //TODO: Handle receipt submission to backend
         val client = OkHttpClient();
-        val user = MySingleton.getUsername()
+        val user = RequestQueueSingleton.getUsername()
         val url = "http://ec2-18-136-119-32.ap-southeast-1.compute.amazonaws.com:8000/users/${user}/qr-receipts"
 
         // Check if value on form has been edited
@@ -113,7 +110,7 @@ class QRScannerResultActivity : AppCompatActivity() {
                 }
         )
 
-        MySingleton.getInstance(this).addToRequestQueue(jsonObjectRequest)
+        RequestQueueSingleton.getInstance(this).addToRequestQueue(jsonObjectRequest)
         setResult(RESULT_OK)
         finish()
     }

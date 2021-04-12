@@ -1,4 +1,4 @@
-package com.example.gitrich
+package com.example.gitrich.receipts
 
 import android.content.Context
 import android.content.Intent
@@ -8,7 +8,9 @@ import android.util.Base64
 import android.view.*
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
+import com.example.gitrich.R
 import com.example.gitrich.models.Receipt
+import com.example.gitrich.request.RequestQueueSingleton
 import java.io.File
 
 private const val EDIT_DELETE_STATUS_CODE = 999
@@ -24,7 +26,7 @@ class ReceiptDetails : AppCompatActivity() {
     private lateinit var date: TextView
     private lateinit var itemList: ListView
     private lateinit var receipt: Receipt
-    private var username = MySingleton.getUsername()
+    private var username = RequestQueueSingleton.getUsername()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_receipt_details)
@@ -143,7 +145,7 @@ class ReceiptDetails : AppCompatActivity() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == EDIT_DELETE_STATUS_CODE ) {
+        if (requestCode == EDIT_DELETE_STATUS_CODE) {
             if (resultCode == DELETE_STATUS_CODE) {
                 setResult(1010)
                 finish()

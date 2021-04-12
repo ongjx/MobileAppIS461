@@ -1,20 +1,17 @@
-package com.example.gitrich
+package com.example.gitrich.receipts
 
-import android.app.Activity
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.net.Uri
 import android.os.Bundle
 import android.util.Base64
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
-import com.android.volley.Request
 import com.example.gitrich.databinding.ActivityOCRScannerBinding
+import com.example.gitrich.request.RequestQueueSingleton
 import okhttp3.MediaType
 import org.json.JSONObject
 import java.io.ByteArrayOutputStream
-import java.io.InputStream
 import okhttp3.*
 import java.io.File
 import java.io.IOException
@@ -34,7 +31,7 @@ class OCRScannerActivity : AppCompatActivity() {
         if (intent != null) {
             filepath = intent.getString("filepath").toString()
 
-            val root = getExternalFilesDir(MySingleton.getUsername())
+            val root = getExternalFilesDir(RequestQueueSingleton.getUsername())
             val imgFile = File(root, filepath)
 
             if (imgFile.exists()) {
@@ -70,7 +67,7 @@ class OCRScannerActivity : AppCompatActivity() {
     }
 
     fun post_ocr_receipt() {
-        val username = MySingleton.getUsername()
+        val username = RequestQueueSingleton.getUsername()
         val client = OkHttpClient()
 
         // val url = "http://ec2-18-136-119-32.ap-southeast-1.compute.amazonaws.com:8000/users/" + username + "/ocr-receipts"
