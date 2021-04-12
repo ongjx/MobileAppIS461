@@ -71,9 +71,9 @@ class QRScannerResultActivity : AppCompatActivity() {
         val url = "http://ec2-18-136-119-32.ap-southeast-1.compute.amazonaws.com:8000/users/${user}/qr-receipts"
 
         // Check if value on form has been edited
-        amount = findViewById<TextInputEditText>(R.id.create_amount).text.toString()
-        date = findViewById<TextInputEditText>(R.id.create_date).text.toString()
-        store = findViewById<TextInputEditText>(R.id.create_store).text.toString()
+        amount = findViewById<TextInputEditText>(R.id.totalAmount).text.toString()
+        date = findViewById<TextInputEditText>(R.id.receipt_date).text.toString()
+        store = findViewById<TextInputEditText>(R.id.receipt_name).text.toString()
         desc = findViewById<TextInputEditText>(R.id.create_desc).text.toString()
         category = findViewById<AutoCompleteTextView>(R.id.receipt_category).text.toString()
         val items = desc.splitToSequence("\n")
